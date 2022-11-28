@@ -2,16 +2,25 @@ import { useEffect, useState, useRef, createContext } from "react";
 import Checkbox from "./Checkbox";
 import PlayBeatChord from "./PlayBeatChord";
 import Sequencer from "./Sequencer";
+import styled from "styled-components";
 
-export const MusicParametersContext = createContext();
+import { GlobalStyleComponent } from "styled-components";
+
+// export const MusicParametersContext = createContext();
 // ? do i even need context?
 
 const App = () => {
-  const [amtOfNotes, setAmtOfNotes] = useState(8);
   return (
-    <MusicParametersContext.Provider value={(amtOfNotes, setAmtOfNotes)}>
-      <Sequencer />;
-    </MusicParametersContext.Provider>
+    // <MusicParametersContext.Provider
+    //   value={{
+    //     amtOfNotes,
+    //     setAmtOfNotes,
+    //     resolution,
+    //     setResolution,
+    //   }}
+    // >
+    <Sequencer />
+    // </MusicParametersContext.Provider>
   );
 };
 
