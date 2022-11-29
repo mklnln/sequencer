@@ -11,3 +11,15 @@ export const generateAreBeatsCheckedInitialState = (
   });
   return makeAreBeatsChecked;
 };
+
+export const clearAreBeatsChecked = (
+  makeNotesState,
+  blankStepCountArray,
+  setAreBeatsChecked
+) => {
+  const makeAreBeatsChecked = {};
+  makeNotesState.forEach((num) => {
+    makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray;
+  });
+  setAreBeatsChecked(makeAreBeatsChecked);
+};
