@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
-import styled from "styled-components";
+import {useContext, useEffect, useState} from "react"
+import styled from "styled-components"
+import {MusicParametersContext} from "../App"
 const Checkbox = ({
   handleBeatCheckbox,
   beatIndex,
@@ -8,13 +9,29 @@ const Checkbox = ({
 }) => {
   const [checked, setChecked] = useState(
     areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? "checked" : ""
-  );
+  )
+  // const [hoveredButton, setHoveredButton] = useState(false)
+  // const {chordToHover, setChordToHover} = useContext(MusicParametersContext)
+  // const hoverIndex = []
+
+  // if (chordToHover.chordID === chordIndex) {
+  //   if (
+  //     chordToHover.chordInputStep === beatIndex ||
+  //     chordToHover.chordInputStep === beatIndex + 1 ||
+  //     chordToHover.chordInputStep === beatIndex + 2 ||
+  //     chordToHover.chordInputStep === beatIndex + 3
+  //   ) {
+  //     setHoveredButton(true)
+  //   } else if (chordToHover.chordInputStep === beatIndex) {
+  //     setHoveredButton(false)
+  //   }
+  // }
 
   useEffect(() => {
     setChecked(
       areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? "checked" : ""
-    );
-  }, [areBeatsChecked]);
+    )
+  }, [areBeatsChecked])
 
   return (
     <>
@@ -24,19 +41,20 @@ const Checkbox = ({
         // onClick={() => {
         //   console.log(areBeatsChecked);
         // }}
+        // className={hoveredButton ? "hoverAppearance" : ""}
         onChange={() => {
-          console.log("checkbox onchange");
+          console.log("checkbox onchange")
           // clg here with handleBeatCheckbox disabled does not change the state. good.
-          console.log(areBeatsChecked);
-          handleBeatCheckbox(chordIndex, beatIndex, checked);
-          setChecked(!checked);
+          console.log(areBeatsChecked)
+          handleBeatCheckbox(chordIndex, beatIndex, checked)
+          setChecked(!checked)
         }}
       />
     </>
-  );
-};
+  )
+}
 
-export default Checkbox;
+export default Checkbox
 
 const CheckboxButton = styled.input`
   border: none;
@@ -46,6 +64,15 @@ const CheckboxButton = styled.input`
   height: 4px;
   padding: 10px;
   appearance: none;
+  .hoverAppearance {
+    cursor: pointer;
+    background-color: #eaeae1;
+    border: 5px solid #eaeae1;
+    opacity: 25%;
+    padding: 5px;
+    border-radius: 5px;
+  }
+
   :hover {
     cursor: pointer;
     background-color: #eaeae1;
@@ -64,4 +91,4 @@ const CheckboxButton = styled.input`
   :checked && :hover {
     background-color: white;
   }
-`;
+`
