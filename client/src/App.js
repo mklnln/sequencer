@@ -17,6 +17,17 @@ const App = () => {
   const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
   const [rootNote, setRootNote] = useState(0)
   const [wonkFactor, setWonkFactor] = useState(120)
+  const [chordToHover, setChordToHover] = useState({})
+  const [chordInputStep, setChordInputStep] = useState(1)
+  // * we couldn't make chordhover work mb because setstate in checkbox re-rendered all checkboxes and caused too many re-renders? idk. stretch goal.
+  // const handleChordHover = (chordHovered) => {
+  //   console.log(chordInputStep)
+  //   let time = 0
+  //   if (time < 1) {
+  //     time++
+  //     setTempo("hi")
+  //   }
+  // }
   return (
     <BrowserRouter>
       <MusicParametersContext.Provider
@@ -29,6 +40,8 @@ const App = () => {
           setRootNote,
           wonkFactor,
           setWonkFactor,
+          chordInputStep,
+          setChordInputStep,
         }}
       >
         <GlobalStyle />
