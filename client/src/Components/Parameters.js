@@ -27,18 +27,14 @@ const Parameters = ({
   }
 
   const parseSteps = (e) => {
-    console.log("steps")
     setStepCount(parseInt(e.target.value))
-    console.log(stepCount)
   }
 
   const parseRoot = (e) => {
     setRootNote(parseInt(e.target.value))
-    console.log(rootNote)
   }
   const parseWonk = (e) => {
     setWonkFactor(parseInt(e.target.value))
-    console.log(wonkFactor)
   }
 
   //   useEffect(() => {
@@ -49,17 +45,20 @@ const Parameters = ({
 
   return (
     <MainDiv>
-      <button
-        onClick={() => {
-          if (!playing) {
-            setPlaying(true)
-          } else {
-            setPlaying(false)
-          }
-        }}
-      >
-        start/stop
-      </button>
+      <StartButtonDiv>
+        <button
+          onClick={() => {
+            if (!playing) {
+              setPlaying(true)
+            } else {
+              setPlaying(false)
+            }
+          }}
+        >
+          {playing ? "stop" : "start"}
+        </button>
+        <p>press s to start/stop</p>
+      </StartButtonDiv>
       {/* <button onClick={() => synth.stop()}>stop synth</button> */}
       <ParameterDiv>
         <span>Tempo</span>
@@ -77,8 +76,8 @@ const Parameters = ({
         <span>Wonk</span>
         <Parameter
           type="range"
-          min="60.0"
-          max="600.0"
+          min="1.0"
+          max="400.0"
           step="1"
           value={wonkFactor}
           onInput={(e) => parseWonk(e)}
@@ -141,4 +140,11 @@ const RadioDiv = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+`
+
+const StartButtonDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 `

@@ -1,19 +1,23 @@
-import React, {useEffect} from "react"
+import React, {useContext, useEffect} from "react"
 import styled from "styled-components"
 import Profile from "./Profile"
 import LoginButton from "./LoginButton"
 import LogoutButton from "./LogoutButton"
 import {useAuth0} from "@auth0/auth0-react"
+import {MusicParametersContext} from "../App"
 const Header = () => {
   const {user, isAuthenticated, isLoading, error} = useAuth0()
-
+  const {loadUserSongs, setLoadUserSongs, handleLoadSongsFetch} = useContext(
+    MusicParametersContext
+  )
   useEffect(() => {
     if (user) {
       console.log(user.sub)
       fetch(`/api/user-login/${user.sub}`)
         .then((res) => res.json())
         .then((data) => {
-          console.log(data)
+          console.log(data, "loading user and songs")
+          setLoadUserSongs(handleLoadSongsFetch(data.data))
         })
     }
   }, [user])
@@ -32,7 +36,7 @@ const Header = () => {
               <UserInfoDiv
               // todo onClick to profile page where we show all saved songs
               >
-                {user?.picture && (
+                {user.picture && (
                   <ProfilePic src={user.picture} alt={user?.name} />
                 )}
                 <span>{user?.given_name}</span>
