@@ -16,10 +16,18 @@ const App = () => {
   const [tempo, setTempo] = useState(150)
   const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
   const [rootNote, setRootNote] = useState(0)
-  const [wonkFactor, setWonkFactor] = useState(120)
+  const [wonkFactor, setWonkFactor] = useState(1)
+  const [attack, setAttack] = useState(2)
+  const [volume, setVolume] = useState(50)
+  const [sound, setSound] = useState("sine")
+  const [filterCutoff, setFilterCutoff] = useState(7500)
+  const [decay, setDecay] = useState(20)
+  const [sustain, setSustain] = useState(20)
+  const [release, setRelease] = useState(20)
   const [chordToHover, setChordToHover] = useState({})
   const [chordInputStep, setChordInputStep] = useState(1)
   const [loadUserSongs, setLoadUserSongs] = useState(null)
+  const [songSaved, setSongSaved] = useState(false)
   const handleLoadSongsFetch = (songsAndIDs) => {
     console.log(songsAndIDs, "oyoyoyoyo")
     const keysToUse = Object.keys(songsAndIDs).filter((key) => {
@@ -59,6 +67,22 @@ const App = () => {
           loadUserSongs,
           setLoadUserSongs,
           handleLoadSongsFetch,
+          volume,
+          setVolume,
+          sound,
+          setSound,
+          filterCutoff,
+          setFilterCutoff,
+          attack,
+          setAttack,
+          decay,
+          setDecay,
+          sustain,
+          setSustain,
+          release,
+          setRelease,
+          songSaved,
+          setSongSaved,
         }}
       >
         <GlobalStyle />

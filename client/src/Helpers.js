@@ -1,25 +1,36 @@
-import { useContext } from "react";
-import { MusicParametersContext } from "./App";
+import {useContext} from "react"
+import {MusicParametersContext} from "./App"
 
 export const generateAreBeatsCheckedInitialState = (
-  makeNotesState,
-  blankStepCountArray
+  makeChordNotesState,
+  makeMelodyNotesState,
+  blankStepCountArray,
+  whichGrid
 ) => {
-  const makeAreBeatsChecked = {};
-  makeNotesState.forEach((num) => {
-    makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray;
-  });
-  return makeAreBeatsChecked;
-};
+  const makeAreBeatsChecked = {}
+
+  if (whichGrid === "chords") {
+    makeChordNotesState.forEach((num) => {
+      makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray
+    })
+    return makeAreBeatsChecked
+  }
+  if (whichGrid === "melody") {
+    makeMelodyNotesState.forEach((num) => {
+      makeAreBeatsChecked[`${num}`] = blankStepCountArray
+    })
+    return makeAreBeatsChecked
+  }
+}
 
 export const clearAreBeatsChecked = (
-  makeNotesState,
+  makeChordNotesState,
   blankStepCountArray,
   setAreBeatsChecked
 ) => {
-  const makeAreBeatsChecked = {};
-  makeNotesState.forEach((num) => {
-    makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray;
-  });
-  setAreBeatsChecked(makeAreBeatsChecked);
-};
+  const makeAreBeatsChecked = {}
+  makeChordNotesState.forEach((num) => {
+    makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray
+  })
+  setAreBeatsChecked(makeAreBeatsChecked)
+}

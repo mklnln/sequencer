@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react"
+import {useContext, useEffect, useRef, useState} from "react"
 import curlybrace from "./Components/curlybrace.svg"
 import Checkbox from "./Components/Checkbox"
 import {MusicParametersContext} from "./App.js"
@@ -33,6 +33,22 @@ const Sequencer = () => {
     setChordInputStep,
     loadUserSongs,
     setLoadUserSongs,
+    volume,
+    sound,
+    filterCutoff,
+    attack,
+    decay,
+    sustain,
+    release,
+    setVolume,
+    setSound,
+    setFilterCutoff,
+    setAttack,
+    setDecay,
+    setSustain,
+    setRelease,
+    songSaved,
+    setSongSaved,
   } = useContext(MusicParametersContext)
   const {isAuthenticated, user} = useAuth0()
   const [playing, setPlaying] = useState(false)
@@ -51,7 +67,9 @@ const Sequencer = () => {
 
   const [loadSong, setLoadSong] = useState()
   const [userIsTyping, setUserIsTyping] = useState(false)
-  const [songSaved, setSongSaved] = useState(false)
+
+  const playingRef = useRef(playing)
+  const currentBeatRef = useRef(currentBeat)
 
   const romanNumeralReference = {
     major: {
@@ -65,10 +83,16 @@ const Sequencer = () => {
       8: "I",
     },
   }
-  const makeNotesState = []
+  const makeMelodyNotesState = []
+  // [8,7,6,5,4,3,2,1] where amtofnotes = 8
+  for (let i = amtOfNotes * 2 - 1; i > 0; i--) {
+    makeMelodyNotesState.push(i)
+  }
+
+  const makeChordNotesState = []
   // [8,7,6,5,4,3,2,1] where amtofnotes = 8
   for (let i = amtOfNotes; i > 0; i--) {
-    makeNotesState.push(i)
+    makeChordNotesState.push(i)
   }
   const blankStepCountArray = []
   // [0,0,0,0,0,0,0,0] where stepCount = 8
@@ -76,7 +100,21 @@ const Sequencer = () => {
     blankStepCountArray.push(0)
   }
   const [areBeatsChecked, setAreBeatsChecked] = useState(
-    generateAreBeatsCheckedInitialState(makeNotesState, blankStepCountArray)
+    generateAreBeatsCheckedInitialState(
+      makeChordNotesState,
+      makeMelodyNotesState,
+      blankStepCountArray,
+      "chords"
+    )
+  )
+
+  const [areMelodyBeatsChecked, setAreMelodyBeatsChecked] = useState(
+    generateAreBeatsCheckedInitialState(
+      makeChordNotesState,
+      makeMelodyNotesState,
+      blankStepCountArray,
+      "melody"
+    )
   )
   // this is the proper format of the master reference of notes areBeatsChecked. the amtOfNotes would be 8
   // {
@@ -106,20 +144,29 @@ const Sequencer = () => {
       } else {
         setCurrentBeat(1) // ! this resets the playback to the beginning. remove to just make it a pause button.
       }
+      currentBeatRef.current = currentBeat
       setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
-      makeNotesState.forEach((noteRow, index) => {
+      makeChordNotesState.forEach((noteRow, index) => {
         if (
           areBeatsChecked[`chord-${noteRow}`][currentBeat - 1] === 1 &&
           playing
         ) {
-          playback(makeNotesState.length - index, playing, rootNote, wonkFactor)
-          // playSample()
-          // PlayBeatChord(
-          //   makeNotesState.length - index,
-          //   playing,
-          //   rootNote,
-          //   wonkFactor
-          // )
+          // playback(makeChordNotesState.length - index, playing, rootNote, wonkFactor)
+          if (sound !== "voice") {
+            PlayBeatChord(
+              makeChordNotesState.length - index,
+              playing,
+              rootNote,
+              wonkFactor,
+              volume,
+              sound,
+              filterCutoff,
+              attack,
+              decay,
+              sustain,
+              release
+            )
+          }
         }
       })
       // ! the below line's interval timing was secondsPerBeat * 1000, but i noticed that the stated value of 150 was in truth more like 130. 150/130 is 1.15, thus i thought a 15% decrease in the interval would give me a more accurate time. this is true, but i'm not sure what's going on exactly. that's why 850 is used as its 15% less
@@ -143,7 +190,6 @@ const Sequencer = () => {
       [chordShortcut]: [...arrayReplacement],
     })
   }
-
   const handleChordClick = (chordID, index) => {
     // todo wanna fetch new chords based off of what we've already set, thus need state.. chosenAPI chords?
     setHookTheoryChords(null)
@@ -208,7 +254,7 @@ const Sequencer = () => {
 
   const handleSave = () => {
     const emptyBeatsChecked = generateAreBeatsCheckedInitialState(
-      makeNotesState,
+      makeChordNotesState,
       blankStepCountArray
     )
     console.log(songName)
@@ -238,6 +284,13 @@ const Sequencer = () => {
       saveObj[songName].rootNote = rootNote
       saveObj[songName].tempo = tempo
       saveObj[songName].wonkFactor = wonkFactor
+      saveObj[songName].volume = volume
+      saveObj[songName].sound = sound
+      saveObj[songName].filterCutoff = filterCutoff
+      saveObj[songName].attack = attack
+      saveObj[songName].decay = decay
+      saveObj[songName].sustain = sustain
+      saveObj[songName].release = release
       setSongSaved("saving to database...")
       fetch(`/api/save-song/${songName}`, {
         method: "POST",
@@ -378,97 +431,46 @@ const Sequencer = () => {
   }, [chosenAPIChords])
 
   useEffect(() => {
-    document.removeEventListener("keydown", detectKeyDown, true)
-  }, [userIsTyping])
-  // ! having trouble with using s in a song name triggering start/stop
-  useEffect(() => {
-    // if (!userIsTyping) {
-    console.log("usfx playing cuz usertypew")
+    // when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
+    const detectKeyDown = (e) => {
+      // ! for some reason, all the userIsTyping i get back (and i can get back up to 35 of them) return false, even though im typing
 
-    // }
-    // ! must remove eventlistener or else we have an exponential amount listening to it which is what causes the slow down.
-    // document.removeEventListener("keydown", detectKeyDown, true)
-  }, [playing])
-  // useEffect(() => {
-  //   if (userIsTyping) setPlaying(false)
-  //   // if (userIsTyping)
-  //   //   document.removeEventListener("keydown", detectKeyDown, true)
-  // }, [userIsTyping])
+      // * bashu: check event target for type, which should give an input text field. check for this type and change state based on it not being an text input.
+      // ? can't access current state with event listener
+      if (e.key === "s" && e.target.type !== "text") {
+        console.log("that key was s")
+        playingRef.current = !playingRef.current
+        // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
+        // -> reason why is the comment under first useFX line
+        // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
+        setPlaying(playingRef.current)
+
+        // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
+        // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
+      }
+    }
+
+    document.addEventListener("keydown", detectKeyDown, true)
+  }, [])
 
   useEffect(() => {
     if (chordInputStep > stepCount) setChordInputStep(1)
   }, [chordInputStep])
 
-  const detectKeyDown = (e) => {
-    // without this remove eventlistener, it will retrigger the useEffect dependent on playing many times, causing a slow down
-    document.removeEventListener("keydown", detectKeyDown, true)
-    // ! for some reason, all the userIsTyping i get back (and i can get back up to 35 of them) return false, even though im typing
-    if (e.key === "s" && !userIsTyping) {
-      setPlaying(!playing)
-    }
-  }
-
-  if (userIsTyping) {
-    document.removeEventListener("keydown", detectKeyDown, true)
-  } else {
-    document.addEventListener("keydown", detectKeyDown, true)
-  }
-
-  // ` took this away cuz header was doin the same thing and this came after and was v slow
-  // useEffect(() => {
-  //   console.log("useFX after isauth loads to get user songs")
-  //   console.log(user)
-  //   // if (user) {
-  //   //   fetch(`/api/load-songs/${user.sub}`, {
-  //   //     method: "GET",
-  //   //     headers: {
-  //   //       Accept: "application/json",
-  //   //       "Content-Type": "application/json",
-  //   //     },
-  //   //   })
-  //   //     .then((res) => res.json())
-  //   //     .then((data) => {
-  //   //       console.log(data, "songs loaded")
-  //   //       setLoadUserSongs(handleLoadSongsFetch(data.data))
-  //   //     })
-  //   //     .catch((error) => {
-  //   //       window.alert(error)
-  //   //     })
-  //   // }
-  // }, [isAuthenticated])
+  useEffect(() => {
+    console.log(playingRef, "usefx playingref changed???!!", playing)
+  }, [playing])
 
   const handleLoadSong = (e) => {
     setLoadSong(e.target.value)
   }
-
-  const handleInputFocus = (e) => {
-    document.removeEventListener("keydown", detectKeyDown, true)
-    setUserIsTyping(true)
-  }
-  const handleInputBlur = (e) => {
-    // document.removeEventListener("keydown", detectKeyDown, true)
-    setUserIsTyping(false)
-  }
-  // let samples
-  // const samplePaths = ["c2.mp3", "./assets/samples/c3.mp3"]
-  useEffect(() => {
-    // ! sometimes upon refresh i lose my inputted notes. i used this to test it, but couldnt always reproduce it. mb was realted to a proxy error on a fetch (???)
-    // console.log("OUR USE EFFECT")
-    // setupSample(samplePaths).then((response) => {
-    //   samples = response
-    //   console.log(response)
-    //   console.log(samples, "ihihihi123")
-    // })
-
-    console.log(areBeatsChecked, "mg changed?? from useEffect")
-  }, [areBeatsChecked])
 
   // necessary in order to update the page when stepCount changes
   useEffect(() => {
     if (loadUserSongs) {
       console.log(loadUserSongs[loadSong], "kekeke")
       const newMaster = {}
-      makeNotesState.forEach((note) => {
+      makeChordNotesState.forEach((note) => {
         newMaster[`chord-${note}`] = areBeatsChecked[`chord-${note}`]
         // this takes away if the new length is smaller
         while (newMaster[`chord-${note}`].length > blankStepCountArray.length) {
@@ -493,18 +495,24 @@ const Sequencer = () => {
       setStepCount(song["stepCount"])
       setTempo(song["tempo"])
       setWonkFactor(song["wonkFactor"])
+      setVolume(song["volume"])
+      setSound(song["sound"])
+      setFilterCutoff(song["filterCutoff"])
+      setAttack(song["attack"])
+      setDecay(song["decay"])
+      setSustain(song["sustain"])
+      setRelease(song["release"])
       setAreBeatsChecked(song["areBeatsChecked"])
     }
   }, [loadSong])
 
+  // removes 'Song saved!' notification after 5s
   useEffect(() => {
     setTimeout(() => {
       setSongSaved(false)
-      console.log("we no save song anymo")
     }, 5000)
   }, [songSaved])
-
-  // useEffect(() => {}, [tempo, stepCount])
+  console.log(makeMelodyNotesState, "melodynotes")
   return (
     <>
       <Parameters
@@ -515,15 +523,20 @@ const Sequencer = () => {
         generateAreBeatsCheckedInitialState={
           generateAreBeatsCheckedInitialState
         }
-        makeNotesState={makeNotesState}
+        makeChordNotesState={makeChordNotesState}
         blankStepCountArray={blankStepCountArray}
       />
-      <SequencerGrid>
+      <MelodySequencerGrid>
         <TitleDiv>
-          {makeNotesState.map((chord) => {
+          {makeMelodyNotesState.map((chord) => {
+            if (chord / 8 === 0 || (chord > 7 && chord <= 14)) {
+              chord = chord - 7
+            } else if (chord > 14) {
+              chord = chord - 14
+            }
             return (
               <ChordTitle>
-                {romanNumeralReference["major"][chord]}
+                {chord}
                 <br />
               </ChordTitle>
             )
@@ -531,7 +544,75 @@ const Sequencer = () => {
           <BlankDiv />
         </TitleDiv>
         <AllBoxesDiv>
-          {makeNotesState.map((chord, notesIndex) => {
+          {makeMelodyNotesState.map((chord, notesIndex) => {
+            const chordIndex = chord
+            return (
+              <ChordDiv key={`row-${chordIndex}`}>
+                {/* {areMelodyBeatsChecked[`${chordIndex}`].map((check, index) => {
+                  return (
+                    <Checkbox
+                      key={`row-${chordIndex}-beat-${index}`}
+                      chord={chord}
+                      areBeatsChecked={areBeatsChecked}
+                      beatIndex={index}
+                      chordIndex={chordIndex}
+                      handleBeatCheckbox={handleBeatCheckbox}
+                    />
+                  )
+                  // }
+                })} */}
+              </ChordDiv>
+            )
+          })}
+          <PointerContainer>
+            {blankStepCountArray.map((step, index) => {
+              const num = index + 1
+              // every 2 beats make a div
+              if ((index + 1) % 2 === 0) {
+                return (
+                  <>
+                    <BeatMarker
+                      className={
+                        currentBeat === num ||
+                        currentBeat === num + 1 ||
+                        num === currentBeatRef.current
+                          ? "current"
+                          : ""
+                      }
+                    >
+                      <BeatSpan
+                        className={
+                          currentBeat === num ||
+                          currentBeat === num + 1 ||
+                          num === currentBeatRef.current
+                            ? "current"
+                            : ""
+                        }
+                      >
+                        {num / 2}
+                      </BeatSpan>
+                    </BeatMarker>
+                  </>
+                )
+              }
+            })}
+          </PointerContainer>
+        </AllBoxesDiv>
+      </MelodySequencerGrid>
+      <ChordSequencerGrid>
+        <TitleDiv>
+          {makeChordNotesState.map((chord) => {
+            return (
+              <ChordTitle>
+                {romanNumeralReference["major"][chord]}
+                <br />
+              </ChordTitle>
+            )
+          })}
+          <BlankDiv /> {/* provides spacing */}
+        </TitleDiv>
+        <AllBoxesDiv>
+          {makeChordNotesState.map((chord, notesIndex) => {
             const chordIndex = chord
             return (
               <ChordDiv key={`row-${chordIndex}`}>
@@ -554,11 +635,30 @@ const Sequencer = () => {
           <PointerContainer>
             {blankStepCountArray.map((step, index) => {
               const num = index + 1
+              // every 2 beats make a div
               if ((index + 1) % 2 === 0) {
                 return (
                   <>
-                    <BeatMarker>
-                      <BeatSpan>{num / 2}</BeatSpan>
+                    <BeatMarker
+                      className={
+                        currentBeat === num ||
+                        currentBeat === num + 1 ||
+                        num === currentBeatRef.current
+                          ? "current"
+                          : ""
+                      }
+                    >
+                      <BeatSpan
+                        className={
+                          currentBeat === num ||
+                          currentBeat === num + 1 ||
+                          num === currentBeatRef.current
+                            ? "current"
+                            : ""
+                        }
+                      >
+                        {num / 2}
+                      </BeatSpan>
                     </BeatMarker>
                   </>
                 )
@@ -566,7 +666,7 @@ const Sequencer = () => {
             })}
           </PointerContainer>
         </AllBoxesDiv>
-      </SequencerGrid>
+      </ChordSequencerGrid>
       <HookTheoryChordsDiv>
         {hookTheoryChords ? (
           hookTheoryChords.map((chord, index) => {
@@ -590,18 +690,20 @@ const Sequencer = () => {
       <BottomDiv>
         <button
           onClick={() => {
-            console.log(areBeatsChecked)
-            console.log(loadUserSongs)
-            console.log(isAuthenticated, "auth?")
+            // console.log(areBeatsChecked)
+            // console.log(loadUserSongs)
+            // console.log(isAuthenticated, "auth?")
+            console.log(playing, "playing")
+            console.log(areMelodyBeatsChecked, makeMelodyNotesState)
           }}
         >
           see checked boxes
         </button>
         <button
           onClick={() => {
-            console.log(makeNotesState)
+            console.log(makeChordNotesState)
             clearAreBeatsChecked(
-              makeNotesState,
+              makeChordNotesState,
               blankStepCountArray,
               setAreBeatsChecked
             )
@@ -620,8 +722,8 @@ const Sequencer = () => {
               type="text"
               onChange={handleSongName}
               value={songName}
-              onFocus={handleInputFocus}
-              onBlur={handleInputBlur}
+              // onFocus={handleInputFocus}
+              // onBlur={handleInputBlur}
             />
 
             <button onClick={() => handleSave()}>save to mongo</button>
@@ -656,7 +758,15 @@ const Sequencer = () => {
 
 export default Sequencer
 
-const SequencerGrid = styled.section`
+const ChordSequencerGrid = styled.div`
+  /* padding: 20px 20px 0px 20px; */
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`
+const MelodySequencerGrid = styled.div`
   /* padding: 20px 20px 0px 20px; */
 
   display: flex;
@@ -688,6 +798,8 @@ const TitleDiv = styled.div`
 `
 const BlankDiv = styled.div`
   height: 50px;
+  width: 50px;
+  border: 1px solid fuchsia;
 `
 
 const ChordTitle = styled.span`
@@ -714,10 +826,6 @@ const PointerContainer = styled.div`
   height: 10px;
 `
 
-const Pointer = styled.img`
-  /* position: relative; */
-  pointer-events: none;
-`
 const BottomDiv = styled.div`
   width: 100%;
   height: 100px;
@@ -726,10 +834,10 @@ const BottomDiv = styled.div`
 const LoadingSongsDiv = styled.div``
 
 const BeatMarker = styled.div`
-  border-left: 1px solid white;
+  border-left: 1px solid rgba(211, 211, 211, 0.25);
   width: 53px;
   height: 20px;
-  opacity: 50%;
+  opacity: 100%;
 `
 const BeatSpan = styled.span`
   padding-left: 5px;
