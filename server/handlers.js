@@ -9,10 +9,27 @@ const options = {
   useUnifiedTopology: true,
 }
 const client = new MongoClient(MONGO_URI, options)
-
 const db = client.db("sequencer")
 
+// ! somaye sol'n to mongo closed error. 'mb due to a connection happening when the client.close() runs
+// let clientDB = null;
+// let timeOut=0
+// const getClientDB = async() => {
+//     clearTimeout(timeOut)
+//     if(!clientDB){
+//         const client = new MongoClient(MONGO_URI, options);
+//         await client.connect();
+//         clientDB = await client.db(DB_NAME);
+//     }
+//     timeOut= setTimeout(() => {
+//         client.close()
+//         clientDB=null
+//     }, 5000);
+//     return clientDB;
+// }
+
 const getUser = async (req, res) => {
+  // ! somaye: avoid closed mongo server error by naming fxn where you create the db string, i.e. client.db("sequencer")
   console.log(req.params)
   const {userID} = req.params
   console.log("hello, we reached handler")

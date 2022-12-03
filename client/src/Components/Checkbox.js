@@ -38,18 +38,12 @@ const Checkbox = ({
       <CheckboxButton
         type="checkbox"
         checked={checked ? "checked" : ""}
-        // onClick={() => {
-        //   console.log(areBeatsChecked);
-        // }}
-        // className={hoveredButton ? "hoverAppearance" : ""}
         onChange={() => {
-          console.log("checkbox onchange")
-          // clg here with handleBeatCheckbox disabled does not change the state. good.
-          console.log(areBeatsChecked)
           handleBeatCheckbox(chordIndex, beatIndex, checked)
           setChecked(!checked)
         }}
       />
+      {/* {chordIndex === 1 && <BeatMarker></BeatMarker>} */}
     </>
   )
 }
@@ -91,4 +85,10 @@ const CheckboxButton = styled.input`
   :checked && :hover {
     background-color: white;
   }
+`
+const BeatMarker = styled.div`
+  display: inline;
+  position: relative;
+  top: 50%;
+  border: 1px solid fuchsia;
 `

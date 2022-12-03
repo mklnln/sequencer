@@ -19,6 +19,20 @@ const App = () => {
   const [wonkFactor, setWonkFactor] = useState(120)
   const [chordToHover, setChordToHover] = useState({})
   const [chordInputStep, setChordInputStep] = useState(1)
+  const [loadUserSongs, setLoadUserSongs] = useState(null)
+  const handleLoadSongsFetch = (songsAndIDs) => {
+    console.log(songsAndIDs, "oyoyoyoyo")
+    const keysToUse = Object.keys(songsAndIDs).filter((key) => {
+      return key !== "userID" && key !== "_id"
+    })
+    const newState = {}
+    keysToUse.forEach((key) => {
+      newState[key] = songsAndIDs[key]
+      // return {[key]: songsAndIDs[key]}
+    })
+    console.log(newState)
+    return newState
+  }
   // * we couldn't make chordhover work mb because setstate in checkbox re-rendered all checkboxes and caused too many re-renders? idk. stretch goal.
   // const handleChordHover = (chordHovered) => {
   //   console.log(chordInputStep)
@@ -42,6 +56,9 @@ const App = () => {
           setWonkFactor,
           chordInputStep,
           setChordInputStep,
+          loadUserSongs,
+          setLoadUserSongs,
+          handleLoadSongsFetch,
         }}
       >
         <GlobalStyle />

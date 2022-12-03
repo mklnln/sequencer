@@ -6,7 +6,13 @@ import {
   clearAreBeatsChecked,
   generateAreBeatsCheckedInitialState,
 } from "./Helpers"
-import {PlayBeatChord} from "./AudioEngine.js"
+import {
+  playSample,
+  getFile,
+  setupSample,
+  PlayBeatChord,
+  playback,
+} from "./AudioEngine.js"
 import styled from "styled-components"
 import HookTheoryChordButton from "./Components/HookTheoryChordButton"
 import RemoveChordButton from "./RemoveChordButton"
@@ -20,9 +26,13 @@ const Sequencer = () => {
     stepCount,
     setStepCount,
     rootNote,
+    setRootNote,
     wonkFactor,
+    setWonkFactor,
     chordInputStep,
     setChordInputStep,
+    loadUserSongs,
+    setLoadUserSongs,
   } = useContext(MusicParametersContext)
   const {isAuthenticated, user} = useAuth0()
   const [playing, setPlaying] = useState(false)
@@ -38,8 +48,10 @@ const Sequencer = () => {
   const [buttonsPushed, setButtonsPushed] = useState(0)
   const [hookTheoryChords, setHookTheoryChords] = useState(null)
   const [chosenAPIChords, setChosenAPIChords] = useState([])
-  const [loadUserSongs, setLoadUserSongs] = useState([])
-  const [loadSong, setLoadSong] = useState({})
+
+  const [loadSong, setLoadSong] = useState()
+  const [userIsTyping, setUserIsTyping] = useState(false)
+  const [songSaved, setSongSaved] = useState(false)
 
   const romanNumeralReference = {
     major: {
@@ -100,15 +112,18 @@ const Sequencer = () => {
           areBeatsChecked[`chord-${noteRow}`][currentBeat - 1] === 1 &&
           playing
         ) {
-          PlayBeatChord(
-            makeNotesState.length - index,
-            playing,
-            rootNote,
-            wonkFactor
-          )
+          playback(makeNotesState.length - index, playing, rootNote, wonkFactor)
+          // playSample()
+          // PlayBeatChord(
+          //   makeNotesState.length - index,
+          //   playing,
+          //   rootNote,
+          //   wonkFactor
+          // )
         }
       })
-    }, (secondsPerBeat * 1000) / 2)
+      // ! the below line's interval timing was secondsPerBeat * 1000, but i noticed that the stated value of 150 was in truth more like 130. 150/130 is 1.15, thus i thought a 15% decrease in the interval would give me a more accurate time. this is true, but i'm not sure what's going on exactly. that's why 850 is used as its 15% less
+    }, (secondsPerBeat * 850) / 2)
     // ! even set manually at 1000ms (i.e. one second), this will oscillate in and out of rhythm with a clock ticking each second. the 2 refers to how many subdivisions a quarter note gives. our stepCount is 8th notes.
     return () => clearInterval(interval)
   }, [playing, currentBeat])
@@ -213,8 +228,9 @@ const Sequencer = () => {
       alert(
         `You can't save without actually putting some notes in the sequencer.`
       )
+    } else if (loadUserSongs[songName]) {
+      alert(`That song already exists in the database. Use another name.`)
     } else {
-      console.log(songName)
       const saveObj = {}
       saveObj[songName] = {areBeatsChecked}
       saveObj.userID = user.sub
@@ -222,7 +238,7 @@ const Sequencer = () => {
       saveObj[songName].rootNote = rootNote
       saveObj[songName].tempo = tempo
       saveObj[songName].wonkFactor = wonkFactor
-      console.log(JSON.stringify(saveObj))
+      setSongSaved("saving to database...")
       fetch(`/api/save-song/${songName}`, {
         method: "POST",
         headers: {
@@ -233,6 +249,11 @@ const Sequencer = () => {
       })
         .then((res) => res.json())
         .then((data) => {
+          if (data.status === 200) {
+            console.log(songSaved, "saved in response")
+            console.log("the song was saved")
+            setSongSaved("Song saved!")
+          }
           console.log(data)
         })
         .catch((error) => {
@@ -258,6 +279,7 @@ const Sequencer = () => {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log(data, "hook API givin prllems")
         setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
       })
       .catch((error) => {
@@ -281,76 +303,206 @@ const Sequencer = () => {
     )
       .then((res) => res.json())
       .then((data) => {
-        setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
+        console.log(data, "hook API givin prllems,for subsequent chords")
+        const removeUnsupportedChords = data.filter((chord) => {
+          return chord["chord_ID"].length <= 1
+        })
+        console.log(removeUnsupportedChords)
+        setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
       })
       .catch((error) => {
         window.alert(error)
       })
+
+    if (chosenAPIChords.length > 1) {
+      // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
+      let fetches = 2
+      let APISongs = []
+      let page = 1
+      fetch(
+        `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+            Authorization: "Bearer 6253102743c64eb2313c2c56d40bf6a6",
+          },
+          // body: JSON.stringify({ order: formData }),
+        }
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data, "hook API givin songs w chords")
+          fetches--
+          page++
+          data.forEach((song) => {
+            APISongs.push(song)
+          })
+        })
+        .catch((error) => {
+          window.alert(error)
+        })
+      if (fetches > 0) {
+        setTimeout(() => {
+          fetch(
+            `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}&page=${page}`,
+            {
+              method: "GET",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer 6253102743c64eb2313c2c56d40bf6a6",
+              },
+              // body: JSON.stringify({ order: formData }),
+            }
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              console.log(
+                data,
+                `"hook API givin songs w chords, fetch #${fetches}"`
+              )
+              fetches--
+              page++
+              data.forEach((song) => {
+                APISongs.push(song)
+              })
+            })
+            .catch((error) => {
+              window.alert(error)
+            })
+        }, 2000)
+      }
+    }
   }, [chosenAPIChords])
 
-  // ! this renders a few times before fulfilling the intended functionality. trying it in other ways yields absurd amounts of re-renders. it seems wonky to re-render 3-4 times.. but it works? so...
   useEffect(() => {
-    document.addEventListener("keydown", detectKeyDown, true)
+    document.removeEventListener("keydown", detectKeyDown, true)
+  }, [userIsTyping])
+  // ! having trouble with using s in a song name triggering start/stop
+  useEffect(() => {
+    // if (!userIsTyping) {
+    console.log("usfx playing cuz usertypew")
+
+    // }
+    // ! must remove eventlistener or else we have an exponential amount listening to it which is what causes the slow down.
+    // document.removeEventListener("keydown", detectKeyDown, true)
   }, [playing])
+  // useEffect(() => {
+  //   if (userIsTyping) setPlaying(false)
+  //   // if (userIsTyping)
+  //   //   document.removeEventListener("keydown", detectKeyDown, true)
+  // }, [userIsTyping])
 
   useEffect(() => {
     if (chordInputStep > stepCount) setChordInputStep(1)
   }, [chordInputStep])
 
   const detectKeyDown = (e) => {
-    if (e.key === "s") {
+    // without this remove eventlistener, it will retrigger the useEffect dependent on playing many times, causing a slow down
+    document.removeEventListener("keydown", detectKeyDown, true)
+    // ! for some reason, all the userIsTyping i get back (and i can get back up to 35 of them) return false, even though im typing
+    if (e.key === "s" && !userIsTyping) {
       setPlaying(!playing)
     }
   }
 
-  useEffect(() => {
-    console.log(user)
-    if (user) {
-      fetch(`/api/load-songs/${user.sub}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data)
-          setLoadUserSongs(handleLoadSongsFetch(data.data))
-        })
-        .catch((error) => {
-          window.alert(error)
-        })
-    }
-  }, [isAuthenticated])
-
-  const handleLoadSongsFetch = (songsAndIDs) => {
-    console.log(songsAndIDs, "oyoyoyoyo")
-    const keysToUse = Object.keys(songsAndIDs).filter((key) => {
-      return key !== "userID" && key !== "_id"
-    })
-    const newState = {}
-    keysToUse.forEach((key) => {
-      newState[key] = songsAndIDs[key]
-      // return {[key]: songsAndIDs[key]}
-    })
-    return newState
+  if (userIsTyping) {
+    document.removeEventListener("keydown", detectKeyDown, true)
+  } else {
+    document.addEventListener("keydown", detectKeyDown, true)
   }
+
+  // ` took this away cuz header was doin the same thing and this came after and was v slow
+  // useEffect(() => {
+  //   console.log("useFX after isauth loads to get user songs")
+  //   console.log(user)
+  //   // if (user) {
+  //   //   fetch(`/api/load-songs/${user.sub}`, {
+  //   //     method: "GET",
+  //   //     headers: {
+  //   //       Accept: "application/json",
+  //   //       "Content-Type": "application/json",
+  //   //     },
+  //   //   })
+  //   //     .then((res) => res.json())
+  //   //     .then((data) => {
+  //   //       console.log(data, "songs loaded")
+  //   //       setLoadUserSongs(handleLoadSongsFetch(data.data))
+  //   //     })
+  //   //     .catch((error) => {
+  //   //       window.alert(error)
+  //   //     })
+  //   // }
+  // }, [isAuthenticated])
 
   const handleLoadSong = (e) => {
     setLoadSong(e.target.value)
   }
 
+  const handleInputFocus = (e) => {
+    document.removeEventListener("keydown", detectKeyDown, true)
+    setUserIsTyping(true)
+  }
+  const handleInputBlur = (e) => {
+    // document.removeEventListener("keydown", detectKeyDown, true)
+    setUserIsTyping(false)
+  }
+  // let samples
+  // const samplePaths = ["c2.mp3", "./assets/samples/c3.mp3"]
   useEffect(() => {
-    setAreBeatsChecked(
-      generateAreBeatsCheckedInitialState(makeNotesState, blankStepCountArray)
-    )
+    // ! sometimes upon refresh i lose my inputted notes. i used this to test it, but couldnt always reproduce it. mb was realted to a proxy error on a fetch (???)
+    // console.log("OUR USE EFFECT")
+    // setupSample(samplePaths).then((response) => {
+    //   samples = response
+    //   console.log(response)
+    //   console.log(samples, "ihihihi123")
+    // })
+
+    console.log(areBeatsChecked, "mg changed?? from useEffect")
+  }, [areBeatsChecked])
+
+  // necessary in order to update the page when stepCount changes
+  useEffect(() => {
+    if (loadUserSongs) {
+      console.log(loadUserSongs[loadSong], "kekeke")
+      const newMaster = {}
+      makeNotesState.forEach((note) => {
+        newMaster[`chord-${note}`] = areBeatsChecked[`chord-${note}`]
+        // this takes away if the new length is smaller
+        while (newMaster[`chord-${note}`].length > blankStepCountArray.length) {
+          newMaster[`chord-${note}`].pop()
+        }
+
+        // this puts more in if the new length is greater
+        while (newMaster[`chord-${note}`].length < blankStepCountArray.length) {
+          newMaster[`chord-${note}`].push(0)
+        }
+      })
+      setAreBeatsChecked(newMaster)
+      console.log(newMaster)
+    }
   }, [stepCount])
 
   useEffect(() => {
-    // ! sometimes upon refresh i lose my inputted notes. i used this to test it, but couldnt always reproduce it. mb was realted to a proxy error on a fetch (???)
-    console.log(areBeatsChecked, "mg changed?? from useEffect")
-  }, [areBeatsChecked])
+    if (loadSong) {
+      console.log(loadUserSongs)
+      const song = loadUserSongs[loadSong]
+      setRootNote(song["rootNote"])
+      setStepCount(song["stepCount"])
+      setTempo(song["tempo"])
+      setWonkFactor(song["wonkFactor"])
+      setAreBeatsChecked(song["areBeatsChecked"])
+    }
+  }, [loadSong])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setSongSaved(false)
+      console.log("we no save song anymo")
+    }, 5000)
+  }, [songSaved])
 
   // useEffect(() => {}, [tempo, stepCount])
   return (
@@ -400,18 +552,18 @@ const Sequencer = () => {
             )
           })}
           <PointerContainer>
-            <Pointer
-              alt="pointer"
-              src={curlybrace}
-              style={{
-                transform: `scale(${pointerWidth},1) rotate( -90deg)`,
-                position: `relative`,
-                // todo change left to correspond to where the chord goes
-                //16 notes, 1: -36 2: -12, 12, 36
-                left: `36%`,
-                // top: `-10px`,
-              }}
-            />
+            {blankStepCountArray.map((step, index) => {
+              const num = index + 1
+              if ((index + 1) % 2 === 0) {
+                return (
+                  <>
+                    <BeatMarker>
+                      <BeatSpan>{num / 2}</BeatSpan>
+                    </BeatMarker>
+                  </>
+                )
+              }
+            })}
           </PointerContainer>
         </AllBoxesDiv>
       </SequencerGrid>
@@ -432,15 +584,15 @@ const Sequencer = () => {
             )
           })
         ) : (
-          <>loading chords...</>
+          <>loading chords from the HookTheory API...</>
         )}
       </HookTheoryChordsDiv>
       <BottomDiv>
         <button
           onClick={() => {
-            console.log(chosenAPIChords)
-            console.log(loadUserSongs, "usersongs")
-            console.log(loadSong)
+            console.log(areBeatsChecked)
+            console.log(loadUserSongs)
+            console.log(isAuthenticated, "auth?")
           }}
         >
           see checked boxes
@@ -464,29 +616,39 @@ const Sequencer = () => {
         {isAuthenticated && (
           <>
             <span>Song Name:</span>
-            <input type="text" onChange={handleSongName} value={songName} />
+            <input
+              type="text"
+              onChange={handleSongName}
+              value={songName}
+              onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
+            />
 
             <button onClick={() => handleSave()}>save to mongo</button>
+            <span>{songSaved ? songSaved : ""}</span>
+            {loadUserSongs ? (
+              <LoadingSongsDiv>
+                <label>Load Song:</label>
+                <select value={loadSong} onChange={handleLoadSong}>
+                  <option default hidden>
+                    Choose a song...
+                  </option>
+                  {Object.keys(loadUserSongs).map((song, index) => {
+                    return (
+                      <>
+                        <option key={song} value={song}>
+                          {song}
+                        </option>
+                      </>
+                    )
+                  })}
+                </select>
+              </LoadingSongsDiv>
+            ) : (
+              <span>loading songs...</span>
+            )}
           </>
         )}
-
-        <>
-          <label>Load Song</label>
-          <select value={loadSong} onChange={handleLoadSong}>
-            <option default hidden>
-              Choose a song...
-            </option>
-            {Object.keys(loadUserSongs).map((song, index) => {
-              return (
-                <>
-                  <option key={song} value={song}>
-                    {song}
-                  </option>
-                </>
-              )
-            })}
-          </select>
-        </>
       </BottomDiv>
     </>
   )
@@ -560,4 +722,17 @@ const BottomDiv = styled.div`
   width: 100%;
   height: 100px;
   margin: 10px;
+`
+const LoadingSongsDiv = styled.div``
+
+const BeatMarker = styled.div`
+  border-left: 1px solid white;
+  width: 53px;
+  height: 20px;
+  opacity: 50%;
+`
+const BeatSpan = styled.span`
+  padding-left: 5px;
+  color: white;
+  opacity: 50%;
 `
