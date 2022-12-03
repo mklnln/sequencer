@@ -10,22 +10,6 @@ const Checkbox = ({
   const [checked, setChecked] = useState(
     areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? "checked" : ""
   )
-  // const [hoveredButton, setHoveredButton] = useState(false)
-  // const {chordToHover, setChordToHover} = useContext(MusicParametersContext)
-  // const hoverIndex = []
-
-  // if (chordToHover.chordID === chordIndex) {
-  //   if (
-  //     chordToHover.chordInputStep === beatIndex ||
-  //     chordToHover.chordInputStep === beatIndex + 1 ||
-  //     chordToHover.chordInputStep === beatIndex + 2 ||
-  //     chordToHover.chordInputStep === beatIndex + 3
-  //   ) {
-  //     setHoveredButton(true)
-  //   } else if (chordToHover.chordInputStep === beatIndex) {
-  //     setHoveredButton(false)
-  //   }
-  // }
 
   useEffect(() => {
     setChecked(
@@ -43,7 +27,6 @@ const Checkbox = ({
           setChecked(!checked)
         }}
       />
-      {/* {chordIndex === 1 && <BeatMarker></BeatMarker>} */}
     </>
   )
 }
@@ -85,10 +68,4 @@ const CheckboxButton = styled.input`
   :checked && :hover {
     background-color: white;
   }
-`
-const BeatMarker = styled.div`
-  display: inline;
-  position: relative;
-  top: 50%;
-  border: 1px solid fuchsia;
 `

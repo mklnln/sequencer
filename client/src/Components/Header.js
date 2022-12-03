@@ -7,11 +7,10 @@ import {useAuth0} from "@auth0/auth0-react"
 import {MusicParametersContext} from "../App"
 const Header = () => {
   const {user, isAuthenticated, isLoading, error} = useAuth0()
-  const {loadUserSongs, setLoadUserSongs, handleLoadSongsFetch} = useContext(
-    MusicParametersContext
-  )
+  const {loadUserSongs, setLoadUserSongs, handleLoadSongsFetch, songSaved} =
+    useContext(MusicParametersContext)
   useEffect(() => {
-    if (user) {
+    if (user || songSaved === "Song saved!") {
       console.log(user.sub)
       fetch(`/api/user-login/${user.sub}`)
         .then((res) => res.json())

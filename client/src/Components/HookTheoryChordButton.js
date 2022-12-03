@@ -15,17 +15,6 @@ const HookTheoryChordButton = ({
 
   return (
     <VerticalAlignDiv>
-      <RemoveButtonsDiv>
-        {/* {blankStepCountArray.slice(0, 4).map((step, index) => {
-          return ( */}
-        <RemoveChordButton
-          index={index}
-          handleChordRemove={handleChordRemove}
-        />
-        {/* )
-        }) */}
-      </RemoveButtonsDiv>
-
       <ChordButton
         onClick={() => handleChordClick(chord.chord_ID, index)}
         // onMouseEnter={() => handleChordHover(chord.chord_ID)}

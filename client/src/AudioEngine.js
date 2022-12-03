@@ -5,6 +5,10 @@ const audioContext = new AudioContext()
 const c2 = require("./assets/samples/oohc2.mp3")
 const source = audioContext.createBufferSource()
 
+// React Hook "useContext" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function
+// const {wonkFactor, attack, volume} = useContext(MusicParametersContext)
+
+// http://localhost:3000/assets/samples/c2.mp3
 let audio
 // code creative
 fetch(c2)
@@ -72,11 +76,23 @@ export const playback = (index, playing, rootNote, wonkFactor) => {
   })
 }
 
-export const PlayBeatChord = (index, playing, rootNote, wonkFactor) => {
+export const PlayBeatChord = (
+  index,
+  playing,
+  rootNote,
+  wonkFactor,
+  volume,
+  sound,
+  filterCutoff,
+  attack,
+  decay,
+  sustain,
+  release
+) => {
   const rootFrequency = 220 * 2 ** (rootNote / 12) // instead of accessing a big object with note frequency values, we can just calculate them based off of A3 = 220Hz
   const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
   // take index, voice chord based off the starting note of the scale
-  const chordVoicing = [scale[index - 1], scale[index + 1], scale[index + 3]] // based off of index being a proper scale degree (1,2,3 etc), we need to minus one to
+  const chordVoicing = [scale[index - 1], , scale[index + 1], scale[index + 3]] // based off of index being a proper scale degree (1,2,3 etc), we need to minus one to
   // we want index, index+2, index+4 notes played.
   // ? this could be a state KEY as in major, minor, harmonic minor
   chordVoicing.forEach((monophone) => {
@@ -85,45 +101,56 @@ export const PlayBeatChord = (index, playing, rootNote, wonkFactor) => {
     // 0 = 1
     // 1/12, 1.0075
 
-    // 440 is just a placehodlder thats going to C, D# or
-    // octave / 12 = chromatic scale
-    // major 1, 3, 5, 6, 8, 10, 11, 12
-    // hard code skipping notes to create major scale
-    // todo different note
-    const tone = audioContext.createOscillator()
+    const osc = audioContext.createOscillator()
+    osc.frequency.value = note // (1.1/12) 1.075*
+    osc.type = sound
+    const lowPassFilter = audioContext.createBiquadFilter()
+    lowPassFilter.frequency.value = filterCutoff
+    lowPassFilter.type = "lowpass"
     const now = audioContext.currentTime
-    const randomFreq = Math.random() * 500 + 100
-    tone.frequency.value = note // (1.1/12) 1.075*
-    tone.type = "sine"
+    osc.connect(lowPassFilter)
     const synthGain = audioContext.createGain()
     // shape the ADSR (attack, decay, sustain, release) envelope of the sound
-    // todo could easily set ADSR in FE as state variables
-    // todo filter, wave, etc
-    const attackTime = 0.037
-    const decayTime = 0.2
-    const sustainLevel = 0.0
-    const releaseTime = 0.0
-    const duration = 1
+    const attackTime = (attack / 100) * 2
+    const decayTime = decay / 100
+    // the 1/3 value is meant to reduce volume to avoid clipping, same with releaseTime
+    let sustainLevel = (sustain / 100) * (1 / 4)
+    // subtracting sustain to a value below or near zero may flip it back over to 0.9999, distorting the audio. set to 0 to avoid this.
+    if (sustain === 1) sustainLevel = 0
+    const releaseTime = (release / 10) * (1 / 3)
+    // duration refers to how long the note is held. hardcoded in order to avoid clipping
+    const duration = 0.5
     synthGain.gain.setValueAtTime(0, 0)
-    // increase or decrease gain based on the above ADSR values
-    synthGain.gain.linearRampToValueAtTime(0.3, now + attackTime)
+    // attack
+    synthGain.gain.linearRampToValueAtTime(
+      (volume / 100) * (1 / 3),
+      now + attackTime
+    )
+    // decay down from attack peak to sustain level
     synthGain.gain.linearRampToValueAtTime(
       sustainLevel,
       now + attackTime + decayTime
     )
-    synthGain.gain.setValueAtTime(sustainLevel, now + duration - releaseTime)
-    synthGain.gain.linearRampToValueAtTime(0, now + duration)
-    tone.connect(synthGain)
+
+    synthGain.gain.linearRampToValueAtTime(
+      0,
+      now + duration + attackTime + decayTime + releaseTime
+    )
+    lowPassFilter.connect(synthGain)
     synthGain.connect(audioContext.destination)
+    // ! when tf am i doing key off?
 
     if (playing) {
+      // osc.start()
       setTimeout(() => {
-        tone.start()
+        osc.start()
       }, Math.random() * wonkFactor)
       setTimeout(() => {
-        // ! stopping the tone is necessary to keep the audioengine running else it eventually runs out of free oscillators
-        tone.stop()
-      }, 4000)
+        // ! stopping the osc is necessary to keep the audioengine running else it eventually runs out of free oscillators
+        // ! additionally,
+        osc.stop()
+        // remember that setTimeout works in ms, synth in s
+      }, (duration + attackTime + decayTime + releaseTime) * 1000)
     }
   })
 }
