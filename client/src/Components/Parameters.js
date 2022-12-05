@@ -2,10 +2,12 @@ import React, {useContext, useEffect, useState} from "react"
 import styled from "styled-components"
 import {Donut} from "react-dial-knob"
 import {MusicParametersContext} from "../App"
+import {loadSample} from "../AudioEngine"
 
 const Parameters = ({playing, setPlaying}) => {
   //   const [tempo, setTempo] = useState(150)
   const {
+    audioContext,
     tempo,
     setTempo,
     stepCount,
@@ -14,8 +16,10 @@ const Parameters = ({playing, setPlaying}) => {
     setRootNote,
     wonkFactor,
     setWonkFactor,
-    volume,
-    setVolume,
+    melodyVolume,
+    setMelodyVolume,
+    chordsVolume,
+    setChordsVolume,
     sound,
     setSound,
     filterCutoff,
@@ -43,11 +47,23 @@ const Parameters = ({playing, setPlaying}) => {
   const parseWonk = (e) => {
     setWonkFactor(parseInt(e.target.value))
   }
-  const parseVolume = (e) => {
-    setVolume(parseInt(e.target.value))
+  const parseMelodyVolume = (e) => {
+    setMelodyVolume(parseInt(e.target.value))
+  }
+  const parseChordsVolume = (e) => {
+    setChordsVolume(parseInt(e.target.value))
   }
   const parseSound = (e) => {
     setSound(e.target.value)
+    if (
+      e.target.value === "samplePianoC2" ||
+      e.target.value === "sampleOohC2" ||
+      e.target.value === "sampleRonyA2" ||
+      e.target.value === "sampleFeltPianoC3"
+    ) {
+      console.log(e.target.value, "CONTAINS sample LESSSSSSSGOOOOOOOOOO")
+      loadSample(e.target.value, audioContext)
+    }
   }
   const parseFilterCutoff = (e) => {
     setFilterCutoff(parseInt(e.target.value))
@@ -85,7 +101,7 @@ const Parameters = ({playing, setPlaying}) => {
         >
           {playing ? "stop" : "start"}
         </button>
-        <p>press s to start/stop</p>
+        <span>press s</span> <span>start/stop</span>
       </StartButtonDiv>
       {/* <button onClick={() => synth.stop()}>stop synth</button> */}
       <ParameterDiv>
@@ -113,16 +129,28 @@ const Parameters = ({playing, setPlaying}) => {
         <span>{wonkFactor}</span>
       </ParameterDiv>
       <ParameterDiv>
-        <span>Volume</span>
+        <span>Melody</span>
         <Parameter
           type="range"
           min="0"
           max="100"
           step="1"
-          value={volume}
-          onInput={(e) => parseVolume(e)}
+          value={melodyVolume}
+          onInput={(e) => parseMelodyVolume(e)}
         />
-        <span>{volume}</span>
+        <span>{melodyVolume}</span>
+      </ParameterDiv>
+      <ParameterDiv>
+        <span>Chords</span>
+        <Parameter
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value={chordsVolume}
+          onInput={(e) => parseChordsVolume(e)}
+        />
+        <span>{chordsVolume}</span>
       </ParameterDiv>
       <SoundFilterDiv>
         <ParameterDiv>
@@ -132,7 +160,10 @@ const Parameters = ({playing, setPlaying}) => {
             <option value="square">Square Wave</option>
             <option value="sawtooth">Sawtooth Wave</option>
             <option value="triangle">Triangle Wave</option>
-            <option value="64"></option>
+            <option value="sampleOohC2">Sample -- Ooh</option>
+            <option value="samplePianoC2">Sample -- Piano</option>
+            <option value="sampleFeltPianoC3">Sample -- Felt Piano</option>
+            <option value="sampleRonyA2">Sample -- Rony Uhh</option>
           </select>
         </ParameterDiv>
         <SoundFilterDiv>
@@ -238,7 +269,7 @@ const MainDiv = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  border: 1px solid fuchsia;
+  margin-bottom: 40px;
 `
 
 const Parameter = styled.input`
@@ -252,6 +283,7 @@ const ParameterDiv = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: 20px;
 `
 
 const StartButtonDiv = styled.div`
@@ -262,6 +294,10 @@ const StartButtonDiv = styled.div`
 `
 const SoundFilterDiv = styled.div`
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 `
 const Filter = styled.input`
   height: 20px;

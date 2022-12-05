@@ -50,6 +50,7 @@ const ChordButton = styled.button`
   font-weight: 700px;
   :hover {
     cursor: pointer;
+    border-color: #88b1b1;
   }
 `
 
