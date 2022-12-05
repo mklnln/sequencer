@@ -12,6 +12,8 @@
 /build
 
 # misc
+Sequencer (two clocks).js
+AudioEngine (two clocks).js
 .env
 .DS_Store
 .env.local

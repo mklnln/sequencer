@@ -1,26 +1,14 @@
 import {useContext, useEffect, useRef, useState} from "react"
-import curlybrace from "./Components/curlybrace.svg"
 import Checkbox from "./Components/Checkbox"
 import {MusicParametersContext} from "./App.js"
-import {
-  clearAreBeatsChecked,
-  clearAreMelodyBeatsChecked,
-  generateAreBeatsCheckedInitialState,
-  handleLoadSongsFetch,
-  handleSongName,
-  handleSave,
-  handleDelete,
-} from "./Helpers"
-import {playSample, getFile, setupSample, playSynth} from "./AudioEngine.js"
+import {generateAreBeatsCheckedInitialState} from "./Helpers"
+import {playSample, playSynth} from "./AudioEngine.js"
 import styled from "styled-components"
 import HookTheoryChordButton from "./Components/HookTheoryChordButton"
-import RemoveChordButton from "./RemoveChordButton"
 import Parameters from "./Components/Parameters"
 import {useAuth0} from "@auth0/auth0-react"
 import MelodyCheckbox from "./Components/MelodyCheckbox"
-import LoadSaveTestButtons from "./Components/LoadSaveTestButtons"
 const Sequencer = () => {
-  // const [tempo, setTempo] = useState(150)
   const {
     audioContext,
     tempo,
@@ -59,7 +47,6 @@ const Sequencer = () => {
     loadSong,
     setLoadSong,
     setSongName,
-    songName,
     areBeatsChecked,
     setAreBeatsChecked,
     areMelodyBeatsChecked,
@@ -67,31 +54,16 @@ const Sequencer = () => {
     makeChordNotesState,
     makeMelodyNotesState,
     blankStepCountArray,
-    amtOfNotes,
     chosenAPIChords,
     setChosenAPIChords,
-    setAmtOfNotes,
     hookTheoryChords,
     setHookTheoryChords,
   } = useContext(MusicParametersContext)
-  const {isAuthenticated, user} = useAuth0()
+  const {user} = useAuth0()
   const [playing, setPlaying] = useState(false)
   const [currentBeat, setCurrentBeat] = useState(0)
-  const [nextBeatTime, setNextBeatTime] = useState(0)
-
-  // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
-  // 1 pointer width covers 2 steps, or 1/4 of 8. set to 2 for 16, 3 for 32
-  // ! don't forget to also set
-
-  const [pointerWidth, setPointerWidth] = useState(2)
-
-  const [buttonsPushed, setButtonsPushed] = useState(0)
-
-  const [userIsTyping, setUserIsTyping] = useState(false)
-
   const playingRef = useRef(playing)
   const currentBeatRef = useRef(currentBeat)
-
   const romanNumeralReference = {
     major: {
       1: "I",
@@ -104,95 +76,27 @@ const Sequencer = () => {
       8: "I",
     },
   }
-  // const makeMelodyNotesState = []
-  // // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-  // for (let i = amtOfNotes * 2 - 1; i > 0; i--) {
-  //   makeMelodyNotesState.push(i)
-  // }
 
-  // const makeChordNotesState = []
-  // // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-  // for (let i = amtOfNotes; i > 0; i--) {
-  //   makeChordNotesState.push(i)
-  // }
-  // const blankStepCountArray = []
-  // // [0,0,0,0,0,0,0,0] where stepCount = 8
-  // for (let i = stepCount; i > 0; i--) {
-  //   blankStepCountArray.push(0)
-  // }
+  const milliSecondsPerBeat = ((60 / tempo / 2) * 1000) / 10
 
-  // this is the proper format of the master reference of notes areBeatsChecked. the amtOfNotes would be 8
-  // {
-  // chord-8: [1, 0, 0, 0, 0, 0, 0, 1],
-  // chord-7: [0, 1, 0, 0, 0, 0, 0, 0],
-  // chord-6: [0, 0, 0, 0, 0, 0, 0, 0],
-  // chord-5: [0, 0, 0, 0, 0, 1, 0, 0],
-  // chord-4: [0, 0, 0, 0, 0, 0, 0, 0],
-  // chord-3: [0, 0, 0, 0, 0, 0, 0, 0],
-  // chord-2: [0, 0, 0, 0, 0, 0, 0, 0],
-  // chord-1: [0, 0, 0, 1, 0, 0, 0, 0],
-  // }
-
-  // * this array is for visual purposes. try state though?
-  const notesInQueue = []
-  const scheduleBeat = (beatNumber, time) => {
-    notesInQueue.push({note: beatNumber, time})
-  }
-  const secondsPerBeat = 45.0 / tempo
-
-  // * a tale of two clocks
-  // setTimeout looks ahead and finds if any notes are due to be played
-  // okay if its delayed because it looks at an interval of time in the future
-  // it schedules web audio events in the future
-  // "The setTimeout timer basically just checks to see if any notes are going to need to be scheduled “soon” based on the current tempo, and then schedules them"
-  // the setTimeout plays any notes that need to be played now as well as in its future interval
-  // How much the lookahead overlaps with the next interval’s start time is determines how resilient your app will be across different machines, and as it becomes more complex (and layout and garbage collection may take longer).
-  //  resilient to slower machines and operating systems, it’s best to have a large overall lookahead and a reasonably short interval
-  //
-
-  // * lookahead is the amt of the future interval
-  // * timeout interval is how often the setTimeout is called with its lookahead
-  // * A good place to start is probably 100ms of “lookahead” time, with intervals set to 25ms.
-
-  // while (nextnotetime < currenttime + lookahead) {
-  // schedule the note (beatvalue, nextnotetime)
-  // nextnote()
-
-  // may need to bring audiocontext in here and pass it over to the synth engine
-
-  const scheduleAheadTime = 100 // ms? idk
   useEffect(() => {
+    // setInterval is called by milliSecondsPerBeat, so it gets called many times a second depending on the set tempo
     const interval = setInterval(() => {
-      const nextNote = () => {
+      if (playing) {
+        // advance the current beat
         currentBeat <= 0 || currentBeat >= stepCount
           ? setCurrentBeat(1)
           : setCurrentBeat(currentBeat + 1)
-      }
-      // * i am not accounting for events scheduled in the future. all im doing is running through the array as it matches current beat and only then sending a sound if they match.
-      // * i must consider tempo, currentTime, and use scheduleAheadTime with this while statement
-
-      // nextBeatTime is what I need to figure it out and it has to be a fxn of tempo and my beat subdivision
-
-      //
-      if (playing) {
-        while (nextBeatTime < audioContext.currentTime + scheduleAheadTime) {
-          // scheduleNote(current16thNote, nextNoteTime)
-          nextNote()
-        }
-
-        scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
       } else {
-        setCurrentBeat(1) // ! this resets the playback to the beginning. remove to just make it a pause button.
+        setCurrentBeat(1) // this resets the playback to the beginning. remove to just make it a pause button.
       }
+      // used to track beat visually
       currentBeatRef.current = currentBeat
-      console.log(nextBeatTime, "adding ", secondsPerBeat)
-      // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
-      const currentNoteStartTime = nextBeatTime
-      // console.log(makeMelodyNotesState)
-      // console.log(makeChordNotesState)
       makeMelodyNotesState.forEach((noteRow, index) => {
+        // ask if a note is scheduled to play, represented by a 1 in the master reference of notes
         if (areMelodyBeatsChecked[noteRow][currentBeat - 1] === 1 && playing) {
           if (!sound.includes("sample")) {
+            // send parameters to be used by the audio engine
             playSynth(
               makeMelodyNotesState.length - index,
               playing,
@@ -207,8 +111,7 @@ const Sequencer = () => {
               sustain,
               release,
               "melody",
-              audioContext,
-              currentNoteStartTime
+              audioContext
             )
           } else {
             playSample(
@@ -217,8 +120,7 @@ const Sequencer = () => {
               rootNote,
               wonkFactor,
               "melody",
-              audioContext,
-              currentNoteStartTime
+              audioContext
             )
           }
         }
@@ -244,8 +146,7 @@ const Sequencer = () => {
               sustain,
               release,
               "chords",
-              audioContext,
-              nextBeatTime
+              audioContext
             )
           } else {
             playSample(
@@ -254,18 +155,12 @@ const Sequencer = () => {
               rootNote,
               wonkFactor,
               "chords",
-              audioContext,
-              nextBeatTime
+              audioContext
             )
           }
         }
       })
-
-      // ! the below line's interval timing was secondsPerBeat * 1000, but i noticed that the stated value of 150 was in truth more like 130. 150/130 is 1.15, thus i thought a 15% decrease in the interval would give me a more accurate time. this is true, but i'm not sure what's going on exactly. that's why 850 is used as its 15% less
-      // old value
-      // }, (secondsPerBeat * 850) / 2)
-    }, scheduleAheadTime)
-    // ! even set manually at 1000ms (i.e. one second), this will oscillate in and out of rhythm with a clock ticking each second. the 2 refers to how many subdivisions a quarter note gives. our stepCount is 8th notes.
+    }, milliSecondsPerBeat)
     return () => clearInterval(interval)
   }, [playing, currentBeat])
 
@@ -276,6 +171,7 @@ const Sequencer = () => {
       setLoadSong("75442486-0878-440c-9db1-a7006c25a39f")
     setHookTheoryChords("")
     const arrayReplacement = []
+    // replace just the one note in the master array given the box that is checked
     blankStepCountArray.forEach((step, index) => {
       if (beatIndex !== index) {
         arrayReplacement.push(areBeatsChecked[`chord-${chordIndex}`][index])
@@ -308,12 +204,9 @@ const Sequencer = () => {
   }
 
   const handleChordClick = (chordID, index) => {
-    // todo wanna fetch new chords based off of what we've already set, thus need state.. chosenAPI chords?
+    // set state once a user clicks on a suggested chord from HookTheory
     setHookTheoryChords([])
-    console.log(hookTheoryChords)
     let newChosenAPIChords = []
-    console.log(chosenAPIChords)
-    console.log(chordID)
     if (chosenAPIChords === "") {
       newChosenAPIChords.push(chordID)
     } else {
@@ -323,6 +216,7 @@ const Sequencer = () => {
     setChosenAPIChords(newChosenAPIChords)
     const chordShortcut = `chord-${chordID}`
     const arrayReplacement = []
+    // push triggered value of 1 into note array if we're near the desired spot on the timeline (chordInputStep), otherwise put existing notes back
     blankStepCountArray.forEach((step, index) => {
       if (
         index + 1 === chordInputStep ||
@@ -335,7 +229,6 @@ const Sequencer = () => {
         arrayReplacement.push(areBeatsChecked[`chord-${chordID}`][index])
       }
     })
-    console.log(arrayReplacement.length, stepCount)
     if (arrayReplacement.length === stepCount) {
       setAreBeatsChecked({
         ...areBeatsChecked,
@@ -345,36 +238,8 @@ const Sequencer = () => {
       setChordInputStep((chordInputStep) => chordInputStep + 4)
     }
   }
-  const handleChordRemove = (chordAtStep, chordID) => {
-    const arrayReplacement = []
-    const chordShortcut = `chord-${chosenAPIChords[chordID]}`
-    const removeAtStep = (chordAtStep - 1) * 4 + 1
-    blankStepCountArray.forEach((step, index) => {
-      if (
-        index + 1 === removeAtStep ||
-        index + 1 === removeAtStep + 1 ||
-        index + 1 === removeAtStep + 2 ||
-        index + 1 === removeAtStep + 3
-      ) {
-        arrayReplacement.push(0)
-      } else {
-        arrayReplacement.push(
-          areBeatsChecked[`chord-${chosenAPIChords[chordID]}`][index]
-        )
-      }
-      console.log(chordID)
-      console.log(arrayReplacement)
-    })
-    if (arrayReplacement.length === stepCount) {
-      // todo update chosenapichords state
-      const replaceAPIChords = []
-      setAreBeatsChecked({
-        ...areBeatsChecked,
-        [chordShortcut]: [...arrayReplacement],
-      })
-    }
-  }
 
+  // suggest chords to the user. when a new chord is chosen, update the suggested chords
   useEffect(() => {
     fetch("https://api.hooktheory.com/v1/trends/nodes", {
       method: "GET",
@@ -383,7 +248,6 @@ const Sequencer = () => {
         "Content-Type": "application/json",
         Authorization: "Bearer 6253102743c64eb2313c2c56d40bf6a6",
       },
-      // body: JSON.stringify({ order: formData }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -392,10 +256,6 @@ const Sequencer = () => {
       .catch((error) => {
         console.log(error)
       })
-  }, [chosenAPIChords])
-
-  useEffect(() => {
-    // todo fit chosen chords in format 1,4 in ${}
     if (chosenAPIChords.length > 0) {
       fetch(
         `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
@@ -406,45 +266,15 @@ const Sequencer = () => {
             "Content-Type": "application/json",
             Authorization: "Bearer 6253102743c64eb2313c2c56d40bf6a6",
           },
-          // body: JSON.stringify({ order: formData }),
         }
       )
         .then((res) => res.json())
         .then((data) => {
-          // i only take chords from the api that match those i've put in the sequencer
+          // only take chords from the api that match those i've put in the sequencer
           const removeUnsupportedChords = data.filter((chord) => {
             return chord["chord_ID"].length <= 1
           })
-          console.log(removeUnsupportedChords)
           setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
-        })
-        .catch((error) => {
-          console.log(error)
-        })
-    }
-
-    // * the below is for getting songs with the specific chord progression.
-    if (chosenAPIChords.length >= 4) {
-      // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
-      const APISongs = []
-      let page = 1
-      fetch(
-        `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: "Bearer 6253102743c64eb2313c2c56d40bf6a6",
-          },
-        }
-      )
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data, "hook API givin songs w chords")
-          data.forEach((song) => {
-            APISongs.push(song)
-          })
         })
         .catch((error) => {
           console.log(error)
@@ -456,39 +286,28 @@ const Sequencer = () => {
     // when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
     const detectKeyDown = (e) => {
       document.removeEventListener("keydown", detectKeyDown, true)
-      // ! for some reason, all the userIsTyping i get back (and i can get back up to 35 of them) return false, even though im typing
 
-      // * bashu: check event target for type, which should give an input text field. check for this type and change state based on it not being an text input.
-      // ? can't access current state with event listener
+      // check event target for type, which should give an input text field. check for this type and change state based on it not being an text input.
+      // can't access current state with event listener, thus we need useRef
       if (e.key === "s" && e.target.type !== "text") {
-        console.log("that key was s")
         playingRef.current = !playingRef.current
-        // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
-        // -> reason why is the comment under first useFX line
-        // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
         setPlaying(playingRef.current)
         document.addEventListener("keydown", detectKeyDown, true)
-        // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
         // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
       }
     }
+    // still debugging. sometimes multiple event listeners are added, due to the magic of react.
     document.removeEventListener("keydown", detectKeyDown, true)
-
     document.addEventListener("keydown", detectKeyDown, true)
   }, [])
 
+  // when adding many suggested chords, eventually you start adding to the beginning again
   useEffect(() => {
     if (chordInputStep > stepCount) setChordInputStep(1)
   }, [chordInputStep])
 
-  useEffect(() => {
-    console.log(playingRef, "usefx playingref changed???!!", playing)
-  }, [playing])
-
   // necessary in order to update the page when stepCount changes
   useEffect(() => {
-    // ! had an if looking for userLoadSongs then realized mb i need it to work without logging in. mb i needed it tho?
-
     // update chord master when the step count changes
     const newMaster = {}
     makeChordNotesState.forEach((note) => {
@@ -523,9 +342,8 @@ const Sequencer = () => {
   }, [stepCount])
 
   useEffect(() => {
-    // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made.
+    // when the user clicks on a note after loading a song, consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made.
     if (loadSong !== "75442486-0878-440c-9db1-a7006c25a39f") {
-      console.log(loadUserSongs)
       const song = loadUserSongs[loadSong]
       setRootNote(song["rootNote"])
       setStepCount(song["stepCount"])
@@ -544,9 +362,8 @@ const Sequencer = () => {
     }
   }, [loadSong])
 
-  // removes 'Song saved!' notification after 5s
+  // reloads song list after saving a song. removes notifications after 5s
   useEffect(() => {
-    // reset loadusersongs so we trigger a fetch in the ohter usefx?
     if (songSaved === "Song saved!") {
       fetch(`/api/user-login/${user.sub}`)
         .then((res) => res.json())
@@ -571,6 +388,7 @@ const Sequencer = () => {
       }, 5000)
     }
   }, [songSaved, songDeleted])
+
   return (
     <>
       <Parameters
@@ -613,7 +431,6 @@ const Sequencer = () => {
                         handleMelodyBeatCheckbox={handleMelodyBeatCheckbox}
                       />
                     )
-                    // }
                   })}
                 </ChordDiv>
               </TitleAndBoxesDiv>
@@ -684,7 +501,6 @@ const Sequencer = () => {
                           handleBeatCheckbox={handleBeatCheckbox}
                         />
                       )
-                      // }
                     }
                   )}
                 </ChordDiv>
@@ -737,7 +553,6 @@ const Sequencer = () => {
                 handleChordClick={handleChordClick}
                 chordInputStep={chordInputStep}
                 index={index}
-                handleChordRemove={handleChordRemove}
                 blankStepCountArray={blankStepCountArray}
                 hookTheoryChords={hookTheoryChords}
               />
@@ -760,15 +575,13 @@ const Sequencer = () => {
 export default Sequencer
 
 const ChordSequencerGrid = styled.div`
-  /* padding: 20px 20px 0px 20px; */
-  height: 300px;
+  height: 270px;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 `
 const MelodySequencerGrid = styled.div`
-  /* height: 400px; */ // used to be needed to not overlap parameters, but seems to be ok.
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -791,15 +604,6 @@ const AllBoxesDiv = styled.div`
   justify-content: center;
   align-items: center;
 `
-
-const TitleDiv = styled.div`
-  height: 270px;
-  padding-right: 8px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-end;
-`
 const BlankDiv = styled.div`
   height: 50px;
   width: 52px;
@@ -821,7 +625,7 @@ const ChordTitle = styled.span`
 `
 
 const HookTheoryChordsDiv = styled.div`
-  height: 150px;
+  height: 100px;
   margin: 10px 0px;
   display: flex;
   justify-content: center;
