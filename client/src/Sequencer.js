@@ -77,7 +77,6 @@ const Sequencer = () => {
   const {isAuthenticated, user} = useAuth0()
   const [playing, setPlaying] = useState(false)
   const [currentBeat, setCurrentBeat] = useState(0)
-  const [nextBeatTime, setNextBeatTime] = useState(0)
 
   // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
   // 1 pointer width covers 2 steps, or 1/4 of 8. set to 2 for 16, 3 for 32
@@ -138,7 +137,7 @@ const Sequencer = () => {
   const scheduleBeat = (beatNumber, time) => {
     notesInQueue.push({note: beatNumber, time})
   }
-  const secondsPerBeat = 45.0 / tempo
+  // const secondsPerBeat = 45.0 / tempo
 
   // * a tale of two clocks
   // setTimeout looks ahead and finds if any notes are due to be played
@@ -161,9 +160,12 @@ const Sequencer = () => {
   // may need to bring audiocontext in here and pass it over to the synth engine
 
   const scheduleAheadTime = 100 // ms? idk
+  let nextBeatTime = 0
+  let currentBeatTime = 0
   useEffect(() => {
     const interval = setInterval(() => {
       const nextNote = () => {
+        // ! we should make sure we're only advancing currentBeat when we reach the correct time for it
         currentBeat <= 0 || currentBeat >= stepCount
           ? setCurrentBeat(1)
           : setCurrentBeat(currentBeat + 1)
@@ -173,19 +175,36 @@ const Sequencer = () => {
 
       // nextBeatTime is what I need to figure it out and it has to be a fxn of tempo and my beat subdivision
 
-      //
-      if (playing) {
-        while (nextBeatTime < audioContext.currentTime + scheduleAheadTime) {
-          // scheduleNote(current16thNote, nextNoteTime)
-          nextNote()
-        }
+      // take tempo
+      // divide by seconds, as audioCtx needs seconds (or ms, lol)
+      // further divide by 2 as we do 8th notes
+      // thus we make smaller and smaller time divisions to then multiply by currentBeat or currentBeat+1 or something
+      // need to reference both master checked arrays for notes to be played in the future
+      // send a call to audioEngine if there is a note to be played, and send the value of the time it is to be played at
 
-        scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+      // 120 comes from seconds divided by 2, i.e. the value of an 8th note
+      // current
+      nextBeatTime += (tempo / 120) * 2
+      currentBeatTime += tempo / 120
+
+      // how can i use current time?
+      // do i need to always use that, then ask currentBeat, then ask where notes will be?
+
+      // console.log(nextBeatTime, currentBeatTime, audioContext.currentTime)
+      //
+      // ! this while condition breaks react
+      // while (nextBeatTime < audioContext.currentTime + scheduleAheadTime) {
+      //   // scheduleNote(current16thNote, nextNoteTime)
+      //   // todo ask if
+      //   nextNote()
+      // }
+      if (playing) {
+        // while: if nextBeat is to be played within the window of the current interval created between currentTime and scheduleAhead...
+        // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
       } else {
         setCurrentBeat(1) // ! this resets the playback to the beginning. remove to just make it a pause button.
       }
       currentBeatRef.current = currentBeat
-      console.log(nextBeatTime, "adding ", secondsPerBeat)
       // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
       const currentNoteStartTime = nextBeatTime
       // console.log(makeMelodyNotesState)
