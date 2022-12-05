@@ -1,6 +1,3 @@
-import {useContext} from "react"
-import {MusicParametersContext} from "./App"
-
 export const generateAreBeatsCheckedInitialState = (
   makeChordNotesState,
   makeMelodyNotesState,
@@ -26,11 +23,28 @@ export const generateAreBeatsCheckedInitialState = (
 export const clearAreBeatsChecked = (
   makeChordNotesState,
   blankStepCountArray,
-  setAreBeatsChecked
+  setAreBeatsChecked,
+  setChosenAPIChords,
+  setChordInputStep,
+  setHookTheoryChords
 ) => {
   const makeAreBeatsChecked = {}
   makeChordNotesState.forEach((num) => {
     makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray
   })
   setAreBeatsChecked(makeAreBeatsChecked)
+  setChosenAPIChords("")
+  setChordInputStep(1)
+  setHookTheoryChords([])
+}
+export const clearAreMelodyBeatsChecked = (
+  makeMelodyNotesState,
+  blankStepCountArray,
+  setAreMelodyBeatsChecked
+) => {
+  const makeAreMelodyBeatsChecked = {}
+  makeMelodyNotesState.forEach((num) => {
+    makeAreMelodyBeatsChecked[num] = blankStepCountArray
+  })
+  setAreMelodyBeatsChecked(makeAreMelodyBeatsChecked)
 }

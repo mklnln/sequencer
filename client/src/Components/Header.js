@@ -5,10 +5,13 @@ import LoginButton from "./LoginButton"
 import LogoutButton from "./LogoutButton"
 import {useAuth0} from "@auth0/auth0-react"
 import {MusicParametersContext} from "../App"
+import {handleLoadSongsFetch} from "../Helpers"
+import LoadSaveTestButtons from "./LoadSaveTestButtons"
 const Header = () => {
   const {user, isAuthenticated, isLoading, error} = useAuth0()
-  const {loadUserSongs, setLoadUserSongs, handleLoadSongsFetch, songSaved} =
-    useContext(MusicParametersContext)
+  const {setLoadUserSongs, songSaved, handleLoadSongsFetch} = useContext(
+    MusicParametersContext
+  )
   useEffect(() => {
     if (user || songSaved === "Song saved!") {
       console.log(user.sub)
@@ -21,11 +24,17 @@ const Header = () => {
     }
   }, [user])
 
-  // todo since this will gives us back the entire document, simply saving the songs in an array of objects [{[0,0],[0,0]etc}, {[0,0],[0,0]etc}] where the key to a given object can be the nameof the song, we can show the keys and click them to load them into the sequencer, changing state on the affected variables. we may need to make an object inside like 'parameters' so that it's obvious what to set states to
-
   return (
     <Banner>
       <h2>Sequencer</h2>
+      <button
+        onClick={() => {
+          console.log(user)
+        }}
+      >
+        check user
+      </button>
+      <LoadSaveTestButtons />
       {error && <span>Error authenticating.. try again.</span>}
       {!error && isLoading && <span>Loading...</span>}
       {!error && !isLoading && (
@@ -35,7 +44,7 @@ const Header = () => {
               <UserInfoDiv
               // todo onClick to profile page where we show all saved songs
               >
-                {user.picture && (
+                {user.picture && !isLoading && (
                   <ProfilePic src={user.picture} alt={user?.name} />
                 )}
                 <span>{user?.given_name}</span>
@@ -54,9 +63,12 @@ export default Header
 
 const Banner = styled.div`
   display: flex;
-  justify-content: space-between;
+  width: 97vw;
+  /* justify-content: space-between; */
   align-items: center;
-  border: 1px solid fuchsia;
+  margin: 15px 0px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid lightgray;
 `
 const ProfilePic = styled.img`
   width: 50px;
@@ -66,7 +78,12 @@ const ProfilePic = styled.img`
 `
 const UserInfoDiv = styled.div`
   display: flex;
-  width: 100%;
   justify-content: right;
   align-items: center;
+`
+const ColumnDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 `

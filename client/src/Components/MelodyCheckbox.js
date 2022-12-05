@@ -1,21 +1,19 @@
 import {useContext, useEffect, useState} from "react"
 import styled from "styled-components"
 import {MusicParametersContext} from "../App"
-const Checkbox = ({
-  handleBeatCheckbox,
+const MelodyCheckbox = ({
+  handleMelodyBeatCheckbox,
   beatIndex,
-  areBeatsChecked,
-  chordIndex,
+  areMelodyBeatsChecked,
+  scaleIndex,
 }) => {
   const [checked, setChecked] = useState(
-    areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? "checked" : ""
+    areMelodyBeatsChecked[scaleIndex][beatIndex] ? "checked" : ""
   )
 
   useEffect(() => {
-    setChecked(
-      areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? "checked" : ""
-    )
-  }, [areBeatsChecked])
+    setChecked(areMelodyBeatsChecked[scaleIndex][beatIndex] ? "checked" : "")
+  }, [areMelodyBeatsChecked])
 
   return (
     <>
@@ -23,7 +21,7 @@ const Checkbox = ({
         type="checkbox"
         checked={checked ? "checked" : ""}
         onChange={() => {
-          handleBeatCheckbox(chordIndex, beatIndex, checked)
+          handleMelodyBeatCheckbox(scaleIndex, beatIndex, checked)
           setChecked(!checked)
         }}
       />
@@ -31,7 +29,7 @@ const Checkbox = ({
   )
 }
 
-export default Checkbox
+export default MelodyCheckbox
 
 const CheckboxButton = styled.input`
   border: none;
@@ -39,23 +37,27 @@ const CheckboxButton = styled.input`
   width: 4px;
   opacity: 25%;
   height: 4px;
-  padding: 10px;
+  padding: 5px 10px;
   appearance: none;
 
   :hover {
     cursor: pointer;
+    border: none;
     background-color: #eaeae1;
-    border: 5px solid #eaeae1;
+    width: 4px;
     opacity: 25%;
-    padding: 5px;
-    border-radius: 5px;
+    height: 4px;
+    padding: 5px 10px;
+    border-radius: 4px;
   }
   :checked {
+    border: none;
     background-color: #eaeae1;
-    border-radius: 10px;
-    border: 5px solid #eaeae1;
+    width: 4px;
     opacity: 80%;
-    padding: 5px;
+    height: 4px;
+    padding: 5px 10px;
+    border-radius: 10px;
   }
   :checked && :hover {
     background-color: white;

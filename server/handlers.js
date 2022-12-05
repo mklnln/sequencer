@@ -67,25 +67,20 @@ const getUser = async (req, res) => {
 
 const saveSong = async (req, res) => {
   const songInfo = req.body
-  const {songName} = req.params
   console.log(songInfo, "songinfo")
   const userID = songInfo.userID
-  // ! can't figure out why i cant get anything in the body of my post
   try {
     await client.connect()
-    const userInfo = await db.collection("users").findOne({userID: userID})
-    if (userInfo) {
-      console.log(userInfo)
-      await db.collection("users").updateOne({userID: userID}, {$set: songInfo})
-      const updatedUserInfo = await db
-        .collection("users")
-        .findOne({userID: userID})
-      res.status(200).json({
-        status: 200,
-        message: "Song saved. Here's the updated document",
-        data: updatedUserInfo,
-      })
-    }
+
+    await db.collection("users").updateOne({userID: userID}, {$set: songInfo})
+    const updatedUserInfo = await db
+      .collection("users")
+      .findOne({userID: userID})
+    res.status(200).json({
+      status: 200,
+      message: "Song saved. Here's the updated document",
+      data: updatedUserInfo,
+    })
   } catch (err) {
     console.log(err.stack)
   } finally {
@@ -114,8 +109,34 @@ const loadSongs = async (req, res) => {
   }
 }
 
+const deleteSong = async (req, res) => {
+  const {userID, songName} = req.body
+  console.log(userID, songName)
+  try {
+    await client.connect()
+    await db
+      .collection("users")
+      .updateOne({userID: userID}, {$unset: {[songName]: ""}})
+    const userInfo = await db.collection("users").findOne({userID: userID})
+    if (userInfo) {
+      res.status(200).json({
+        status: 200,
+        message: "Song deleted. Here's the updated user.",
+        data: userInfo,
+      })
+    } else {
+      console.log("failed? idkwhy")
+    }
+  } catch (err) {
+    console.log(err.stack)
+  } finally {
+    client.close()
+  }
+}
+
 module.exports = {
   getUser,
   saveSong,
   loadSongs,
+  deleteSong,
 }
