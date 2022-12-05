@@ -106,7 +106,7 @@ const Parameters = ({playing, setPlaying}) => {
         <span>Tempo</span>
         <Parameter
           type="range"
-          min="30.0"
+          min="10.0"
           max="300.0"
           step="1"
           value={tempo}

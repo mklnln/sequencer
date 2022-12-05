@@ -413,6 +413,7 @@ const Sequencer = () => {
             }
             return (
               <TitleAndBoxesDiv>
+                {/* unable to get rid of an 'each child in a list needs a key' error  */}
                 <TitleSpanDiv>
                   <NoteTitle>
                     {note}

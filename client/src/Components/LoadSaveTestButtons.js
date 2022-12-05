@@ -198,7 +198,8 @@ const LoadSaveTestButtons = () => {
               {loadUserSongs ? (
                 <LoadingSongsDiv>
                   <ColumnDiv>
-                    <label>Load Song:</label>
+                    {/* unable to get rid of an 'each child in a list needs a key' error  */}
+                    <label key={`${Math.random()}`}>Load Song:</label>
                     <select
                       value={loadSong}
                       onChange={(e) => {
