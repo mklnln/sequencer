@@ -1,18 +1,10 @@
-import {useEffect, useState, useRef, createContext, Fragment} from "react"
+import {useState, createContext} from "react"
 import {BrowserRouter, Routes, Route} from "react-router-dom"
 import Header from "./Components/Header"
-import Checkbox from "./Components/Checkbox"
-import PlayBeatChord from "./PlayBeatChord"
 import Sequencer from "./Sequencer"
-import styled from "styled-components"
-import LoginButton from "./Components/LoginButton"
-import LogoutButton from "./Components/LogoutButton"
-import {GlobalStyleComponent} from "styled-components"
 import GlobalStyle from "./globalStyles"
 import {generateAreBeatsCheckedInitialState} from "./Helpers"
 export const MusicParametersContext = createContext()
-// ? do i even need context?
-
 const App = () => {
   const audioContext = new AudioContext()
   const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
@@ -41,6 +33,17 @@ const App = () => {
       "chords"
     )
   )
+  // this is the proper format of the master reference of notes areBeatsChecked. the amtOfNotes would be 8
+  // {
+  // chord-8: [1, 0, 0, 0, 0, 0, 0, 1],
+  // chord-7: [0, 1, 0, 0, 0, 0, 0, 0],
+  // chord-6: [0, 0, 0, 0, 0, 0, 0, 0],
+  // chord-5: [0, 0, 0, 0, 0, 1, 0, 0],
+  // chord-4: [0, 0, 0, 0, 0, 0, 0, 0],
+  // chord-3: [0, 0, 0, 0, 0, 0, 0, 0],
+  // chord-2: [0, 0, 0, 0, 0, 0, 0, 0],
+  // chord-1: [0, 0, 0, 1, 0, 0, 0, 0],
+  // }
   const [areMelodyBeatsChecked, setAreMelodyBeatsChecked] = useState(
     generateAreBeatsCheckedInitialState(
       makeChordNotesState,
@@ -60,7 +63,6 @@ const App = () => {
   const [decay, setDecay] = useState(20)
   const [sustain, setSustain] = useState(20)
   const [release, setRelease] = useState(20)
-  const [chordToHover, setChordToHover] = useState({})
   const [chordInputStep, setChordInputStep] = useState(1)
   const [chosenAPIChords, setChosenAPIChords] = useState([])
   const [hookTheoryChords, setHookTheoryChords] = useState([])
@@ -72,6 +74,7 @@ const App = () => {
   const [songSaved, setSongSaved] = useState(false)
   const [songDeleted, setSongDeleted] = useState(false)
 
+  // remove non-song data from the BE document
   const handleLoadSongsFetch = (songsAndIDs) => {
     const keysToUse = Object.keys(songsAndIDs).filter((key) => {
       return key !== "userID" && key !== "_id"
