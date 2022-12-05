@@ -211,11 +211,11 @@ const LoadSaveTestButtons = () => {
                       </option>
                       {Object.keys(loadUserSongs).map((song, index) => {
                         return (
-                          <>
-                            <option key={song} value={song}>
+                          <React.Fragment key={song} >
+                            <option  value={song}>
                               {song}
                             </option>
-                          </>
+                          </React.Fragment>
                         )
                       })}
                     </select>

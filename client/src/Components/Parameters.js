@@ -62,8 +62,10 @@ const Parameters = ({playing, setPlaying}) => {
       e.target.value === "samplePianoC2" ||
       e.target.value === "sampleOohC2" ||
       e.target.value === "sampleRonyA2" ||
-      e.target.value === "sampleFeltPianoC3"
+      e.target.value === "sampleFeltPianoC3" ||
+      e.target.value === "sampleSMWSteelC3"
     ) {
+      // required to load sample in advance of playing
       loadSample(e.target.value, audioContext)
     }
   }
@@ -159,7 +161,7 @@ const Parameters = ({playing, setPlaying}) => {
             <option value="sawtooth">Sawtooth Wave</option>
             <option value="triangle">Triangle Wave</option>
             <option value="sampleOohC2">Sample -- Ooh</option>
-            <option value="samplePianoC2">Sample -- Piano</option>
+            <option value="sampleSMWSteelC3">Sample -- SMW Steel Drum</option>
             <option value="sampleFeltPianoC3">Sample -- Felt Piano</option>
             <option value="sampleRonyA2">Sample -- Rony Uhh</option>
           </select>

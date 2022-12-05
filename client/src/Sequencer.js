@@ -1,4 +1,4 @@
-import {useContext, useEffect, useRef, useState} from "react"
+import React, {useContext, useEffect, useRef, useState} from "react"
 import Checkbox from "./Components/Checkbox"
 import {MusicParametersContext} from "./App.js"
 import {generateAreBeatsCheckedInitialState} from "./Helpers"
@@ -117,7 +117,6 @@ const Sequencer = () => {
             playSample(
               makeMelodyNotesState.length - index,
               playing,
-              rootNote,
               wonkFactor,
               "melody",
               audioContext
@@ -152,7 +151,6 @@ const Sequencer = () => {
             playSample(
               makeChordNotesState.length - index,
               playing,
-              rootNote,
               wonkFactor,
               "chords",
               audioContext
@@ -404,7 +402,7 @@ const Sequencer = () => {
       />
       <MelodySequencerGrid>
         <AllBoxesDiv>
-          {makeMelodyNotesState.map((note) => {
+          {makeMelodyNotesState.map((note, indexMelody) => {
             const scaleIndex = note
             if (note / 8 === 0 || (note > 7 && note <= 14)) {
               note = note - 7
@@ -412,7 +410,7 @@ const Sequencer = () => {
               note = note - 14
             }
             return (
-              <TitleAndBoxesDiv>
+              <TitleAndBoxesDiv key={`note-${note}, at index ${indexMelody}`}>
                 {/* unable to get rid of an 'each child in a list needs a key' error  */}
                 <TitleSpanDiv>
                   <NoteTitle>
@@ -445,7 +443,7 @@ const Sequencer = () => {
               // every 2 beats make a div
               if ((index + 1) % 2 === 0) {
                 return (
-                  <>
+                  <React.Fragment key={`note-${step}, at index ${index}`}>
                     <BeatMarker
                       key={num * Math.random()}
                       className={
@@ -469,7 +467,7 @@ const Sequencer = () => {
                         {num / 2}
                       </BeatSpan>
                     </BeatMarker>
-                  </>
+                  </React.Fragment>
                 )
               }
             })}
@@ -478,11 +476,11 @@ const Sequencer = () => {
       </MelodySequencerGrid>
       <ChordSequencerGrid>
         <AllBoxesDiv>
-          {makeChordNotesState.map((chord) => {
+          {makeChordNotesState.map((chord, index) => {
             const chordIndex = chord
 
             return (
-              <TitleAndBoxesDiv>
+              <TitleAndBoxesDiv key={`note-${chord}, at index ${index}`}>
                 <TitleSpanDiv>
                   <ChordTitle>
                     {romanNumeralReference["major"][chord]}
@@ -515,7 +513,7 @@ const Sequencer = () => {
               // every 2 beats make a div
               if ((index + 1) % 2 === 0) {
                 return (
-                  <>
+                  <React.Fragment key={index}>
                     <BeatMarker
                       className={
                         currentBeat === num ||
@@ -537,7 +535,7 @@ const Sequencer = () => {
                         {num / 2}
                       </BeatSpan>
                     </BeatMarker>
-                  </>
+                  </React.Fragment>
                 )
               }
             })}

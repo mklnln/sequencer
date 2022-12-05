@@ -1,7 +1,7 @@
 import {useContext} from "react"
 import {MusicParametersContext} from "./App.js"
 
-const samplePianoC2 = require("./assets/samples/c2.mp3")
+const sampleSMWSteelC3 = require("./assets/samples/SMWSteelC3.mp3")
 const sampleOohC2 = require("./assets/samples/oohc2.mp3")
 const sampleFeltPianoC3 = require("./assets/samples/feltPianoC3.mp3")
 const sampleRonyA2 = require("./assets/samples/RonyA2.mp3")
@@ -14,8 +14,8 @@ export const loadSample = (sample, audioContext) => {
   let fetchSrc = sample
   // left in for demo purposes
   console.log(typeof fetchSrc) // a string
-  if (sample === "samplePianoC2") {
-    fetchSrc = samplePianoC2
+  if (sample === "sampleSMWSteelC3") {
+    fetchSrc = sampleSMWSteelC3
   } else if (sample === "sampleRonyA2") {
     fetchSrc = sampleRonyA2
   } else if (sample === "sampleOohC2") {
