@@ -41,7 +41,6 @@ const LoadSaveTestButtons = () => {
     setLoadSong,
   } = useContext(MusicParametersContext)
 
-  console.log(loadUserSongs)
   const {user, isAuthenticated, isLoading, error} = useAuth0()
   useEffect(() => {}, [loadUserSongs])
 

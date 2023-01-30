@@ -49,8 +49,7 @@ export const playSample = (
   rootNote,
   wonkFactor,
   voiceQty,
-  audioContext,
-  currentNoteStartTime
+  audioContext
 ) => {
   // C3 sounds best
   const rootFrequency = 1
@@ -141,7 +140,6 @@ export const playSynth = (
     voicing.push(scale[index + 1])
     voicing.push(scale[index + 3])
   }
-
   // we want index, index+2, index+4 notes played.
   // ? this could be a state KEY as in major, minor, harmonic minor
   voicing.forEach((monophone) => {
@@ -156,14 +154,8 @@ export const playSynth = (
     const lowPassFilter = audioContext.createBiquadFilter()
     lowPassFilter.frequency.value = filterCutoff
     lowPassFilter.type = "lowpass"
-    const now = audioContext.currentTime
-    const scheduleStart = currentNoteStartTime
-    console.log(
-      audioContext.currentTime,
-      "currentTimeCTX   ",
-      currentNoteStartTime,
-      "currentNoteStartTime"
-    )
+    // ? we need to send over some number to affect noteTime.
+    let noteTime = audioContext.currentTime // ! resets when a new note is clicked
     osc.connect(lowPassFilter)
     const synthGain = audioContext.createGain()
     // shape the ADSR (attack, decay, sustain, release) envelope of the sound
@@ -180,32 +172,36 @@ export const playSynth = (
     // attack
     synthGain.gain.linearRampToValueAtTime(
       (volume / 100) * (1 / 3),
-      currentNoteStartTime + attackTime
+      noteTime + attackTime
     )
     // decay down from attack peak to sustain level
     synthGain.gain.linearRampToValueAtTime(
       sustainLevel,
-      currentNoteStartTime + attackTime + decayTime
+      noteTime + attackTime + decayTime
     )
 
     synthGain.gain.linearRampToValueAtTime(
       0,
-      currentNoteStartTime + duration + attackTime + decayTime + releaseTime
+      noteTime + duration + attackTime + decayTime + releaseTime
     )
     lowPassFilter.connect(synthGain)
     synthGain.connect(audioContext.destination)
     // ! when tf am i doing key off?
 
+    // * a tale of two clocks
+    // osc.start( time );
+    // osc.stop( time + noteLength );
+    // todo noteLength must be calculated by my linearRamp to whatever synth ADSR parameters
+
     if (playing) {
       // osc.start()
-      setTimeout(() => {
-        osc.start(currentNoteStartTime)
-        // }, Math.random() * wonkFactor)
-      }, 1)
+      noteTime = noteTime // doesn't work adding more than 1 second
+      osc.start(noteTime)
+      // }, Math.random() * wonkFactor)
       setTimeout(() => {
         // ! stopping the osc is necessary to keep the audioengine running else it eventually runs out of free oscillators
         // ! additionally,
-        osc.stop()
+        osc.stop() // this can be replaced by using the optional parameters on .start(when, offset, DURATION) and will achieve the same result
         // remember that setTimeout works in ms, synth in s
       }, (duration + attackTime + decayTime + releaseTime) * 1000)
     }

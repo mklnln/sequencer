@@ -77,7 +77,7 @@ const Sequencer = () => {
   const {isAuthenticated, user} = useAuth0()
   const [playing, setPlaying] = useState(false)
   const [currentBeat, setCurrentBeat] = useState(0)
-  const [nextBeatTime, setNextBeatTime] = useState(30 / tempo)
+  const [nextBeatTime, setNextBeatTime] = useState(0)
 
   // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
   // 1 pointer width covers 2 steps, or 1/4 of 8. set to 2 for 16, 3 for 32
@@ -138,12 +138,7 @@ const Sequencer = () => {
   const scheduleBeat = (beatNumber, time) => {
     notesInQueue.push({note: beatNumber, time})
   }
-  const secondsPerBeat = 30 / tempo // 120 because with 60 bpm, we set resolution to 1/8th notes
-  // 30 / 60 = 0.5s
-  // 30 / 120 = 0.25s
-  // 30 / 240 = 0.125s
-
-  // secondsPerBeat should be inversely proportional to the tempo, i.e. gets smaller as tempo increases.
+  const secondsPerBeat = tempo / 60
   // ?
   // how do we math into seconds per bpm? beats per minute. divided by 60, thats beats per second.
   // 120bpm / 60 = 2 beats per second.
@@ -178,140 +173,102 @@ const Sequencer = () => {
   // may need to bring audiocontext in here and pass it over to the synth engine
 
   const scheduleAheadTime = 100 // ms? idk
-  const contextTime = audioContext.currentTime
   useEffect(() => {
     // ! mb prefer setTimeout? if the useEffect gets called every time, a new interval will be made and may consistently keep going, looping over and over on itself.
-    // this useEffect is called for every single beat
-    // currentNoteStartTime keeps counting up
-    // audioContext.currentTime resets
-    // i think we need this useEffect in audioEngine.js
-    // reason being we need audioContext.currentTime while scheduling, i.e. before sending notes over to the engine.
-    // mb we can share the audioContext between files?
-    setTimeout(() => {
+    const interval = setInterval(() => {
       // * a tale of two clocks
-      // Chris: I’m not keeping track of “sequence time” - that is, time since the beginning of starting the metronome. All we have to do is remember when we played the last note, and figure out when the next note is scheduled to play.
+      // I’m not keeping track of “sequence time” - that is, time since the beginning of starting the metronome. All we have to do is remember when we played the last note, and figure out when the next note is scheduled to play.
       // e.g. fxn nextNote = const secondsPerBeat = 60/tempo, nextNoteTime += 0.25 *secondsPerBeat (1/4 note resolution)
       // if you calculate next beat time for each note, you don't have to worry about keeping track of global time, only need nextNoteTime
 
-      currentBeatRef.current = currentBeat
-      currentBeatRef.current = currentBeat
-      // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
-
-      // todo kek this is not it
-      const currentNoteStartTime = nextBeatTime
-
-      // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
-      //   scheduleNote( current16thNote, nextNoteTime );
-      //   nextNote();
-      // }
-
-      console.log(
-        `is ${nextBeatTime} < ${contextTime} + ${
-          scheduleAheadTime / 1000
-        } ? === `,
-        nextBeatTime < contextTime + scheduleAheadTime / 1000
-      )
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
-
-      // ! for monday mykl:
-      // todo need to make CW's while statement (now the if below ending in '/ 1000') work properly. nextBeatTime needs to be in some semblance of sync with contextTime
-      // also consider that contextTime resets when a new note is added. mb when notes change, we can also reset nextBeatTime
-
-      if (nextBeatTime < contextTime + scheduleAheadTime / 1000) {
-        // scheduleNote(current16thNote, nextNoteTime)
-        // nextNote()
-        makeMelodyNotesState.forEach((noteRow, index) => {
-          if (
-            areMelodyBeatsChecked[noteRow][currentBeat - 1] === 1 &&
-            playing
-          ) {
-            if (!sound.includes("sample")) {
-              playSynth(
-                makeMelodyNotesState.length - index,
-                playing,
-                rootNote,
-                wonkFactor,
-                melodyVolume,
-                chordsVolume,
-                sound,
-                filterCutoff,
-                attack,
-                decay,
-                sustain,
-                release,
-                "melody",
-                audioContext,
-                currentNoteStartTime
-              )
-            } else {
-              playSample(
-                makeMelodyNotesState.length - index,
-                playing,
-                rootNote,
-                wonkFactor,
-                "melody",
-                audioContext,
-                currentNoteStartTime
-              )
-            }
-          }
-        })
-
-        makeChordNotesState.forEach((noteRow, index) => {
-          if (
-            areBeatsChecked[`chord-${noteRow}`][currentBeat - 1] === 1 &&
-            playing
-          ) {
-            if (!sound.includes("sample")) {
-              playSynth(
-                makeChordNotesState.length - index,
-                playing,
-                rootNote,
-                wonkFactor,
-                melodyVolume,
-                chordsVolume,
-                sound,
-                filterCutoff,
-                attack,
-                decay,
-                sustain,
-                release,
-                "chords",
-                audioContext,
-                currentNoteStartTime
-              )
-            } else {
-              playSample(
-                makeChordNotesState.length - index,
-                playing,
-                rootNote,
-                wonkFactor,
-                "chords",
-                audioContext,
-                currentNoteStartTime
-              )
-            }
-          }
-        })
-      }
       if (playing) {
-        if (currentBeat <= 0 || currentBeat >= stepCount) {
-          setCurrentBeat(1)
-          console.log("reset beattime")
-          console.log(currentBeat)
-          // setNextBeatTime(secondsPerBeat)
-        } else {
-          setCurrentBeat(currentBeat + 1)
-          setNextBeatTime(nextBeatTime + secondsPerBeat)
-        }
+        currentBeat <= 0 || currentBeat >= stepCount
+          ? setCurrentBeat(1)
+          : setCurrentBeat(currentBeat + 1)
         scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
       } else {
         setCurrentBeat(1) // this resets the playback to the beginning. remove to just make it a pause button.
       }
+      currentBeatRef.current = currentBeat
+      setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
+      currentBeatRef.current = currentBeat
+      // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
+      const currentNoteStartTime = nextBeatTime
+      // console.log(makeMelodyNotesState)
+      // console.log(makeChordNotesState)
+      makeMelodyNotesState.forEach((noteRow, index) => {
+        if (areMelodyBeatsChecked[noteRow][currentBeat - 1] === 1 && playing) {
+          if (!sound.includes("sample")) {
+            playSynth(
+              makeMelodyNotesState.length - index,
+              playing,
+              rootNote,
+              wonkFactor,
+              melodyVolume,
+              chordsVolume,
+              sound,
+              filterCutoff,
+              attack,
+              decay,
+              sustain,
+              release,
+              "melody",
+              audioContext
+            )
+          } else {
+            playSample(
+              makeMelodyNotesState.length - index,
+              playing,
+              rootNote,
+              wonkFactor,
+              "melody",
+              audioContext
+            )
+          }
+        }
+      })
+
+      makeChordNotesState.forEach((noteRow, index) => {
+        if (
+          areBeatsChecked[`chord-${noteRow}`][currentBeat - 1] === 1 &&
+          playing
+        ) {
+          if (!sound.includes("sample")) {
+            playSynth(
+              makeChordNotesState.length - index,
+              playing,
+              rootNote,
+              wonkFactor,
+              melodyVolume,
+              chordsVolume,
+              sound,
+              filterCutoff,
+              attack,
+              decay,
+              sustain,
+              release,
+              "chords",
+              audioContext
+            )
+          } else {
+            playSample(
+              makeChordNotesState.length - index,
+              playing,
+              rootNote,
+              wonkFactor,
+              "chords",
+              audioContext
+            )
+          }
+        }
+      })
+
+      // ! the below line's interval timing was secondsPerBeat * 1000, but i noticed that the stated value of 150 was in truth more like 130. 150/130 is 1.15, thus i thought a 15% decrease in the interval would give me a more accurate time. this is true, but i'm not sure what's going on exactly. that's why 850 is used as its 15% less
+      // old value
+      // }, (secondsPerBeat * 850) / 2)
     }, scheduleAheadTime)
+    // ! even set manually at 1000ms (i.e. one second), this will oscillate in and out of rhythm with a clock ticking each second. the 2 refers to how many subdivisions a quarter note gives. our stepCount is 8th notes.
+    return () => clearInterval(interval)
   }, [playing, currentBeat])
 
   const handleBeatCheckbox = (chordIndex, beatIndex, checked) => {
