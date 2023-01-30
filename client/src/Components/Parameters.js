@@ -33,6 +33,9 @@ const Parameters = ({playing, setPlaying}) => {
     release,
     setRelease,
   } = useContext(MusicParametersContext)
+
+  // setState on parameters was finnicky at times, making separate functions helped.
+  // TO-DO: cut down on this bloat and keep setState calls as anonymous callbacks within the below returns.
   const parseTempo = (e) => {
     setTempo(parseInt(e.target.value, 10))
   }
@@ -61,7 +64,6 @@ const Parameters = ({playing, setPlaying}) => {
       e.target.value === "sampleRonyA2" ||
       e.target.value === "sampleFeltPianoC3"
     ) {
-      console.log(e.target.value, "CONTAINS sample LESSSSSSSGOOOOOOOOOO")
       loadSample(e.target.value, audioContext)
     }
   }
@@ -81,12 +83,8 @@ const Parameters = ({playing, setPlaying}) => {
   const parseRelease = (e) => {
     setRelease(parseInt(e.target.value))
   }
-  //   useEffect(() => {
-  //     setAreBeatsChecked(
-  //       generateAreBeatsCheckedInitialState(makeNotesState, blankStepCountArray)
-  //     )
-  //   }, [stepCount])
 
+  // TO-DO: make a parameter component in order to avoid repetition
   return (
     <MainDiv>
       <StartButtonDiv>
@@ -108,8 +106,8 @@ const Parameters = ({playing, setPlaying}) => {
         <span>Tempo</span>
         <Parameter
           type="range"
-          min="60.0"
-          max="240.0"
+          min="30.0"
+          max="300.0"
           step="1"
           value={tempo}
           onInput={(e) => parseTempo(e)}

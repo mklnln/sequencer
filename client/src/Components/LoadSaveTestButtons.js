@@ -6,7 +6,6 @@ import {clearAreBeatsChecked, clearAreMelodyBeatsChecked} from "../Helpers"
 
 const LoadSaveTestButtons = () => {
   const {
-    playing,
     areMelodyBeatsChecked,
     makeChordNotesState,
     setAreBeatsChecked,
@@ -39,6 +38,7 @@ const LoadSaveTestButtons = () => {
     setLoadUserSongs,
     setSongName,
     setLoadSong,
+    handleLoadSongsFetch,
   } = useContext(MusicParametersContext)
 
   const {user, isAuthenticated, isLoading, error} = useAuth0()
@@ -71,13 +71,11 @@ const LoadSaveTestButtons = () => {
         `You can't save without actually putting some notes in the sequencer.`
       )
     } else {
+      // load all relevant parameters into the body for the backend
       const saveObj = {}
-      console.log(areBeatsChecked, areMelodyBeatsChecked)
       saveObj[songName] = {}
       saveObj[songName].areBeatsChecked = areBeatsChecked
       saveObj[songName].areMelodyBeatsChecked = areMelodyBeatsChecked
-      console.log(saveObj[songName].areMelodyBeatsChecked)
-      console.log(saveObj[songName].areBeatsChecked)
       saveObj.userID = user.sub
       saveObj[songName].stepCount = stepCount
       saveObj[songName].rootNote = rootNote
@@ -92,7 +90,6 @@ const LoadSaveTestButtons = () => {
       saveObj[songName].sustain = sustain
       saveObj[songName].release = release
 
-      console.log(saveObj)
       setSongSaved("saving to database...")
       fetch(`/api/save-song`, {
         method: "POST",
@@ -120,14 +117,11 @@ const LoadSaveTestButtons = () => {
     }
   }
   const handleDelete = () => {
-    // make endpoint, BE logic
-
     if (loadSong === "75442486-0878-440c-9db1-a7006c25a39f" && user.sub) {
       window.alert(
         "Invalid selection. In order to delete, you must be logged-in and load the song from the dropdown list and then click delete. Making changes after loading will prevent deletion."
       )
     } else {
-      console.log(typeof user)
       const bodyObj = {}
       bodyObj.songName = loadSong
       bodyObj.userID = user.sub
@@ -157,13 +151,9 @@ const LoadSaveTestButtons = () => {
     }
   }
 
+  // setState was finnicky at times, this helped. to be fixed.
   const handleSongName = (e) => {
     setSongName(e.target.value)
-  }
-
-  const handleLoadSong = (e) => {
-    console.log(e.target.value)
-    setLoadSong(e.target.value)
   }
 
   return (
@@ -178,7 +168,6 @@ const LoadSaveTestButtons = () => {
         </StyledButton>
         <StyledButton
           onClick={() => {
-            console.log(makeChordNotesState)
             clearAreBeatsChecked(
               makeChordNotesState,
               blankStepCountArray,
@@ -203,9 +192,6 @@ const LoadSaveTestButtons = () => {
           reset melodies
         </StyledButton>
       </ColumnDiv>
-      {/* 
-      could cond'ly render showing faded StyledButton if unauthenticated
-      */}
       <br />
       {loadUserSongs ? (
         <>
@@ -213,13 +199,7 @@ const LoadSaveTestButtons = () => {
             <>
               <ColumnDiv>
                 <span>Song Name:</span>
-                <input
-                  type="text"
-                  onChange={handleSongName}
-                  value={songName}
-                  // onFocus={handleInputFocus}
-                  // onBlur={handleInputBlur}
-                />
+                <input type="text" onChange={handleSongName} value={songName} />
 
                 <StyledButton onClick={() => handleSave()}>
                   save song
@@ -231,11 +211,9 @@ const LoadSaveTestButtons = () => {
                 <LoadingSongsDiv>
                   <ColumnDiv>
                     <label>Load Song:</label>
-                    {/* <select value={loadSong} onChange={handleLoadSong}> */}
                     <select
                       value={loadSong}
                       onChange={(e) => {
-                        console.log(setLoadSong)
                         setLoadSong(e.target.value)
                       }}
                     >
@@ -276,18 +254,22 @@ const LoadSaveTestButtons = () => {
 }
 
 export default LoadSaveTestButtons
-const LoadingSongsDiv = styled.div``
+const LoadingSongsDiv = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
 const DeleteButton = styled.button`
   margin: 20px;
+
+  background-color: red;
 `
 const MainDiv = styled.div`
   width: 1900px;
   display: flex;
   justify-content: center;
-  /* align-items: center; */
   flex-direction: row;
 `
-const LoadedUserDiv = styled.div``
 
 const ColumnDiv = styled.div`
   display: flex;

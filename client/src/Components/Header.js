@@ -1,11 +1,9 @@
 import React, {useContext, useEffect} from "react"
 import styled from "styled-components"
-import Profile from "./Profile"
 import LoginButton from "./LoginButton"
 import LogoutButton from "./LogoutButton"
 import {useAuth0} from "@auth0/auth0-react"
 import {MusicParametersContext} from "../App"
-import {handleLoadSongsFetch} from "../Helpers"
 import LoadSaveTestButtons from "./LoadSaveTestButtons"
 const Header = () => {
   const {user, isAuthenticated, isLoading, error} = useAuth0()
@@ -14,7 +12,6 @@ const Header = () => {
   )
   useEffect(() => {
     if (user || songSaved === "Song saved!") {
-      console.log(user.sub)
       fetch(`/api/user-login/${user.sub}`)
         .then((res) => res.json())
         .then((data) => {
@@ -41,9 +38,7 @@ const Header = () => {
         <>
           <>
             {isAuthenticated && (
-              <UserInfoDiv
-              // todo onClick to profile page where we show all saved songs
-              >
+              <UserInfoDiv>
                 {user.picture && !isLoading && (
                   <ProfilePic src={user.picture} alt={user?.name} />
                 )}
@@ -64,7 +59,6 @@ export default Header
 const Banner = styled.div`
   display: flex;
   width: 97vw;
-  /* justify-content: space-between; */
   align-items: center;
   margin: 15px 0px;
   padding-bottom: 15px;
@@ -80,10 +74,4 @@ const UserInfoDiv = styled.div`
   display: flex;
   justify-content: right;
   align-items: center;
-`
-const ColumnDiv = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
 `

@@ -3,14 +3,7 @@ import styled from "styled-components"
 import {MusicParametersContext} from "../App"
 import RemoveChordButton from "../RemoveChordButton"
 
-const HookTheoryChordButton = ({
-  chord,
-  handleChordClick,
-  index,
-  handleChordRemove,
-  blankStepCountArray,
-  hookTheoryChords,
-}) => {
+const HookTheoryChordButton = ({chord, handleChordClick, index}) => {
   // const {handleChordHover} = useContext(MusicParametersContext)
 
   return (
@@ -28,13 +21,6 @@ const HookTheoryChordButton = ({
 }
 
 export default HookTheoryChordButton
-
-const RemoveButtonsDiv = styled.div`
-  display: flex;
-  padding: 10px 0 0 0;
-  justify-content: center;
-  align-items: center;
-`
 
 const ChordButton = styled.button`
   width: 80px;
