@@ -38,7 +38,6 @@ const LoadSaveTestButtons = () => {
     setLoadUserSongs,
     setSongName,
     setLoadSong,
-    handleLoadSongsFetch,
   } = useContext(MusicParametersContext)
 
   const {user, isAuthenticated, isLoading, error} = useAuth0()
