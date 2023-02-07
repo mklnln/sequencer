@@ -147,7 +147,7 @@ const App = () => {
         <Header />
         <Routes>
           <Route>
-            <Route path="/" element={<Sequencer />} />
+            <Route path="/*" element={<Sequencer />} />
           </Route>
         </Routes>
       </MusicParametersContext.Provider>
