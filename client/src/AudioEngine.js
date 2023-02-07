@@ -92,7 +92,8 @@ export const playSynth = (
   sustain,
   release,
   polyphony,
-  audioContext
+  audioContext,
+  currentNoteStartTime
 ) => {
   let rootFrequency = 220 * 2 ** (rootNote / 12) // instead of accessing a big object with note frequency values, we can just calculate them based off of A3 = 220Hz
 
@@ -128,7 +129,7 @@ export const playSynth = (
     lowPassFilter.frequency.value = filterCutoff
     lowPassFilter.type = "lowpass"
     // ? we need to send over some number to affect noteTime.
-    let noteTime = audioContext.currentTime // ! resets when a new note is clicked
+    // let noteTime = audioContext.currentTime // ! resets when a new note is clicked
     osc.connect(lowPassFilter)
     const synthGain = audioContext.createGain()
     // shape the ADSR (attack, decay, sustain, release) envelope of the sound
@@ -145,18 +146,18 @@ export const playSynth = (
     // attack
     synthGain.gain.linearRampToValueAtTime(
       (volume / 100) * (1 / 3),
-      noteTime + attackTime
+      currentNoteStartTime + attackTime
     )
     // decay down from attack peak to sustain level
     const volumeModifier = (volume * sustainLevel) / 100
     synthGain.gain.linearRampToValueAtTime(
       sustainLevel,
-      noteTime + attackTime + decayTime
+      currentNoteStartTime + attackTime + decayTime
     )
     // release down to zero after note duration
     synthGain.gain.linearRampToValueAtTime(
       0,
-      noteTime + duration + attackTime + decayTime + releaseTime
+      currentNoteStartTime + duration + attackTime + decayTime + releaseTime
     )
     lowPassFilter.connect(synthGain)
     synthGain.connect(audioContext.destination)
@@ -168,8 +169,7 @@ export const playSynth = (
 
     if (playing) {
       // osc.start()
-      noteTime = noteTime // doesn't work adding more than 1 second
-      osc.start(noteTime)
+      osc.start(currentNoteStartTime)
       // }, Math.random() * wonkFactor)
       setTimeout(() => {
         // ! stopping the osc is necessary to keep the audioengine running else it eventually runs out of free oscillators

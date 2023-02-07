@@ -4,9 +4,16 @@ import Header from "./Components/Header"
 import Sequencer from "./Sequencer"
 import GlobalStyle from "./globalStyles"
 import {generateAreBeatsCheckedInitialState} from "./Helpers"
+import {useEffect} from "react"
 export const MusicParametersContext = createContext()
 const App = () => {
-  const audioContext = new AudioContext()
+  // the next three statements are meant to begin fiddling with my problem of integrating CW's while statement. i am now successfully resetting the audiocontext on each change of [playing]
+  const [audioContext, setAudioContext] = useState(new AudioContext())
+  const [playing, setPlaying] = useState(false)
+  useEffect(() => {
+    setAudioContext(new AudioContext())
+  }, [playing])
+
   const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
   const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
   const makeMelodyNotesState = []
@@ -52,6 +59,7 @@ const App = () => {
       "melody"
     )
   )
+
   const [tempo, setTempo] = useState(60)
   const [rootNote, setRootNote] = useState(0)
   const [wonkFactor, setWonkFactor] = useState(1)
@@ -91,6 +99,8 @@ const App = () => {
       <MusicParametersContext.Provider
         value={{
           audioContext,
+          playing,
+          setPlaying,
           tempo,
           setTempo,
           stepCount,

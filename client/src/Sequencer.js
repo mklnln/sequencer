@@ -11,6 +11,8 @@ import MelodyCheckbox from "./Components/MelodyCheckbox"
 const Sequencer = () => {
   const {
     audioContext,
+    playing,
+    setPlaying,
     tempo,
     setTempo,
     stepCount,
@@ -60,9 +62,11 @@ const Sequencer = () => {
     setHookTheoryChords,
   } = useContext(MusicParametersContext)
   const {user} = useAuth0()
-  const [playing, setPlaying] = useState(false)
+
   const [currentBeat, setCurrentBeat] = useState(0)
-  const [nextBeatTime, setNextBeatTime] = useState(30 / tempo)
+  const [nextNoteTime, setNextNoteTime] = useState(0)
+  const [notesToBePlayed, setNotesToBePlayed] = useState({})
+  const [calcTime, setCalcTime] = useState(0)
 
   // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
   // 1 pointer width covers 2 steps, or 1/4 of 8. set to 2 for 16, 3 for 32
@@ -145,10 +149,32 @@ const Sequencer = () => {
   // * timeout interval is how often the setTimeout is called with its lookahead
   // * A good place to start is probably 100ms of “lookahead” time, with intervals set to 25ms.
 
-  // may need to bring audiocontext in here and pass it over to the synth engine
-
   const scheduleAheadTime = 100 // ms? idk
   const contextTime = audioContext.currentTime
+  let notesToBePlayedObj = {}
+  useEffect(() => {
+    // this useEffect creates an object of arrays containing the melody notes to be played
+    for (let i = 0; i < stepCount; i++) {
+      // need to check first index of all note arrays separately, checking every column along X-axis
+      const notesOfSameBeat = []
+      for (let j = 15; j >= 1; j--) {
+        // checking every row along Y-axis
+        if (areMelodyBeatsChecked[j][i] === 1) {
+          notesOfSameBeat.push(j)
+          notesToBePlayedObj = {
+            ...notesToBePlayedObj,
+            [`beat${i + 1}`]: [...notesOfSameBeat],
+          }
+        }
+      }
+    }
+    setNotesToBePlayed(notesToBePlayedObj)
+    console.log(notesToBePlayedObj)
+  }, [tempo, areMelodyBeatsChecked])
+  useEffect(() => {
+    setNextNoteTime(0)
+  }, [areMelodyBeatsChecked, areBeatsChecked, playing])
+
   useEffect(() => {
     // ! mb prefer setTimeout? if the useEffect gets called every time, a new interval will be made and may consistently keep going, looping over and over on itself.
     // this useEffect is called for every single beat
@@ -164,11 +190,10 @@ const Sequencer = () => {
       // if you calculate next beat time for each note, you don't have to worry about keeping track of global time, only need nextNoteTime
 
       currentBeatRef.current = currentBeat
-      currentBeatRef.current = currentBeat
-      // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
+      // setNextBeatTime(nextNoteTime + secondsPerBeat) // todo need for visual
 
       // todo kek this is not it
-      const currentNoteStartTime = nextBeatTime
+      const currentNoteStartTime = nextNoteTime
 
       // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
       //   scheduleNote( current16thNote, nextNoteTime );
@@ -176,23 +201,26 @@ const Sequencer = () => {
       // }
 
       console.log(
-        `is ${nextBeatTime} < ${contextTime} + ${
-          scheduleAheadTime / 1000
-        } ? === `,
-        nextBeatTime < contextTime + scheduleAheadTime / 1000
+        `is ${calcTime} < ${contextTime} + ${scheduleAheadTime / 1000} ? === `,
+        calcTime < contextTime + scheduleAheadTime / 1000
       )
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
-      // * we need to change the beat often enough that the useEffect engages, but not so often that it completely outpaces contextTime
 
-      // ! for monday mykl:
-      // todo need to make CW's while statement (now the if below ending in '/ 1000') work properly. nextBeatTime needs to be in some semblance of sync with contextTime
-      // also consider that contextTime resets when a new note is added. mb when notes change, we can also reset nextBeatTime
+      // * nextNoteTime must be turned into a calculation based off of what notes are to be scheduled based off of the 'areMelodyBeatsChecked' array of arrays.
 
-      if (nextBeatTime < contextTime + scheduleAheadTime / 1000) {
+      // note at beat 1 should play at time = 0 seconds
+      // note at beat 2 should play at time = (secondsPerBeat * 1) seconds
+      // this is true while currentBeat is at 1, i.e. the beginning
+      // eventually need to make nextNoteTime greater than contextTime & scheduleAhead so that whole thing can be an if else, the else advancing currentBeat.
+      // in other words, we need to do one of two things: schedule a note to be played if nextNoteTime is < blabla, or advance currentBeat
+      // at the moment, nextNoteTime is not set to anything
+      // set nextBeat after scheduling a note
+
+      //!  experimenting with calcTime, trying to avoid useState
+      if (calcTime < contextTime + scheduleAheadTime / 1000) {
         // scheduleNote(current16thNote, nextNoteTime)
         // nextNote()
+
+        // todo i've already checked to see if a note is played, so we just need to send the scale degree over to the synth engine, based off of notesToBePlayedObj
         makeMelodyNotesState.forEach((noteRow, index) => {
           if (
             areMelodyBeatsChecked[noteRow][currentBeat - 1] === 1 &&
@@ -266,18 +294,49 @@ const Sequencer = () => {
             }
           }
         })
+
+        // todo assess notesToBePlayedObj and advance nextNoteTime so that we can re-do ye olde CW if
+        // starts at 0, so the first note to be played will be on beat 1.
+        // ! we may have an issue in assuming it's always on beat 1 tho.
+        // whatever. assume start on beat 1.
+        //
+        console.log(notesToBePlayed)
+        // we want seconds. find the next note to be played, first of all
+        // we are by necessity having just played a note, so we can assume that we're looking for the second one
+        // notesToBePlayed looks like {beat1: [1,2], beat4: [3,5]}
+
+        // * for tomorrow:
+        // * i tried to calculate the time to the next beat to be played. it's not working, lol. it may just be a confusion with nextNoteTime, which also exists and is not being used. I think i avoided it cuz i wanted to avoid state, but i think i need to use state regardless, as it needs to persist between renders.... is that what i mean?
+        // it's also not changing every beat, but rather every reset of currentBeat. perhaps related to my for loop.
+
+        for (let i = currentBeat + 1; i <= stepCount; i++) {
+          if (notesToBePlayed[`beat${i}`]) {
+            let calculation = 0
+            calculation = (i - currentBeat) * secondsPerBeat + calcTime
+            console.log(secondsPerBeat)
+            console.log(calculation)
+            setCalcTime(calculation)
+            setNextNoteTime(calculation)
+          }
+        }
+
+        // setNextNoteTime(calcTime)
+        console.log(calcTime)
+        // * put this to an else condition of CW's while (now my if). i was hoping to either set a note to play or change the current beat so the sequencer keeps moving. atm its stopped. mb maybe a state that says notePlayed = true then flip to false?
       }
       if (playing) {
         if (currentBeat <= 0 || currentBeat >= stepCount) {
           setCurrentBeat(1)
-          console.log("reset beattime")
-          console.log(currentBeat)
-          // setNextBeatTime(secondsPerBeat)
         } else {
+          // ! currentBeat is advanced every scheduleAheadTime, not based on tempo!! wtf
+          // ! currentBeat is advanced every scheduleAheadTime, not based on tempo!! wtf
+          // ! currentBeat is advanced every scheduleAheadTime, not based on tempo!! wtf
+          // ! currentBeat is advanced every scheduleAheadTime, not based on tempo!! wtf
+          // ! currentBeat is advanced every scheduleAheadTime, not based on tempo!! wtf
           setCurrentBeat(currentBeat + 1)
-          setNextBeatTime(nextBeatTime + secondsPerBeat)
+          // setNextBeatTime(nextNoteTime + secondsPerBeat)
         }
-        scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+        scheduleBeat(currentBeat, nextNoteTime) // todo needed for visual
       } else {
         setCurrentBeat(1) // this resets the playback to the beginning. remove to just make it a pause button.
       }
@@ -306,7 +365,8 @@ const Sequencer = () => {
   }
 
   const handleMelodyBeatCheckbox = (scaleIndex, beatIndex, checked) => {
-    const chordShortcut = scaleIndex
+    // beatIndex represents the specific beat (x-axis) that was clicked
+    const chordShortcut = scaleIndex // y-axis
     const arrayReplacement = []
     if (loadSong !== "75442486-0878-440c-9db1-a7006c25a39f")
       setLoadSong("75442486-0878-440c-9db1-a7006c25a39f")
@@ -317,6 +377,7 @@ const Sequencer = () => {
         arrayReplacement.push(checked ? 0 : 1)
       }
     })
+
     setAreMelodyBeatsChecked({
       ...areMelodyBeatsChecked,
       [chordShortcut]: [...arrayReplacement],
