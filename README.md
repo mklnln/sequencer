@@ -7,10 +7,10 @@ A music sequencer plays pre-determined notes over an interval of time and uses a
 The intention was to create a visual representation of the notes of the major scale and the corresponding chords. Playing just these notes makes it easier for beginners to play something that "sounds good" and inspires more music making. I really want more people to discover the joy of making music!
 
 # Technologies Used
-Hosted on Render and made with React, the core functionality of the sequencer works entirely client-side. 
+Hosted on Render and made with React, the core functionality of the sequencer works entirely client-side. Auth0 and MongoDB are used in tandem to create a user profile that can store and load both songs and sound engine parameters. Styling is done with styled-components, a React specific CSS-styling solution.
 
-### The Web Audio API is the real star of the show.
-
+### The [Web Audio API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API) is the real star of the show.
+I taught myself a new technology for this project. This API unlocks the various features of JavaScript to play sounds in a browser. It includes its own synthesizer engine, allowing one to use various different sound waveforms and adjust different parameters, all of which have a noticeable and interesting effect on the sound. I also was able to integrate samples, so I took a brief moment of my bootcamp instructor saying 'uhh' and got him to sing Careless Whisper for my final presentation.
 
 # MVP
 As outlined in my project proposal, the *minimum viable product* was to log in via Auth0, save/load songs and settings in MongoDB, visualize chord probability from the HookTheory API, and play sounds based off the sequencer grid. 
