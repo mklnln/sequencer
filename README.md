@@ -31,5 +31,5 @@ Please note that this is an MVP and still contains bugs. I hope you'll find some
 - [ ] Get tempo to reflect real BPM values (currently just approximate)
 - [ ] Fix bugs with parameter manipulation, especially when the values are set to extremes (ADSR, tempo, filter, etc)
 - [ ] Design UI with inspiration from real-world synth hardware using Figma
-- [ ] Create ? icons with corresponding modals to teach the user about both the sequencer and music theory.
+- [ ] Create ? icons with corresponding modals to teach the user about both the sequencer and music theory
 - [ ] Finishing touches (tab icon, tab title, song pre-loaded, UX decisions, etc)
