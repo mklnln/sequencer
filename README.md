@@ -1,7 +1,7 @@
 # Simple Sequencer
 
 # What's a sequencer?
-A music sequencer plays pre-determined notes over an interval of time and uses a sort of grid to do so. Along the x-axis, there are different columns that each represent a beat, i.e. a musical slice of time. Along the y-axis, there are different rows that each represent different notes of the major scale. Click various notes and then hit the start/stop button (shortcut: s) to hear them played back. Change the sounds to different synthesizer waveforms or use the loaded samples. 
+A music sequencer plays pre-determined notes over an interval of time and uses a sort of grid to visually represent itself. Along the x-axis, there are different columns that each represent a beat, i.e. a musical slice of time. Along the y-axis, there are different rows that each represent different notes of the major scale. Click various notes and then hit the start/stop button (shortcut: s) to hear them played back. Change the sounds to different synthesizer waveforms or use the loaded samples. 
 
 # Why make this?
 The intention was to create a visual representation of the notes of the major scale and the corresponding chords. Playing just these notes makes it easier for beginners to play something that "sounds good" and inspires more music making. I really want more people to discover the joy of making music!
