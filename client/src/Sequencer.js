@@ -457,12 +457,12 @@ const Sequencer = () => {
   useEffect(() => {
     // when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
     const detectKeyDown = (e) => {
-      document.removeEventListener("keydown", detectKeyDown, true)
       // ! for some reason, all the userIsTyping i get back (and i can get back up to 35 of them) return false, even though im typing
 
       // * bashu: check event target for type, which should give an input text field. check for this type and change state based on it not being an text input.
       // ? can't access current state with event listener
       if (e.key === "s" && e.target.type !== "text") {
+        document.removeEventListener("keydown", detectKeyDown, true)
         console.log("that key was s")
         playingRef.current = !playingRef.current
         // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
@@ -470,13 +470,15 @@ const Sequencer = () => {
         // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
         setPlaying(playingRef.current)
         document.addEventListener("keydown", detectKeyDown, true)
+        console.log("key listener added")
         // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
         // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
       }
     }
     document.removeEventListener("keydown", detectKeyDown, true)
-
+    console.log("key listener removed")
     document.addEventListener("keydown", detectKeyDown, true)
+    console.log("key listener added")
   }, [])
 
   useEffect(() => {

@@ -1,0 +1,13 @@
+bugs
+
+sometimes the playback will stop due to the variable 'now' being at value of 0. this is audioContext.currentTime, so it should very much keep going
+    -> changing filter parameter makes audioContext reset
+    -> THEORY: this is due to too many audioContexts being created.
+        -> issue disappears when i audioContext.close() after a parameter change. however, this stops current playback and restarts once i stop changing parameter. fixed by close() after 1000ms timeout, but sounds taking longer than 1000ms would get cut out. changed it to 5000ms.
+
+s short cut doesn't start playback
+    -> didnt change anything except add console.logs to see when event listeners are put in and taken away, now it works. ???
+    -> pressing another key will 
+
+to-do
+    -> can i make the filter value logarithmic? there's more interesting sounds happening in the lower end between 100 and 3k but from 5k to 11k it barely does anything, yet 100-3k takes only 1/4 the space

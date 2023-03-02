@@ -38,26 +38,54 @@ const Parameters = ({playing, setPlaying}) => {
   // TO-DO: cut down on this bloat and keep setState calls as anonymous callbacks within the below returns.
   const parseTempo = (e) => {
     setTempo(parseInt(e.target.value, 10))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
 
   const parseSteps = (e) => {
     setStepCount(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
 
   const parseRoot = (e) => {
     setRootNote(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
   const parseWonk = (e) => {
     setWonkFactor(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
   const parseMelodyVolume = (e) => {
     setMelodyVolume(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
   const parseChordsVolume = (e) => {
     setChordsVolume(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
   const parseSound = (e) => {
     setSound(e.target.value)
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
     if (
       e.target.value === "samplePianoC2" ||
       e.target.value === "sampleOohC2" ||
@@ -69,19 +97,39 @@ const Parameters = ({playing, setPlaying}) => {
   }
   const parseFilterCutoff = (e) => {
     setFilterCutoff(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
   const parseAttack = (e) => {
     setAttack(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
 
   const parseDecay = (e) => {
     setDecay(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
   const parseSustain = (e) => {
     setSustain(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
   const parseRelease = (e) => {
     setRelease(parseInt(e.target.value))
+    setTimeout(() => {
+      audioContext.close()
+      console.log("wait 1000ms")
+    }, 5000)
   }
 
   // TO-DO: make a parameter component in order to avoid repetition
