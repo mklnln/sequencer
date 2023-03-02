@@ -214,7 +214,7 @@ const Sequencer = () => {
       // in other words, we need to do one of two things: schedule a note to be played if nextNoteTime is < blabla, or advance currentBeat
       // at the moment, nextNoteTime is not set to anything
       // set nextBeat after scheduling a note
-
+      console.log(calcTime, "time")
       //!  experimenting with calcTime, trying to avoid useState
       if (calcTime < contextTime + scheduleAheadTime / 1000) {
         // scheduleNote(current16thNote, nextNoteTime)
@@ -309,20 +309,19 @@ const Sequencer = () => {
         // * i tried to calculate the time to the next beat to be played. it's not working, lol. it may just be a confusion with nextNoteTime, which also exists and is not being used. I think i avoided it cuz i wanted to avoid state, but i think i need to use state regardless, as it needs to persist between renders.... is that what i mean?
         // it's also not changing every beat, but rather every reset of currentBeat. perhaps related to my for loop.
 
-        for (let i = currentBeat + 1; i <= stepCount; i++) {
-          if (notesToBePlayed[`beat${i}`]) {
-            let calculation = 0
-            calculation = (i - currentBeat) * secondsPerBeat + calcTime
-            console.log(secondsPerBeat)
-            console.log(calculation)
-            setCalcTime(calculation)
-            setNextNoteTime(calculation)
-          }
-        }
-
         // setNextNoteTime(calcTime)
         console.log(calcTime)
         // * put this to an else condition of CW's while (now my if). i was hoping to either set a note to play or change the current beat so the sequencer keeps moving. atm its stopped. mb maybe a state that says notePlayed = true then flip to false?
+      }
+      for (let i = currentBeat + 1; i <= stepCount; i++) {
+        if (notesToBePlayed[`beat${i}`]) {
+          let calculation = 0
+          calculation = (i - currentBeat) * secondsPerBeat + calcTime
+          console.log(secondsPerBeat)
+          console.log(calculation, "reset calcTime")
+          setCalcTime(calculation)
+          setNextNoteTime(calculation)
+        }
       }
       if (playing) {
         if (currentBeat <= 0 || currentBeat >= stepCount) {
