@@ -11,3 +11,10 @@ s short cut doesn't start playback
 
 to-do
     -> can i make the filter value logarithmic? there's more interesting sounds happening in the lower end between 100 and 3k but from 5k to 11k it barely does anything, yet 100-3k takes only 1/4 the space
+    -> nice knobs. use https://g200kg.github.io/input-knobs/
+        -> visual bug. fixed by removing a value of 1.6 from ik.frameheight
+            -> "0px " + -((v * ik.sprites) | 0) * (ik.frameheight - 1.6) + "px"
+                -> tried again after fixing it. the issue is back. i removed it, it's somehow not an issue at all anymore? ok.
+        -> mb try https://github.com/g200kg/webaudio-controls instead?
+    -> knob values are set by react but not keeping up with those in input-knobs.js
+        -> integrate react into input-knobs? we have DOM elements and event listeners

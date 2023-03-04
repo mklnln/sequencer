@@ -3,6 +3,7 @@ import styled from "styled-components"
 import {Donut} from "react-dial-knob"
 import {MusicParametersContext} from "../App"
 import {loadSample} from "../AudioEngine"
+import InputKnob from "./InputKnob"
 
 const Parameters = ({playing, setPlaying}) => {
   //   const [tempo, setTempo] = useState(150)
@@ -132,6 +133,19 @@ const Parameters = ({playing, setPlaying}) => {
     }, 5000)
   }
 
+  // useEffect(() => {
+  //   // used for input-knobs.js
+  //   const script = document.createElement("script")
+  //   script.innerHTML = knobListener
+  //   script.async = true
+  //   console.log("input knobs loaded")
+  //   document.body.appendChild(script)
+
+  //   return () => {
+  //     document.body.removeChild(script)
+  //   }
+  // }, [])
+
   // TO-DO: make a parameter component in order to avoid repetition
   return (
     <MainDiv>
@@ -152,20 +166,15 @@ const Parameters = ({playing, setPlaying}) => {
       {/* <button onClick={() => synth.stop()}>stop synth</button> */}
       <ParameterDiv>
         <span>Tempo</span>
-        <Parameter
-          type="range"
-          min="30.0"
-          max="300.0"
-          step="1"
-          value={tempo}
-          onInput={(e) => parseTempo(e)}
-        />
+        {/* <Parameter */}
+        <InputKnob parseTempo={parseTempo} />
         <span>{tempo}</span>
       </ParameterDiv>
       <ParameterDiv>
         <span>Wonk</span>
         <Parameter
           type="range"
+          class="input-knob"
           min="1.0"
           max="400.0"
           step="1"
@@ -176,8 +185,9 @@ const Parameters = ({playing, setPlaying}) => {
       </ParameterDiv>
       <ParameterDiv>
         <span>Melody</span>
-        <Parameter
+        <input
           type="range"
+          class="input-knob"
           min="0"
           max="100"
           step="1"
@@ -188,8 +198,9 @@ const Parameters = ({playing, setPlaying}) => {
       </ParameterDiv>
       <ParameterDiv>
         <span>Chords</span>
-        <Parameter
+        <input
           type="range"
+          class="input-knob"
           min="0"
           max="100"
           step="1"
@@ -215,8 +226,9 @@ const Parameters = ({playing, setPlaying}) => {
         <SoundFilterDiv>
           <ParameterDiv>
             <span>Filter</span>
-            <Filter
+            <input
               type="range"
+              class="input-knob"
               min="0"
               max="11000"
               step="10"
@@ -229,8 +241,9 @@ const Parameters = ({playing, setPlaying}) => {
       </SoundFilterDiv>
       <ParameterDiv>
         <span>Attack</span>
-        <Parameter
+        <input
           type="range"
+          class="input-knob"
           min="1.0"
           max="100.0"
           step="1"
@@ -241,8 +254,9 @@ const Parameters = ({playing, setPlaying}) => {
       </ParameterDiv>
       <ParameterDiv>
         <span>Decay</span>
-        <Parameter
+        <input
           type="range"
+          class="input-knob"
           min="1.0"
           max="100.0"
           step="1"
@@ -253,8 +267,9 @@ const Parameters = ({playing, setPlaying}) => {
       </ParameterDiv>
       <ParameterDiv>
         <span>Sustain</span>
-        <Parameter
+        <input
           type="range"
+          class="input-knob"
           min="1.0"
           max="100.0"
           step="1"
@@ -265,8 +280,9 @@ const Parameters = ({playing, setPlaying}) => {
       </ParameterDiv>
       <ParameterDiv>
         <span>Release</span>
-        <Parameter
+        <input
           type="range"
+          class="input-knob"
           min="1.0"
           max="100.0"
           step="1"
