@@ -1,0 +1,62 @@
+import { useContext, useEffect, useState } from 'react'
+import styled from 'styled-components'
+import { MusicParametersContext } from '../App'
+const Checkbox = ({
+    handleBeatCheckbox,
+    beatIndex,
+    areBeatsChecked,
+    chordIndex,
+}) => {
+    const [checked, setChecked] = useState(
+        areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? 'checked' : ''
+    )
+
+    useEffect(() => {
+        setChecked(
+            areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? 'checked' : ''
+        )
+    }, [areBeatsChecked])
+
+    return (
+        <>
+            <CheckboxButton
+                type="checkbox"
+                checked={checked ? 'checked' : ''}
+                onChange={() => {
+                    handleBeatCheckbox(chordIndex, beatIndex, checked)
+                    setChecked(!checked)
+                }}
+            />
+        </>
+    )
+}
+
+export default Checkbox
+
+const CheckboxButton = styled.input`
+    border: none;
+    background-color: gray;
+    width: 20px;
+    opacity: 25%;
+    height: 20px;
+    appearance: none;
+
+    :hover {
+        cursor: pointer;
+        background-color: #eaeae1;
+        border: 5px solid #eaeae1;
+        opacity: 25%;
+        padding: 5px;
+        border-radius: 5px;
+    }
+    :checked {
+        background-color: #eaeae1;
+        border-radius: 10px;
+        border: 5px solid #eaeae1;
+        opacity: 80%;
+        padding: 5px;
+    }
+    :checked && :hover {
+        background-color: white;
+    }
+`

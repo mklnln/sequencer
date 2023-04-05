@@ -1,6 +1,6 @@
 import {useContext, useEffect, useRef, useState} from "react"
 import curlybrace from "./Components/curlybrace.svg"
-import Checkbox from "./Components/Checkbox"
+import Checkbox from "./Components/ChordCheckbox"
 import {MusicParametersContext} from "./App.js"
 import {
   clearAreBeatsChecked,
@@ -783,7 +783,7 @@ const MelodySequencerGrid = styled.div`
 const ChordDiv = styled.div`
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
 `
