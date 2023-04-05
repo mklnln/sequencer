@@ -167,18 +167,26 @@ const Parameters = ({playing, setPlaying}) => {
       <ParameterDiv>
         <span>Tempo</span>
         {/* <Parameter */}
-        <InputKnob parseTempo={parseTempo} />
+        <InputKnob
+          parseTempo={parseTempo}
+          setParameterState={setTempo}
+          parameterState={tempo}
+          str={"tempo"}
+        />
         <span>{tempo}</span>
       </ParameterDiv>
       <ParameterDiv>
         <span>Wonk</span>
-        <Parameter
+        <InputKnob
           type="range"
           class="input-knob"
           min="1.0"
           max="400.0"
           step="1"
           value={wonkFactor}
+          setParameterState={setWonkFactor}
+          parameterState={wonkFactor}
+          str={"wonkFactor"}
           onInput={(e) => parseWonk(e)}
         />
         <span>{wonkFactor}</span>

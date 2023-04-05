@@ -1,0 +1,90 @@
+import React, { useState } from 'react';
+
+function Knob({ label, value, onChange }) {
+  const [isDragging, setIsDragging] = useState(false);
+
+  function handleMouseDown(event) {
+    setIsDragging(true);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }
+
+  function handleMouseMove(event) {
+    if (isDragging) {
+      const rect = event.target.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const angle = Math.atan2(y - 50, x - 50);
+      const newValue = Math.max(0, Math.min(1, angle / (2 * Math.PI)));
+      onChange(newValue);
+    }
+  }
+
+  function handleMouseUp() {
+    setIsDragging(false);
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  }
+
+  const angle = value * 2 * Math.PI;
+  const x = 50 + 40 * Math.cos(angle);
+  const y = 50 + 40 * Math.sin(angle);
+
+  return (
+    <div style={{ display: 'inline-block', margin: '10px' }}>
+      <div style={{ textAlign: 'center', fontSize: '16px', marginBottom: '5px' }}>{label}</div>
+      <svg width="100" height="100">
+        <circle cx="50" cy="50" r="40" fill="white" stroke="black" strokeWidth="2" />
+        <line x1="50" y1="50" x2={x} y2={y} stroke="black" strokeWidth="2" />
+        <circle cx={x} cy={y} r="10" fill="black" stroke="black" strokeWidth="2" onMouseDown={handleMouseDown} />
+      </svg>
+    </div>
+  );
+}
+
+export default Knob;
+
+
+
+
+
+
+import React, { useState } from 'react';
+import Knob from './Knob';
+
+function ADSRFilter() {
+  // Define the initial state of the ADSR parameters
+  const [attack, setAttack] = useState(0.1);
+  const [decay, setDecay] = useState(0.2);
+  const [sustain, setSustain] = useState(0.5);
+  const [release, setRelease] = useState(0.3);
+
+  // Define functions to handle knob value changes
+  function handleAttackChange(value) {
+    setAttack(value);
+  }
+
+  function handleDecayChange(value) {
+    setDecay(value);
+  }
+
+  function handleSustainChange(value) {
+    setSustain(value);
+  }
+
+  function handleReleaseChange(value) {
+    setRelease(value);
+  }
+
+  return (
+    <div>
+      <h2>ADSR Filter</h2>
+      <Knob label="Attack" value={attack} onChange={handleAttackChange} />
+      <Knob label="Decay" value={decay} onChange={handleDecayChange} />
+      <Knob label="Sustain" value={sustain} onChange={handleSustainChange} />
+      <Knob label="Release" value={release} onChange={handleReleaseChange} />
+    </div>
+  );
+}
+
+export default ADSRFilter;
