@@ -2,13 +2,10 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Checkbox from './Components/ChordCheckbox'
 import { MusicParametersContext } from './App.js'
 import {
-    clearAreBeatsChecked,
-    clearAreMelodyBeatsChecked,
     generateAreBeatsCheckedInitialState,
-    handleLoadSongsFetch,
-    handleSongName,
-    handleSave,
-    handleDelete,
+    makeNewChordMaster,
+    makeNewMelodyMaster,
+    loadChangedSongList,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
@@ -16,9 +13,10 @@ import HookTheoryChordButton from './Components/HookTheoryChordButton'
 import Parameters from './Components/Parameters'
 import { useAuth0 } from '@auth0/auth0-react'
 import MelodyCheckbox from './Components/MelodyCheckbox'
-import LoadSaveTestButtons from './Components/LoadSaveTestButtons'
 const Sequencer = () => {
     // const [tempo, setTempo] = useState(150)
+    // todo make this context one object?
+    // todo what gets used here in sequencer as opposed to elsewhere? mb i can skip bringing them into here
     const {
         audioContext,
         tempo,
@@ -49,9 +47,8 @@ const Sequencer = () => {
         setDecay,
         setSustain,
         setRelease,
-        songSaved,
-        setSongSaved,
-        songDeleted,
+        songSavedOrDeleted,
+        setSongSavedOrDeleted,
         setSongDeleted,
         handleLoadSongsFetch,
         loadSong,
@@ -74,22 +71,14 @@ const Sequencer = () => {
         hugeParametersObject,
         hugeSetStateObject,
     } = useContext(MusicParametersContext)
-    console.log(hugeParametersObject, 'yooj')
     const { isAuthenticated, user } = useAuth0()
+
+    // * the following are clearly related to JUST the sequencer. good that they're here. no refactoring needed.
     const [playing, setPlaying] = useState(false)
     const [currentBeat, setCurrentBeat] = useState(0)
     const [nextBeatTime, setNextBeatTime] = useState(0)
 
-    // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
-    // 1 pointer width covers 2 steps, or 1/4 of 8. set to 2 for 16, 3 for 32
-    // ! don't forget to also set
-
-    const [pointerWidth, setPointerWidth] = useState(2)
-
-    const [buttonsPushed, setButtonsPushed] = useState(0)
-
-    const [userIsTyping, setUserIsTyping] = useState(false)
-
+    // todo find out what these are used for
     const playingRef = useRef(playing)
     const currentBeatRef = useRef(currentBeat)
 
@@ -105,34 +94,6 @@ const Sequencer = () => {
             8: 'I',
         },
     }
-    // const makeMelodyNotesState = []
-    // // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-    // for (let i = amtOfNotes * 2 - 1; i > 0; i--) {
-    //   makeMelodyNotesState.push(i)
-    // }
-
-    // const makeChordNotesState = []
-    // // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-    // for (let i = amtOfNotes; i > 0; i--) {
-    //   makeChordNotesState.push(i)
-    // }
-    // const blankStepCountArray = []
-    // // [0,0,0,0,0,0,0,0] where stepCount = 8
-    // for (let i = stepCount; i > 0; i--) {
-    //   blankStepCountArray.push(0)
-    // }
-
-    // this is the proper format of the master reference of notes areBeatsChecked. the amtOfNotes would be 8
-    // {
-    // chord-8: [1, 0, 0, 0, 0, 0, 0, 1],
-    // chord-7: [0, 1, 0, 0, 0, 0, 0, 0],
-    // chord-6: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-5: [0, 0, 0, 0, 0, 1, 0, 0],
-    // chord-4: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-3: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-2: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-1: [0, 0, 0, 1, 0, 0, 0, 0],
-    // }
 
     // * this array is for visual purposes. try state though?
     const notesInQueue = []
@@ -276,9 +237,9 @@ const Sequencer = () => {
         return () => clearInterval(interval)
     }, [playing, currentBeat])
 
+    // todo make helper
     const handleBeatCheckbox = (chordIndex, beatIndex, checked) => {
         const chordShortcut = `chord-${chordIndex}`
-        // set loaded song to a value the user will never accidentally save to
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
             setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
         setHookTheoryChords('')
@@ -298,6 +259,7 @@ const Sequencer = () => {
         })
     }
 
+    // todo make helper
     const handleMelodyBeatCheckbox = (scaleIndex, beatIndex, checked) => {
         const chordShortcut = scaleIndex
         const arrayReplacement = []
@@ -316,8 +278,8 @@ const Sequencer = () => {
         })
     }
 
+    // todo make helper
     const handleChordClick = (chordID, index) => {
-        // todo wanna fetch new chords based off of what we've already set, thus need state.. chosenAPI chords?
         setHookTheoryChords([])
         console.log(hookTheoryChords)
         let newChosenAPIChords = []
@@ -356,6 +318,8 @@ const Sequencer = () => {
             setChordInputStep((chordInputStep) => chordInputStep + 4)
         }
     }
+
+    // todo make helper
     const handleChordRemove = (chordAtStep, chordID) => {
         const arrayReplacement = []
         const chordShortcut = `chord-${chosenAPIChords[chordID]}`
@@ -405,6 +369,7 @@ const Sequencer = () => {
             })
     }, [chosenAPIChords])
 
+    // todo ? show songs with the given chord progression
     useEffect(() => {
         // todo fit chosen chords in format 1,4 in ${}
         if (chosenAPIChords.length > 0) {
@@ -465,23 +430,22 @@ const Sequencer = () => {
         }
     }, [chosenAPIChords])
 
+    // todo sometimes, after a long pause, pressing S will instantly flip playing to true then not true. this only works when playing is false. when playing is true, S will turn it off and not instantly flip back to playing is true. weird.
+    // -> tried turning off the remove/add listeners within detectKeyDown function
+    // ! -> every time i save this file, the DOM has effectively another event listener. try saving it again, you'll find another. odd numbers will make it seem like its working properly, but the console will show responses from multiple listeners.
     useEffect(() => {
-        // when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
         const detectKeyDown = (e) => {
-            // ! for some reason, all the userIsTyping i get back (and i can get back up to 35 of them) return false, even though im typing
-
-            // * bashu: check event target for type, which should give an input text field. check for this type and change state based on it not being an text input.
             // ? can't access current state with event listener
             if (e.key === 's' && e.target.type !== 'text') {
-                document.removeEventListener('keydown', detectKeyDown, true)
-                console.log('that key was s')
+                // document.removeEventListener('keydown', detectKeyDown, true)
+                // console.log('that key was s')
                 playingRef.current = !playingRef.current
                 // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
-                // -> reason why is the comment under first useFX line
+                // reason why we needed useRef: when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
                 // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
                 setPlaying(playingRef.current)
-                document.addEventListener('keydown', detectKeyDown, true)
-                console.log('key listener added')
+                // document.addEventListener('keydown', detectKeyDown, true)
+                // console.log('key listener added')
                 // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
                 // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
             }
@@ -491,60 +455,36 @@ const Sequencer = () => {
         document.addEventListener('keydown', detectKeyDown, true)
         console.log('key listener added')
     }, [])
-
-    useEffect(() => {
-        if (chordInputStep > stepCount) setChordInputStep(1)
-    }, [chordInputStep])
-
+    // used to monitor the event listener. not necessary in final product
     useEffect(() => {
         console.log(playingRef, 'usefx playingref changed???!!', playing)
     }, [playing])
 
-    // necessary in order to update the page when stepCount changes
+    // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
     useEffect(() => {
-        // ! had an if looking for userLoadSongs then realized mb i need it to work without logging in. mb i needed it tho?
+        if (chordInputStep > stepCount) setChordInputStep(1)
+    }, [chordInputStep])
 
-        // update chord master when the step count changes
-        const newMaster = {}
-        makeChordNotesState.forEach((note) => {
-            newMaster[`chord-${note}`] = areBeatsChecked[`chord-${note}`]
-            // this takes away if the new length is smaller
-            while (
-                newMaster[`chord-${note}`].length > blankStepCountArray.length
-            ) {
-                newMaster[`chord-${note}`].pop()
-            }
-
-            // this puts more in if the new length is greater
-            while (
-                newMaster[`chord-${note}`].length < blankStepCountArray.length
-            ) {
-                newMaster[`chord-${note}`].push(0)
-            }
-        })
+    // when the user selects a different amount of steps, change the notes arrays to accomodate that.
+    useEffect(() => {
+        const newMaster = makeNewChordMaster(
+            makeChordNotesState,
+            areBeatsChecked,
+            blankStepCountArray
+        )
         setAreBeatsChecked(newMaster)
-
-        // update melody master when step count changes
-        const newMelodyMaster = {}
-        makeMelodyNotesState.forEach((note) => {
-            newMelodyMaster[note] = areMelodyBeatsChecked[note]
-            // this takes away if the new length is smaller
-            while (newMelodyMaster[note].length > blankStepCountArray.length) {
-                newMelodyMaster[note].pop()
-            }
-
-            // this puts more in if the new length is greater
-            while (newMelodyMaster[note].length < blankStepCountArray.length) {
-                newMelodyMaster[note].push(0)
-            }
-        })
+        const newMelodyMaster = makeNewMelodyMaster(
+            makeMelodyNotesState,
+            areMelodyBeatsChecked,
+            blankStepCountArray
+        )
         setAreMelodyBeatsChecked(newMelodyMaster)
     }, [stepCount])
 
+    // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
     useEffect(() => {
-        // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made.
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
-            console.log(loadUserSongs)
+            // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
             const song = loadUserSongs[loadSong]
             setRootNote(song['rootNote'])
             setStepCount(song['stepCount'])
@@ -563,33 +503,17 @@ const Sequencer = () => {
         }
     }, [loadSong])
 
-    // removes 'Song saved!' notification after 5s
+    // upon saving or deleting a song, update the song list.
     useEffect(() => {
-        // reset loadusersongs so we trigger a fetch in the ohter usefx?
-        if (songSaved === 'Song saved!') {
-            fetch(`/api/user-login/${user.sub}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data, 'loading user and songs')
-                    setLoadUserSongs(handleLoadSongsFetch(data.data))
-                })
-            setTimeout(() => {
-                setSongSaved(false)
-            }, 5000)
-        }
-        if (songDeleted === 'Song deleted!') {
-            fetch(`/api/user-login/${user.sub}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data, 'loading user and songs')
-                    setLoadUserSongs(handleLoadSongsFetch(data.data))
-                    setSongName('')
-                })
-            setTimeout(() => {
-                setSongDeleted(false)
-            }, 5000)
-        }
-    }, [songSaved, songDeleted])
+        loadChangedSongList(
+            songSavedOrDeleted,
+            user,
+            setLoadUserSongs,
+            setSongSavedOrDeleted,
+            handleLoadSongsFetch
+        )
+    }, [songSavedOrDeleted])
+
     return (
         <>
             <Parameters

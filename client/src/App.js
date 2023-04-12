@@ -71,7 +71,7 @@ const App = () => {
         '75442486-0878-440c-9db1-a7006c25a39f'
     )
     const [songName, setSongName] = useState('')
-    const [songSaved, setSongSaved] = useState(false)
+    const [songSavedOrDeleted, setSongSavedOrDeleted] = useState(false)
     const [songDeleted, setSongDeleted] = useState(false)
 
     // remove non-song data from the BE document
@@ -109,7 +109,7 @@ const App = () => {
         loadUserSongs: loadUserSongs,
         loadSong: loadSong,
         songName: songName,
-        songSaved: songSaved,
+        songSavedOrDeleted: songSavedOrDeleted,
         songDeleted: songDeleted,
     }
 
@@ -131,7 +131,7 @@ const App = () => {
 
         setSustain: setSustain,
         setRelease: setRelease,
-        setSongSaved: setSongSaved,
+        setSongSavedOrDeleted: setSongSavedOrDeleted,
         setSongDeleted: setSongDeleted,
         setAreBeatsChecked: setAreBeatsChecked,
         setAmtOfNotes: setAmtOfNotes,
@@ -177,8 +177,8 @@ const App = () => {
                     setSustain,
                     release,
                     setRelease,
-                    songSaved,
-                    setSongSaved,
+                    songSavedOrDeleted,
+                    setSongSavedOrDeleted,
                     songDeleted,
                     setSongDeleted,
                     handleLoadSongsFetch,
