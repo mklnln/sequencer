@@ -2,41 +2,42 @@
 
 // ideally i can make things super pretty by having all the ugly shit over here. mb thats not realistic though. who knows.
 
-export const generateAreBeatsCheckedInitialState = (
+export const generateAreChordBeatsCheckedInitialState = (
     makeChordNotesState,
     makeMelodyNotesState,
     blankStepCountArray,
     whichGrid
 ) => {
-    const makeAreBeatsChecked = {}
-
+    const makeAreChordBeatsChecked = {}
+    // DRYDRYDRY
+    // TODO refactor and only pass in one of the makeXNotesState, no need to check chords/melody
     if (whichGrid === 'chords') {
         makeChordNotesState.forEach((num) => {
-            makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray
+            makeAreChordBeatsChecked[`note-${num}`] = blankStepCountArray
         })
-        return makeAreBeatsChecked
+        return makeAreChordBeatsChecked
     }
     if (whichGrid === 'melody') {
         makeMelodyNotesState.forEach((num) => {
-            makeAreBeatsChecked[`${num}`] = blankStepCountArray
+            makeAreChordBeatsChecked[`note-${num}`] = blankStepCountArray
         })
-        return makeAreBeatsChecked
+        return makeAreChordBeatsChecked
     }
 }
 
-export const clearAreBeatsChecked = (
+export const clearAreChordBeatsChecked = (
     makeChordNotesState,
     blankStepCountArray,
-    setAreBeatsChecked,
+    setAreChordBeatsChecked,
     setChosenAPIChords,
     setChordInputStep,
     setHookTheoryChords
 ) => {
-    const makeAreBeatsChecked = {}
+    const makeAreChordBeatsChecked = {}
     makeChordNotesState.forEach((num) => {
-        makeAreBeatsChecked[`chord-${num}`] = blankStepCountArray
+        makeAreChordBeatsChecked[`note-${num}`] = blankStepCountArray
     })
-    setAreBeatsChecked(makeAreBeatsChecked)
+    setAreChordBeatsChecked(makeAreChordBeatsChecked)
     setChosenAPIChords('')
     setChordInputStep(1)
     setHookTheoryChords([])
@@ -48,27 +49,27 @@ export const clearAreMelodyBeatsChecked = (
 ) => {
     const makeAreMelodyBeatsChecked = {}
     makeMelodyNotesState.forEach((num) => {
-        makeAreMelodyBeatsChecked[num] = blankStepCountArray
+        makeAreMelodyBeatsChecked[`note-${num}`] = blankStepCountArray
     })
     setAreMelodyBeatsChecked(makeAreMelodyBeatsChecked)
 }
 
 export const makeNewChordMaster = (
     makeChordNotesState,
-    areBeatsChecked,
+    areChordBeatsChecked,
     blankStepCountArray
 ) => {
     const newMaster = {}
     makeChordNotesState.forEach((note) => {
-        newMaster[`chord-${note}`] = areBeatsChecked[`chord-${note}`]
+        newMaster[`note-${note}`] = areChordBeatsChecked[`note-${note}`]
         // this takes away if the new length is smaller
-        while (newMaster[`chord-${note}`].length > blankStepCountArray.length) {
-            newMaster[`chord-${note}`].pop()
+        while (newMaster[`note-${note}`].length > blankStepCountArray.length) {
+            newMaster[`note-${note}`].pop()
         }
 
         // this puts more in if the new length is greater
-        while (newMaster[`chord-${note}`].length < blankStepCountArray.length) {
-            newMaster[`chord-${note}`].push(0)
+        while (newMaster[`note-${note}`].length < blankStepCountArray.length) {
+            newMaster[`note-${note}`].push(0)
         }
     })
     return newMaster
@@ -81,15 +82,19 @@ export const makeNewMelodyMaster = (
 ) => {
     const newMelodyMaster = {}
     makeMelodyNotesState.forEach((note) => {
-        newMelodyMaster[note] = areMelodyBeatsChecked[note]
+        newMelodyMaster[`note-${note}`] = areMelodyBeatsChecked[`note-${note}`]
         // this takes away if the new length is smaller
-        while (newMelodyMaster[note].length > blankStepCountArray.length) {
-            newMelodyMaster[note].pop()
+        while (
+            newMelodyMaster[`note-${note}`].length > blankStepCountArray.length
+        ) {
+            newMelodyMaster[`note-${note}`].pop()
         }
 
         // this puts more in if the new length is greater
-        while (newMelodyMaster[note].length < blankStepCountArray.length) {
-            newMelodyMaster[note].push(0)
+        while (
+            newMelodyMaster[`note-${note}`].length < blankStepCountArray.length
+        ) {
+            newMelodyMaster[`note-${note}`].push(0)
         }
     })
     return newMelodyMaster

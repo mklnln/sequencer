@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Checkbox from './Components/ChordCheckbox'
 import { MusicParametersContext } from './App.js'
 import {
-    generateAreBeatsCheckedInitialState,
+    generateAreChordBeatsCheckedInitialState,
     makeNewChordMaster,
     makeNewMelodyMaster,
     loadChangedSongList,
@@ -55,8 +55,8 @@ const Sequencer = () => {
         setLoadSong,
         setSongName,
         songName,
-        areBeatsChecked,
-        setAreBeatsChecked,
+        areChordBeatsChecked,
+        setAreChordBeatsChecked,
         areMelodyBeatsChecked,
         setAreMelodyBeatsChecked,
         makeChordNotesState,
@@ -160,7 +160,9 @@ const Sequencer = () => {
             // console.log(makeChordNotesState)
             makeMelodyNotesState.forEach((noteRow, index) => {
                 if (
-                    areMelodyBeatsChecked[noteRow][currentBeat - 1] === 1 &&
+                    areMelodyBeatsChecked[`note-${noteRow}`][
+                        currentBeat - 1
+                    ] === 1 &&
                     playing
                 ) {
                     if (!sound.includes('sample')) {
@@ -195,7 +197,7 @@ const Sequencer = () => {
 
             makeChordNotesState.forEach((noteRow, index) => {
                 if (
-                    areBeatsChecked[`chord-${noteRow}`][currentBeat - 1] ===
+                    areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
                         1 &&
                     playing
                 ) {
@@ -237,37 +239,76 @@ const Sequencer = () => {
         return () => clearInterval(interval)
     }, [playing, currentBeat])
 
-    // todo make helper
+    // todo rename handle sequencer checkbox
     const handleBeatCheckbox = (chordIndex, beatIndex, checked) => {
-        const chordShortcut = `chord-${chordIndex}`
+        // for refactoring, i want to make handleBeatCheckbox and handleMelodyBeatCheckbox use the same function
+        // in order to make it adaptable, i can pass in a string telling the function that it is either a chord or melody
+        // using this chord/melody string, i can access the array of arrays directly and just change one box
+        //  ? can i just change one then reset the state? if i make a new variable arrayReplacement, am i just making a reference or actully copying?
+        // ! seems like initializing a new const to the state i just pointing to memory
+        // todo use spread operator to make a deep copy, hence the beauty of the spready operator
+        const chordShortcut = `note-${chordIndex}`
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
+            // any time the user makes a change, the currently loaded song is considered to be a completely different thing
+            // todo can this be refactored to be more semantically meaningful? its opaque af
             setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
-        setHookTheoryChords('')
-        const arrayReplacement = []
+        setHookTheoryChords('') // why do this? once the user clicks a chord outside of HT buttons, you dont see suggestions anymore
+        const arrayReplacement = [] // build new array //todo replace with spread operator on the appropriate object of arrays
         blankStepCountArray.forEach((step, index) => {
+            // check if the current beatIndex we want to change is equal
+            // if not equal, then copy
             if (beatIndex !== index) {
                 arrayReplacement.push(
-                    areBeatsChecked[`chord-${chordIndex}`][index]
+                    areChordBeatsChecked[chordShortcut][index]
                 )
+                // index === beatIndex, i.e. the note we want to handle change for has come up.
             } else {
+                // checked can be either 'checked' or '' (i.e. falsy). essentially this is the question we ask in order to just flip the value
+                // so if checked, we turn it to 0. if unchecked, we turn it to 1.
                 arrayReplacement.push(checked ? 0 : 1)
             }
+            console.log(arrayReplacement, 'replacin')
         })
-        setAreBeatsChecked({
-            ...areBeatsChecked,
+        // ? access areChordBeatsChecked and simply flip the value using  (checked ? 0 : 1).
+        // ? ORRR since if its 0 thats falsy, we can just ask the value then switch to the opposite
+
+        // * need to figure out if i can dynamically set areChordBeatsChecked or areMelodyBeatsChecked
+        // *
+
+        // chordshortcut means we're only resetting one note/chord of the larger object. thx spread operator.
+        // ? presumably the use of the spread operator here enabled me to use the state in the first place, otherwise just pointing to memory
+
+        setAreChordBeatsChecked({
+            ...areChordBeatsChecked,
             [chordShortcut]: [...arrayReplacement],
         })
     }
 
+    const handleCheckbox = (noteIndex, beatIndex, checked, type) => {
+        // ? not sure i need type as a parameter. chord/melody now dealt with, but just need ot set the proper state
+        // ? how to refer dynamically to the state i need to set? mb just return?
+        // // todo change initialization of each state to say note
+        const arrayKey = `note-${noteIndex}`
+        const checkboxArrCopy =
+            type === 'Chords'
+                ? [...areChordBeatsChecked]
+                : [...areMelodyBeatsChecked]
+        if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
+            setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
+        // set the
+    }
+
     // todo make helper
     const handleMelodyBeatCheckbox = (scaleIndex, beatIndex, checked) => {
-        const chordShortcut = scaleIndex
+        const chordShortcut = `note-${scaleIndex}`
         const arrayReplacement = []
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
             setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
         blankStepCountArray.forEach((step, index) => {
             if (beatIndex !== index) {
-                arrayReplacement.push(areMelodyBeatsChecked[scaleIndex][index])
+                arrayReplacement.push(
+                    areMelodyBeatsChecked[chordShortcut][index]
+                )
             } else {
                 arrayReplacement.push(checked ? 0 : 1)
             }
@@ -304,14 +345,14 @@ const Sequencer = () => {
                 arrayReplacement.push(1)
             } else {
                 arrayReplacement.push(
-                    areBeatsChecked[`chord-${chordID}`][index]
+                    areChordBeatsChecked[`chord-${chordID}`][index]
                 )
             }
         })
         console.log(arrayReplacement.length, stepCount)
         if (arrayReplacement.length === stepCount) {
-            setAreBeatsChecked({
-                ...areBeatsChecked,
+            setAreChordBeatsChecked({
+                ...areChordBeatsChecked,
                 [chordShortcut]: [...arrayReplacement],
             })
 
@@ -334,7 +375,9 @@ const Sequencer = () => {
                 arrayReplacement.push(0)
             } else {
                 arrayReplacement.push(
-                    areBeatsChecked[`chord-${chosenAPIChords[chordID]}`][index]
+                    areChordBeatsChecked[`chord-${chosenAPIChords[chordID]}`][
+                        index
+                    ]
                 )
             }
             console.log(chordID)
@@ -343,8 +386,8 @@ const Sequencer = () => {
         if (arrayReplacement.length === stepCount) {
             // todo update chosenapichords state
             const replaceAPIChords = []
-            setAreBeatsChecked({
-                ...areBeatsChecked,
+            setAreChordBeatsChecked({
+                ...areChordBeatsChecked,
                 [chordShortcut]: [...arrayReplacement],
             })
         }
@@ -469,10 +512,10 @@ const Sequencer = () => {
     useEffect(() => {
         const newMaster = makeNewChordMaster(
             makeChordNotesState,
-            areBeatsChecked,
+            areChordBeatsChecked,
             blankStepCountArray
         )
-        setAreBeatsChecked(newMaster)
+        setAreChordBeatsChecked(newMaster)
         const newMelodyMaster = makeNewMelodyMaster(
             makeMelodyNotesState,
             areMelodyBeatsChecked,
@@ -498,7 +541,7 @@ const Sequencer = () => {
             setDecay(song['decay'])
             setSustain(song['sustain'])
             setRelease(song['release'])
-            setAreBeatsChecked(song['areBeatsChecked'])
+            setAreChordBeatsChecked(song['areChordBeatsChecked'])
             setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
         }
     }, [loadSong])
@@ -520,9 +563,9 @@ const Sequencer = () => {
                 playing={playing}
                 setPlaying={setPlaying}
                 tempo={tempo}
-                setAreBeatsChecked={setAreBeatsChecked}
-                generateAreBeatsCheckedInitialState={
-                    generateAreBeatsCheckedInitialState
+                setAreChordBeatsChecked={setAreChordBeatsChecked}
+                generateAreChordBeatsCheckedInitialState={
+                    generateAreChordBeatsCheckedInitialState
                 }
                 makeChordNotesState={makeChordNotesState}
                 blankStepCountArray={blankStepCountArray}
@@ -545,25 +588,25 @@ const Sequencer = () => {
                                     </NoteTitle>
                                 </TitleSpanDiv>
                                 <ChordDiv key={`row-${scaleIndex}`}>
-                                    {areMelodyBeatsChecked[scaleIndex].map(
-                                        (check, index) => {
-                                            return (
-                                                <MelodyCheckbox
-                                                    key={`row-${scaleIndex}-beat-${index}`}
-                                                    note={note}
-                                                    areMelodyBeatsChecked={
-                                                        areMelodyBeatsChecked
-                                                    }
-                                                    beatIndex={index}
-                                                    scaleIndex={scaleIndex}
-                                                    handleMelodyBeatCheckbox={
-                                                        handleMelodyBeatCheckbox
-                                                    }
-                                                />
-                                            )
-                                            // }
-                                        }
-                                    )}
+                                    {areMelodyBeatsChecked[
+                                        `note-${scaleIndex}`
+                                    ].map((check, index) => {
+                                        return (
+                                            <MelodyCheckbox
+                                                key={`row-${scaleIndex}-beat-${index}`}
+                                                note={note}
+                                                areMelodyBeatsChecked={
+                                                    areMelodyBeatsChecked
+                                                }
+                                                beatIndex={index}
+                                                scaleIndex={scaleIndex}
+                                                handleMelodyBeatCheckbox={
+                                                    handleMelodyBeatCheckbox
+                                                }
+                                            />
+                                        )
+                                        // }
+                                    })}
                                 </ChordDiv>
                             </TitleAndBoxesDiv>
                         )
@@ -622,25 +665,25 @@ const Sequencer = () => {
                                     </ChordTitle>
                                 </TitleSpanDiv>
                                 <ChordDiv key={`row-${chordIndex}`}>
-                                    {areBeatsChecked[`chord-${chordIndex}`].map(
-                                        (check, index) => {
-                                            return (
-                                                <Checkbox
-                                                    key={`row-${chordIndex}-beat-${index}`}
-                                                    chord={chord}
-                                                    areBeatsChecked={
-                                                        areBeatsChecked
-                                                    }
-                                                    beatIndex={index}
-                                                    chordIndex={chordIndex}
-                                                    handleBeatCheckbox={
-                                                        handleBeatCheckbox
-                                                    }
-                                                />
-                                            )
-                                            // }
-                                        }
-                                    )}
+                                    {areChordBeatsChecked[
+                                        `note-${chordIndex}`
+                                    ].map((check, index) => {
+                                        return (
+                                            <Checkbox
+                                                key={`row-${chordIndex}-beat-${index}`}
+                                                chord={chord}
+                                                areChordBeatsChecked={
+                                                    areChordBeatsChecked
+                                                }
+                                                beatIndex={index}
+                                                chordIndex={chordIndex}
+                                                handleBeatCheckbox={
+                                                    handleBeatCheckbox
+                                                }
+                                            />
+                                        )
+                                        // }
+                                    })}
                                 </ChordDiv>
                             </TitleAndBoxesDiv>
                         )

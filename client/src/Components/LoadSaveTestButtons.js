@@ -2,13 +2,16 @@ import { useAuth0 } from '@auth0/auth0-react'
 import React, { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
-import { clearAreBeatsChecked, clearAreMelodyBeatsChecked } from '../Helpers'
+import {
+    clearAreChordBeatsChecked,
+    clearAreMelodyBeatsChecked,
+} from '../Helpers'
 
 const LoadSaveTestButtons = () => {
     const {
         areMelodyBeatsChecked,
         makeChordNotesState,
-        setAreBeatsChecked,
+        setAreChordBeatsChecked,
         setChosenAPIChords,
         setChordInputStep,
         setHookTheoryChords,
@@ -19,7 +22,7 @@ const LoadSaveTestButtons = () => {
         songSavedOrDeleted,
         loadSong,
         loadUserSongs,
-        areBeatsChecked,
+        areChordBeatsChecked,
         stepCount,
         rootNote,
         tempo,
@@ -54,8 +57,8 @@ const LoadSaveTestButtons = () => {
 
     const handleSave = () => {
         const testForInput = []
-        Object.keys(areBeatsChecked).forEach((chord) => {
-            areBeatsChecked[chord].map((beat) => {
+        Object.keys(areChordBeatsChecked).forEach((chord) => {
+            areChordBeatsChecked[chord].map((beat) => {
                 if (beat === 1) {
                     testForInput.push(beat)
                 }
@@ -71,7 +74,7 @@ const LoadSaveTestButtons = () => {
             // load all relevant parameters into the body for the backend
             const saveObj = {}
             saveObj[songName] = {}
-            saveObj[songName].areBeatsChecked = areBeatsChecked
+            saveObj[songName].areChordBeatsChecked = areChordBeatsChecked
             saveObj[songName].areMelodyBeatsChecked = areMelodyBeatsChecked
             saveObj.userID = user.sub
             saveObj[songName].stepCount = stepCount
@@ -165,10 +168,10 @@ const LoadSaveTestButtons = () => {
                 </StyledButton>
                 <StyledButton
                     onClick={() => {
-                        clearAreBeatsChecked(
+                        clearAreChordBeatsChecked(
                             makeChordNotesState,
                             blankStepCountArray,
-                            setAreBeatsChecked,
+                            setAreChordBeatsChecked,
                             setChosenAPIChords,
                             setChordInputStep,
                             setHookTheoryChords

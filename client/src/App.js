@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Sequencer from './Sequencer'
 import GlobalStyle from './globalStyles'
-import { generateAreBeatsCheckedInitialState } from './Helpers'
+import { generateAreChordBeatsCheckedInitialState } from './Helpers'
 export const MusicParametersContext = createContext()
 const App = () => {
     const audioContext = new AudioContext()
@@ -25,15 +25,15 @@ const App = () => {
     for (let i = stepCount; i > 0; i--) {
         blankStepCountArray.push(0)
     }
-    const [areBeatsChecked, setAreBeatsChecked] = useState(
-        generateAreBeatsCheckedInitialState(
+    const [areChordBeatsChecked, setAreChordBeatsChecked] = useState(
+        generateAreChordBeatsCheckedInitialState(
             makeChordNotesState,
             makeMelodyNotesState,
             blankStepCountArray,
             'chords'
         )
     )
-    // this is the proper format of the master reference of notes areBeatsChecked. the amtOfNotes would be 8
+    // this is the proper format of the master reference of notes areChordBeatsChecked. the amtOfNotes would be 8
     // {
     // chord-8: [1, 0, 0, 0, 0, 0, 0, 1],
     // chord-7: [0, 1, 0, 0, 0, 0, 0, 0],
@@ -45,7 +45,7 @@ const App = () => {
     // chord-1: [0, 0, 0, 1, 0, 0, 0, 0],
     // }
     const [areMelodyBeatsChecked, setAreMelodyBeatsChecked] = useState(
-        generateAreBeatsCheckedInitialState(
+        generateAreChordBeatsCheckedInitialState(
             makeChordNotesState,
             makeMelodyNotesState,
             blankStepCountArray,
@@ -90,7 +90,7 @@ const App = () => {
         // do these only contain the values of state when the object is called? how does this update? can this lead to bugs?
         amtOfNotes: amtOfNotes,
         stepCount: stepCount,
-        areBeatsChecked: areBeatsChecked,
+        areChordBeatsChecked: areChordBeatsChecked,
         areMelodyBeatsChecked: areMelodyBeatsChecked,
         tempo: tempo,
         rootNote: rootNote,
@@ -133,7 +133,7 @@ const App = () => {
         setRelease: setRelease,
         setSongSavedOrDeleted: setSongSavedOrDeleted,
         setSongDeleted: setSongDeleted,
-        setAreBeatsChecked: setAreBeatsChecked,
+        setAreChordBeatsChecked: setAreChordBeatsChecked,
         setAmtOfNotes: setAmtOfNotes,
         setAreMelodyBeatsChecked: setAreMelodyBeatsChecked,
         setHookTheoryChords: setHookTheoryChords,
@@ -182,8 +182,8 @@ const App = () => {
                     songDeleted,
                     setSongDeleted,
                     handleLoadSongsFetch,
-                    areBeatsChecked,
-                    setAreBeatsChecked,
+                    areChordBeatsChecked,
+                    setAreChordBeatsChecked,
                     areMelodyBeatsChecked,
                     amtOfNotes,
                     setAmtOfNotes,
