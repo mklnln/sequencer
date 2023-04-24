@@ -2,12 +2,13 @@ import { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 const MelodyCheckbox = ({
-    handleMelodyBeatCheckbox,
+    handleCheckbox,
     beatIndex,
     areMelodyBeatsChecked,
     scaleIndex,
 }) => {
     const [checked, setChecked] = useState(
+        // used for styling, see bottom :checked class
         areMelodyBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
     )
 
@@ -17,6 +18,13 @@ const MelodyCheckbox = ({
                 ? 'checked'
                 : ''
         )
+        // console.log(areMelodyBeatsChecked, beatIndex, scaleIndex, 'usefx')
+        // ! holy fuck this is causing a lot of console logs!! worth figurin this the fuck out, goddamn
+        // *its caused by there being acouple hundred checkboxes, lol
+        // it is indeed necessary. without it, clicking 'reset melodies' keeps the checkboxes highlighted as if they were checked
+        // however, these checked boxes are not reflected in areBeatsChecked states
+        // todo see if theres a way to make each checked state keep up to date with a global change like reset melodies.
+        // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
     }, [areMelodyBeatsChecked])
 
     return (
@@ -25,8 +33,9 @@ const MelodyCheckbox = ({
                 type="checkbox"
                 checked={checked ? 'checked' : ''}
                 onChange={() => {
-                    handleMelodyBeatCheckbox(scaleIndex, beatIndex, checked)
+                    handleCheckbox(scaleIndex, beatIndex, checked, 'Melody')
                     setChecked(!checked)
+                    console.log(areMelodyBeatsChecked, 'onChange checkbox')
                 }}
             />
         </>

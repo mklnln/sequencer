@@ -11,18 +11,26 @@ export const generateAreChordBeatsCheckedInitialState = (
     const makeAreChordBeatsChecked = {}
     // DRYDRYDRY
     // TODO refactor and only pass in one of the makeXNotesState, no need to check chords/melody
-    if (whichGrid === 'chords') {
-        makeChordNotesState.forEach((num) => {
-            makeAreChordBeatsChecked[`note-${num}`] = blankStepCountArray
+    // ! did        makeAreChordBeatsChecked[`note-${num}`].push(0) because using blankstepcountarray caused problems with spread operator down the road, each array used the same reference and so a change to one lead to a change to all
+    let amtOfArraysToMake
+
+    console.log('your code is workin')
+    whichGrid === 'chords'
+        ? (amtOfArraysToMake = makeChordNotesState)
+        : (amtOfArraysToMake = makeMelodyNotesState)
+    // if (whichGrid === 'chords') {
+    //     amtOfArraysToMake = makeChordNotesState
+    // } else {
+    //     amtOfArraysToMake = makeMelodyNotesState
+    // }
+    amtOfArraysToMake.forEach((num) => {
+        makeAreChordBeatsChecked[`note-${num}`] = []
+        blankStepCountArray.forEach((step) => {
+            makeAreChordBeatsChecked[`note-${num}`].push(0)
         })
-        return makeAreChordBeatsChecked
-    }
-    if (whichGrid === 'melody') {
-        makeMelodyNotesState.forEach((num) => {
-            makeAreChordBeatsChecked[`note-${num}`] = blankStepCountArray
-        })
-        return makeAreChordBeatsChecked
-    }
+    })
+    console.log(makeAreChordBeatsChecked, 'ieduwe')
+    return makeAreChordBeatsChecked
 }
 
 export const clearAreChordBeatsChecked = (

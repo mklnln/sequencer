@@ -265,7 +265,7 @@ const Sequencer = () => {
             } else {
                 // checked can be either 'checked' or '' (i.e. falsy). essentially this is the question we ask in order to just flip the value
                 // so if checked, we turn it to 0. if unchecked, we turn it to 1.
-                arrayReplacement.push(checked ? 0 : 1)
+                // arrayReplacement.push(checked ? 0 : 1)
             }
             console.log(arrayReplacement, 'replacin')
         })
@@ -278,10 +278,10 @@ const Sequencer = () => {
         // chordshortcut means we're only resetting one note/chord of the larger object. thx spread operator.
         // ? presumably the use of the spread operator here enabled me to use the state in the first place, otherwise just pointing to memory
 
-        setAreChordBeatsChecked({
-            ...areChordBeatsChecked,
-            [chordShortcut]: [...arrayReplacement],
-        })
+        // setAreChordBeatsChecked({
+        //     ...areChordBeatsChecked,
+        //     [chordShortcut]: [...arrayReplacement],
+        // })
     }
 
     const handleCheckbox = (noteIndex, beatIndex, checked, type) => {
@@ -289,13 +289,31 @@ const Sequencer = () => {
         // ? how to refer dynamically to the state i need to set? mb just return?
         // // todo change initialization of each state to say note
         const arrayKey = `note-${noteIndex}`
-        const checkboxArrCopy =
+        console.log(noteIndex)
+        console.log(areMelodyBeatsChecked, 'BEFORE COPY')
+        const checkboxObjCopy =
             type === 'Chords'
-                ? [...areChordBeatsChecked]
-                : [...areMelodyBeatsChecked]
+                ? { ...areChordBeatsChecked }
+                : { ...areMelodyBeatsChecked }
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
             setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
         // set the
+        console.log(checkboxObjCopy[arrayKey], 'arrayKey')
+
+        // ? access areChordBeatsChecked and simply flip the value using  (checked ? 0 : 1).
+        // ? ORRR since if its 0 thats falsy, we can just ask the value then switch to the opposite
+        checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][
+            beatIndex
+        ]
+            ? 0
+            : 1
+        // ! this is 1000% whats setting the object but idfky
+        // ? all the array keys are being changed, as if there was a forEach with each arrayKey and the one specific beatIndex flips
+        // ? this shouldnt happen! idk why it happens.
+        // * mb bc in generateAreChordBeatsCheckedInitialState im referencing the same blankStepCountArray for each array, thus each of them points to the same place in memoery. if im copying it, im pointing to the same place for each array
+        console.log(arrayKey)
+        // checkboxObjCopy[arrayKey] = 3 // this changes only the specific beatIndex, not each arrayKEy but only one
+        console.log(checkboxObjCopy, 'after')
     }
 
     // todo make helper
@@ -313,10 +331,10 @@ const Sequencer = () => {
                 arrayReplacement.push(checked ? 0 : 1)
             }
         })
-        setAreMelodyBeatsChecked({
-            ...areMelodyBeatsChecked,
-            [chordShortcut]: [...arrayReplacement],
-        })
+        // setAreMelodyBeatsChecked({
+        //     ...areMelodyBeatsChecked,
+        //     [chordShortcut]: [...arrayReplacement],
+        // })
     }
 
     // todo make helper
@@ -522,6 +540,7 @@ const Sequencer = () => {
             blankStepCountArray
         )
         setAreMelodyBeatsChecked(newMelodyMaster)
+        console.log('step count?!?!?!?!')
     }, [stepCount])
 
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
@@ -543,6 +562,7 @@ const Sequencer = () => {
             setRelease(song['release'])
             setAreChordBeatsChecked(song['areChordBeatsChecked'])
             setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
+            console.log('load song?!?!?!?')
         }
     }, [loadSong])
 
@@ -600,9 +620,7 @@ const Sequencer = () => {
                                                 }
                                                 beatIndex={index}
                                                 scaleIndex={scaleIndex}
-                                                handleMelodyBeatCheckbox={
-                                                    handleMelodyBeatCheckbox
-                                                }
+                                                handleCheckbox={handleCheckbox}
                                             />
                                         )
                                         // }
