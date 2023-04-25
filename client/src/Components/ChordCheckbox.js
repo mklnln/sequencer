@@ -4,18 +4,20 @@ import { MusicParametersContext } from '../App'
 const Checkbox = ({
     handleBeatCheckbox,
     beatIndex,
-    areBeatsChecked,
+    areChordBeatsChecked,
     chordIndex,
 }) => {
     const [checked, setChecked] = useState(
-        areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? 'checked' : ''
+        areChordBeatsChecked[`note-${chordIndex}`][beatIndex] ? 'checked' : ''
     )
 
     useEffect(() => {
         setChecked(
-            areBeatsChecked[`chord-${chordIndex}`][beatIndex] ? 'checked' : ''
+            areChordBeatsChecked[`note-${chordIndex}`][beatIndex]
+                ? 'checked'
+                : ''
         )
-    }, [areBeatsChecked])
+    }, [areChordBeatsChecked])
 
     return (
         <>
