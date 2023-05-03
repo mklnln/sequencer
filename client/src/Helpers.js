@@ -14,7 +14,6 @@ export const generateAreChordBeatsCheckedInitialState = (
     // ! did        makeAreChordBeatsChecked[`note-${num}`].push(0) because using blankstepcountarray caused problems with spread operator down the road, each array used the same reference and so a change to one lead to a change to all
     let amtOfArraysToMake
 
-    console.log('your code is workin')
     whichGrid === 'chords'
         ? (amtOfArraysToMake = makeChordNotesState)
         : (amtOfArraysToMake = makeMelodyNotesState)
@@ -29,7 +28,6 @@ export const generateAreChordBeatsCheckedInitialState = (
             makeAreChordBeatsChecked[`note-${num}`].push(0)
         })
     })
-    console.log(makeAreChordBeatsChecked, 'ieduwe')
     return makeAreChordBeatsChecked
 }
 
@@ -43,7 +41,10 @@ export const clearAreChordBeatsChecked = (
 ) => {
     const makeAreChordBeatsChecked = {}
     makeChordNotesState.forEach((num) => {
-        makeAreChordBeatsChecked[`note-${num}`] = blankStepCountArray
+        makeAreChordBeatsChecked[`note-${num}`] = []
+        blankStepCountArray.forEach((step) => {
+            makeAreChordBeatsChecked[`note-${num}`].push(0)
+        })
     })
     setAreChordBeatsChecked(makeAreChordBeatsChecked)
     setChosenAPIChords('')
@@ -57,7 +58,10 @@ export const clearAreMelodyBeatsChecked = (
 ) => {
     const makeAreMelodyBeatsChecked = {}
     makeMelodyNotesState.forEach((num) => {
-        makeAreMelodyBeatsChecked[`note-${num}`] = blankStepCountArray
+        makeAreMelodyBeatsChecked[`note-${num}`] = []
+        blankStepCountArray.forEach((step) => {
+            makeAreMelodyBeatsChecked[`note-${num}`].push(0)
+        })
     })
     setAreMelodyBeatsChecked(makeAreMelodyBeatsChecked)
 }
