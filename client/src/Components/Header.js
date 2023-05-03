@@ -22,38 +22,42 @@ const Header = () => {
     }, [user])
 
     return (
-        <Banner>
-            <h2>Sequencer</h2>
-            <button
-                onClick={() => {
-                    console.log(user)
-                }}
-            >
-                check user
-            </button>
-            <LoadSaveTestButtons />
-            {error && <span>Error authenticating.. try again.</span>}
-            {!error && isLoading && <span>Loading...</span>}
-            {!error && !isLoading && (
-                <>
+        <div>
+            <canvas></canvas>
+            <br />
+            <Banner>
+                <h2>Sequencer</h2>
+                <button
+                    onClick={() => {
+                        console.log(user)
+                    }}
+                >
+                    check user
+                </button>
+                <LoadSaveTestButtons />
+                {error && <span>Error authenticating.. try again.</span>}
+                {!error && isLoading && <span>Loading...</span>}
+                {!error && !isLoading && (
                     <>
-                        {isAuthenticated && (
-                            <UserInfoDiv>
-                                {user.picture && !isLoading && (
-                                    <ProfilePic
-                                        src={user.picture}
-                                        alt={user?.name}
-                                    />
-                                )}
-                                <span>{user?.given_name}</span>
-                            </UserInfoDiv>
-                        )}
+                        <>
+                            {isAuthenticated && (
+                                <UserInfoDiv>
+                                    {user.picture && !isLoading && (
+                                        <ProfilePic
+                                            src={user.picture}
+                                            alt={user?.name}
+                                        />
+                                    )}
+                                    <span>{user?.given_name}</span>
+                                </UserInfoDiv>
+                            )}
+                        </>
+                        <LoginButton />
+                        <LogoutButton />
                     </>
-                    <LoginButton />
-                    <LogoutButton />
-                </>
-            )}
-        </Banner>
+                )}
+            </Banner>
+        </div>
     )
 }
 

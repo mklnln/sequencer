@@ -25,6 +25,7 @@ const MelodyCheckbox = ({
         // however, these checked boxes are not reflected in areBeatsChecked states
         // todo see if theres a way to make each checked state keep up to date with a global change like reset melodies.
         // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
+        console.log('useFX on areMelodyBeats')
     }, [areMelodyBeatsChecked])
 
     return (

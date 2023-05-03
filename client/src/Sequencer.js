@@ -302,11 +302,11 @@ const Sequencer = () => {
 
         // ? access areChordBeatsChecked and simply flip the value using  (checked ? 0 : 1).
         // ? ORRR since if its 0 thats falsy, we can just ask the value then switch to the opposite
-        checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][
-            beatIndex
-        ]
-            ? 0
-            : 1
+        // checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][
+        //     beatIndex
+        // ]
+        //     ? 0
+        //     : 1
         // ! this is 1000% whats setting the object but idfky
         // ? all the array keys are being changed, as if there was a forEach with each arrayKey and the one specific beatIndex flips
         // ? this shouldnt happen! idk why it happens.
@@ -314,6 +314,26 @@ const Sequencer = () => {
         console.log(arrayKey)
         // checkboxObjCopy[arrayKey] = 3 // this changes only the specific beatIndex, not each arrayKEy but only one
         console.log(checkboxObjCopy, 'after')
+
+        // ! without making a deep copy of the state variable, the shallow copy mutates the state. this might lead to unexpected behaviour.
+        // todo to fix this, we can mb just
+        // ? hey wait. why am i copying the whole object? why dont i just flip the one little thing and then setstate on that one little part?
+        //  ----
+        console.log(
+            areMelodyBeatsChecked,
+            'melchex, we clicked beatIndex',
+            beatIndex
+        )
+        if (type === 'Melody') {
+            setAreMelodyBeatsChecked((prevState) => ({
+                ...prevState,
+                [arrayKey]: [
+                    ...prevState[arrayKey].slice(0, beatIndex),
+                    prevState[arrayKey][beatIndex] === 1 ? 0 : 1,
+                    ...prevState[arrayKey].slice(beatIndex + 1),
+                ],
+            }))
+        }
     }
 
     // todo make helper
@@ -695,9 +715,7 @@ const Sequencer = () => {
                                                 }
                                                 beatIndex={index}
                                                 chordIndex={chordIndex}
-                                                handleBeatCheckbox={
-                                                    handleBeatCheckbox
-                                                }
+                                                handleCheckbox={handleCheckbox}
                                             />
                                         )
                                         // }

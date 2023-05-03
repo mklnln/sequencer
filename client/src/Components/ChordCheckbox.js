@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 const Checkbox = ({
-    handleBeatCheckbox,
+    handleCheckbox,
     beatIndex,
     areChordBeatsChecked,
     chordIndex,
@@ -25,7 +25,7 @@ const Checkbox = ({
                 type="checkbox"
                 checked={checked ? 'checked' : ''}
                 onChange={() => {
-                    handleBeatCheckbox(chordIndex, beatIndex, checked)
+                    handleCheckbox(chordIndex, beatIndex, checked, 'Chords')
                     setChecked(!checked)
                 }}
             />
