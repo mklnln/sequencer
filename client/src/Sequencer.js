@@ -18,7 +18,6 @@ const Sequencer = () => {
     // todo make this context one object?
     // todo what gets used here in sequencer as opposed to elsewhere? mb i can skip bringing them into here
     const {
-        audioContext,
         tempo,
         setTempo,
         stepCount,
@@ -166,6 +165,7 @@ const Sequencer = () => {
                     playing
                 ) {
                     if (!sound.includes('sample')) {
+                        console.log('play melody!!!!!!!!')
                         playSynth(
                             makeMelodyNotesState.length - index,
                             playing,
@@ -179,8 +179,7 @@ const Sequencer = () => {
                             decay,
                             sustain,
                             release,
-                            'melody',
-                            audioContext
+                            'melody'
                         )
                     } else {
                         playSample(
@@ -188,8 +187,7 @@ const Sequencer = () => {
                             playing,
                             rootNote,
                             wonkFactor,
-                            'melody',
-                            audioContext
+                            'melody'
                         )
                     }
                 }
@@ -202,6 +200,7 @@ const Sequencer = () => {
                     playing
                 ) {
                     if (!sound.includes('sample')) {
+                        console.log('play chords!!!!!!!!!!!!')
                         playSynth(
                             makeChordNotesState.length - index,
                             playing,
@@ -215,8 +214,7 @@ const Sequencer = () => {
                             decay,
                             sustain,
                             release,
-                            'chords',
-                            audioContext
+                            'chords'
                         )
                     } else {
                         playSample(
@@ -224,8 +222,7 @@ const Sequencer = () => {
                             playing,
                             rootNote,
                             wonkFactor,
-                            'chords',
-                            audioContext
+                            'chords'
                         )
                     }
                 }
@@ -239,58 +236,12 @@ const Sequencer = () => {
         return () => clearInterval(interval)
     }, [playing, currentBeat])
 
-    // todo rename handle sequencer checkbox
-    const handleBeatCheckbox = (chordIndex, beatIndex, checked) => {
-        // for refactoring, i want to make handleBeatCheckbox and handleMelodyBeatCheckbox use the same function
-        // in order to make it adaptable, i can pass in a string telling the function that it is either a chord or melody
-        // using this chord/melody string, i can access the array of arrays directly and just change one box
-        //  ? can i just change one then reset the state? if i make a new variable arrayReplacement, am i just making a reference or actully copying?
-        // ! seems like initializing a new const to the state i just pointing to memory
-        // todo use spread operator to make a deep copy, hence the beauty of the spready operator
-        const chordShortcut = `note-${chordIndex}`
-        if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
-            // any time the user makes a change, the currently loaded song is considered to be a completely different thing
-            // todo can this be refactored to be more semantically meaningful? its opaque af
-            setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
-        setHookTheoryChords('') // why do this? once the user clicks a chord outside of HT buttons, you dont see suggestions anymore
-        const arrayReplacement = [] // build new array //todo replace with spread operator on the appropriate object of arrays
-        blankStepCountArray.forEach((step, index) => {
-            // check if the current beatIndex we want to change is equal
-            // if not equal, then copy
-            if (beatIndex !== index) {
-                arrayReplacement.push(
-                    areChordBeatsChecked[chordShortcut][index]
-                )
-                // index === beatIndex, i.e. the note we want to handle change for has come up.
-            } else {
-                // checked can be either 'checked' or '' (i.e. falsy). essentially this is the question we ask in order to just flip the value
-                // so if checked, we turn it to 0. if unchecked, we turn it to 1.
-                // arrayReplacement.push(checked ? 0 : 1)
-            }
-            console.log(arrayReplacement, 'replacin')
-        })
-        // ? access areChordBeatsChecked and simply flip the value using  (checked ? 0 : 1).
-        // ? ORRR since if its 0 thats falsy, we can just ask the value then switch to the opposite
-
-        // * need to figure out if i can dynamically set areChordBeatsChecked or areMelodyBeatsChecked
-        // *
-
-        // chordshortcut means we're only resetting one note/chord of the larger object. thx spread operator.
-        // ? presumably the use of the spread operator here enabled me to use the state in the first place, otherwise just pointing to memory
-
-        // setAreChordBeatsChecked({
-        //     ...areChordBeatsChecked,
-        //     [chordShortcut]: [...arrayReplacement],
-        // })
-    }
-
-    const handleCheckbox = (noteIndex, beatIndex, checked, type) => {
+    const handleCheckbox = (noteIndex, beatIndex, type) => {
         // ? not sure i need type as a parameter. chord/melody now dealt with, but just need ot set the proper state
         // ? how to refer dynamically to the state i need to set? mb just return?
         // // todo change initialization of each state to say note
         const arrayKey = `note-${noteIndex}`
-        console.log(noteIndex)
-        console.log(areMelodyBeatsChecked, 'BEFORE COPY')
+        console.log(type, 'which type')
         const checkboxObjCopy =
             type === 'Chords'
                 ? { ...areChordBeatsChecked }
@@ -695,9 +646,7 @@ const Sequencer = () => {
                                                 }
                                                 beatIndex={index}
                                                 chordIndex={chordIndex}
-                                                handleBeatCheckbox={
-                                                    handleBeatCheckbox
-                                                }
+                                                handleCheckbox={handleCheckbox}
                                             />
                                         )
                                         // }
