@@ -14,7 +14,6 @@ export const generateAreChordBeatsCheckedInitialState = (
     // ! did        makeAreChordBeatsChecked[`note-${num}`].push(0) because using blankstepcountarray caused problems with spread operator down the road, each array used the same reference and so a change to one lead to a change to all
     let amtOfArraysToMake
 
-    console.log('your code is workin')
     whichGrid === 'chords'
         ? (amtOfArraysToMake = makeChordNotesState)
         : (amtOfArraysToMake = makeMelodyNotesState)
@@ -29,7 +28,6 @@ export const generateAreChordBeatsCheckedInitialState = (
             makeAreChordBeatsChecked[`note-${num}`].push(0)
         })
     })
-    console.log(makeAreChordBeatsChecked, 'ieduwe')
     return makeAreChordBeatsChecked
 }
 

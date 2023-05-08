@@ -33,9 +33,8 @@ const MelodyCheckbox = ({
                 type="checkbox"
                 checked={checked ? 'checked' : ''}
                 onChange={() => {
-                    handleCheckbox(scaleIndex, beatIndex, checked, 'Melody')
+                    handleCheckbox(scaleIndex, beatIndex, 'Melody')
                     setChecked(!checked)
-                    console.log(areMelodyBeatsChecked, 'onChange checkbox')
                 }}
             />
         </>
