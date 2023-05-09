@@ -253,7 +253,10 @@ const Sequencer = () => {
             setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
         // set the
         console.log(checkboxObjCopy[arrayKey], 'arrayKey')
-
+        console.log(
+            areMelodyBeatsChecked,
+            'MELODYBEATS WITHIN HANDLECHECKBOX BEFORRREEEEEEEEEEE'
+        )
         // ? access areChordBeatsChecked and simply flip the value using  (checked ? 0 : 1).
         // ? ORRR since if its 0 thats falsy, we can just ask the value then switch to the opposite
         checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][
@@ -564,7 +567,6 @@ const Sequencer = () => {
                         } else if (note > 14) {
                             note = note - 14
                         }
-                        console.log(note, 'note?')
                         return (
                             <TitleAndBoxesDiv>
                                 <TitleSpanDiv>

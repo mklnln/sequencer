@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Donut } from 'react-dial-knob'
 import { MusicParametersContext } from '../App'
 import { loadSample } from '../AudioEngine'
 import { audioTime } from '../AudioEngine'
-
+import Knob from './Knob'
 const Parameters = ({ playing, setPlaying }) => {
     //   const [tempo, setTempo] = useState(150)
     const {
@@ -38,68 +37,28 @@ const Parameters = ({ playing, setPlaying }) => {
     // setState on parameters was finnicky at times, making separate functions helped.
     // TO-DO: cut down on this bloat and keep setState calls as anonymous callbacks within the below returns.
     const parseTempo = (e) => {
-        setTempo(parseInt(e.target.value, 10))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {})
-        }, 5000)
+        setTempo(e)
     }
 
     const parseSteps = (e) => {
         setStepCount(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
 
     const parseRoot = (e) => {
         setRootNote(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
     const parseWonk = (e) => {
         setWonkFactor(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
     const parseMelodyVolume = (e) => {
         setMelodyVolume(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
     const parseChordsVolume = (e) => {
         setChordsVolume(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
     const parseSound = (e) => {
         console.log(audioTime(), 'audiotime')
         setSound(e.target.value)
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
         if (
             e.target.value === 'samplePianoC2' ||
             e.target.value === 'sampleOohC2' ||
@@ -111,49 +70,19 @@ const Parameters = ({ playing, setPlaying }) => {
     }
     const parseFilterCutoff = (e) => {
         setFilterCutoff(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
     const parseAttack = (e) => {
         setAttack(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
 
     const parseDecay = (e) => {
         setDecay(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
     const parseSustain = (e) => {
         setSustain(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
     const parseRelease = (e) => {
         setRelease(parseInt(e.target.value))
-        console.log(audioContext, 'ctx')
-        setTimeout(() => {
-            audioContext.close().then(() => {
-                console.log('then resolved, we closed')
-            })
-        }, 5000)
     }
 
     // TO-DO: make a parameter component in order to avoid repetition
@@ -177,7 +106,11 @@ const Parameters = ({ playing, setPlaying }) => {
                 <span>press s</span> <span>start/stop</span>
             </StartButtonDiv>
             {/* <button onClick={() => synth.stop()}>stop synth</button> */}
+            <Knob value={tempo} onChange={parseTempo} />
+            <ParameterDiv></ParameterDiv>
+
             <ParameterDiv>
+                {' '}
                 <span>Tempo</span>
                 <Parameter
                     type="range"

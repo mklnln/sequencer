@@ -41,7 +41,7 @@ export const clearAreChordBeatsChecked = (
 ) => {
     const makeAreChordBeatsChecked = {}
     makeChordNotesState.forEach((num) => {
-        makeAreChordBeatsChecked[`note-${num}`] = blankStepCountArray
+        makeAreChordBeatsChecked[`note-${num}`] = [...blankStepCountArray]
     })
     setAreChordBeatsChecked(makeAreChordBeatsChecked)
     setChosenAPIChords('')
@@ -55,9 +55,10 @@ export const clearAreMelodyBeatsChecked = (
 ) => {
     const makeAreMelodyBeatsChecked = {}
     makeMelodyNotesState.forEach((num) => {
-        makeAreMelodyBeatsChecked[`note-${num}`] = blankStepCountArray
+        makeAreMelodyBeatsChecked[`note-${num}`] = [...blankStepCountArray]
     })
     setAreMelodyBeatsChecked(makeAreMelodyBeatsChecked)
+    console.log('set new melody beats')
 }
 
 export const makeNewChordMaster = (

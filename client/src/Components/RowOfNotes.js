@@ -7,7 +7,6 @@ const RowOfNotes = ({
     scaleIndex,
     handleCheckbox,
 }) => {
-    console.log(note, 'from RowANotes theer budy')
     return (
         <>
             {areMelodyBeatsChecked[`note-${scaleIndex}`].map((check, index) => {
