@@ -164,9 +164,12 @@ const Parameters = ({ playing, setPlaying }) => {
                     onClick={() => {
                         if (!playing) {
                             setPlaying(true)
+                            // playing = true
                         } else {
                             setPlaying(false)
+                            // playing = false
                         }
+                        console.log(playing, 'playing')
                     }}
                 >
                     {playing ? 'stop' : 'start'}

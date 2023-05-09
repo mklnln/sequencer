@@ -13,6 +13,7 @@ import HookTheoryChordButton from './Components/HookTheoryChordButton'
 import Parameters from './Components/Parameters'
 import { useAuth0 } from '@auth0/auth0-react'
 import MelodyCheckbox from './Components/MelodyCheckbox'
+import RowOfNotes from './Components/RowOfNotes'
 const Sequencer = () => {
     // const [tempo, setTempo] = useState(150)
     // todo make this context one object?
@@ -74,8 +75,12 @@ const Sequencer = () => {
 
     // * the following are clearly related to JUST the sequencer. good that they're here. no refactoring needed.
     const [playing, setPlaying] = useState(false)
-    const [currentBeat, setCurrentBeat] = useState(0)
-    const [nextBeatTime, setNextBeatTime] = useState(0)
+    // const [currentBeat, setCurrentBeat] = useState(0)
+    // const [nextBeatTime, setNextBeatTime] = useState(0)
+
+    // let playing = false
+    let currentBeat = 0
+    let nextBeatTime = 0
 
     // todo find out what these are used for
     const playingRef = useRef(playing)
@@ -144,14 +149,12 @@ const Sequencer = () => {
 
             if (playing) {
                 currentBeat <= 0 || currentBeat >= stepCount
-                    ? setCurrentBeat(1)
-                    : setCurrentBeat(currentBeat + 1)
+                    ? (currentBeat = 1)
+                    : (currentBeat = currentBeat + 1)
                 scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
             } else {
-                setCurrentBeat(1) // this resets the playback to the beginning. remove to just make it a pause button.
+                currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
             }
-            currentBeatRef.current = currentBeat
-            setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
             currentBeatRef.current = currentBeat
             // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
             const currentNoteStartTime = nextBeatTime
@@ -451,11 +454,15 @@ const Sequencer = () => {
             if (e.key === 's' && e.target.type !== 'text') {
                 // document.removeEventListener('keydown', detectKeyDown, true)
                 // console.log('that key was s')
-                playingRef.current = !playingRef.current
                 // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
                 // reason why we needed useRef: when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
                 // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
+
+                // playing = !playing
+                // todo is ok??
+                playingRef.current = !playingRef.current
                 setPlaying(playingRef.current)
+
                 // document.addEventListener('keydown', detectKeyDown, true)
                 // console.log('key listener added')
                 // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
@@ -528,8 +535,15 @@ const Sequencer = () => {
         )
     }, [songSavedOrDeleted])
 
+    const countReRenders = useRef(1)
+
+    useEffect(() => {
+        countReRenders.current = countReRenders.current + 1
+    })
+
     return (
         <>
+            I have rendered {countReRenders.current} times.
             <Parameters
                 playing={playing}
                 setPlaying={setPlaying}
@@ -543,23 +557,34 @@ const Sequencer = () => {
             />
             <MelodySequencerGrid>
                 <AllBoxesDiv>
-                    {makeMelodyNotesState.map((note) => {
+                    {makeMelodyNotesState.map((note, index) => {
                         const scaleIndex = note
                         if (note / 8 === 0 || (note > 7 && note <= 14)) {
                             note = note - 7
                         } else if (note > 14) {
                             note = note - 14
                         }
+                        console.log(note, 'note?')
                         return (
                             <TitleAndBoxesDiv>
                                 <TitleSpanDiv>
                                     <NoteTitle>
                                         {note}
-                                        <br />
+                                        {/* <br /> */}
                                     </NoteTitle>
                                 </TitleSpanDiv>
                                 <ChordDiv key={`row-${scaleIndex}`}>
-                                    {areMelodyBeatsChecked[
+                                    <RowOfNotes
+                                        key={`row-${scaleIndex}-beat-${index}`}
+                                        note={note}
+                                        areMelodyBeatsChecked={
+                                            areMelodyBeatsChecked
+                                        }
+                                        beatIndex={index}
+                                        scaleIndex={scaleIndex}
+                                        handleCheckbox={handleCheckbox}
+                                    />
+                                    {/* {areMelodyBeatsChecked[
                                         `note-${scaleIndex}`
                                     ].map((check, index) => {
                                         return (
@@ -575,7 +600,7 @@ const Sequencer = () => {
                                             />
                                         )
                                         // }
-                                    })}
+                                    })} */}
                                 </ChordDiv>
                             </TitleAndBoxesDiv>
                         )
