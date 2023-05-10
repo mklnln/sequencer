@@ -3,13 +3,15 @@ import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import { loadSample } from '../AudioEngine'
 import { audioTime } from '../AudioEngine'
-import Knob from './Knob'
-const Parameters = ({ playing, setPlaying }) => {
+import Slider from './Slider'
+const Parameters = ({ playing, setPlaying, tempo, setTempo }) => {
     //   const [tempo, setTempo] = useState(150)
+    const [dragging, setDragging] = useState(false)
+    const [dragStartY, setDragStartY] = useState(null)
     const {
         audioContext,
-        tempo,
-        setTempo,
+        // tempo,
+        // setTempo,
         stepCount,
         setStepCount,
         rootNote,
@@ -85,6 +87,20 @@ const Parameters = ({ playing, setPlaying }) => {
         setRelease(parseInt(e.target.value))
     }
 
+    const handleMouseUp = () => {
+        setDragging(false)
+        console.log('dragging false')
+    }
+    const handleMouseDown = (e) => {
+        setDragging(true)
+        console.log('dragging true')
+        setDragStartY(e.clientY)
+    }
+
+    const handleMouseLeave = () => {
+        setDragging(false)
+    }
+    const butt = 'prout'
     // TO-DO: make a parameter component in order to avoid repetition
     return (
         <MainDiv>
@@ -101,12 +117,22 @@ const Parameters = ({ playing, setPlaying }) => {
                         console.log(playing, 'playing')
                     }}
                 >
-                    {playing ? 'stop' : 'start'}
+                    <span> {playing ? 'stop' : 'start'}</span>
                 </button>
                 <span>press s</span> <span>start/stop</span>
             </StartButtonDiv>
             {/* <button onClick={() => synth.stop()}>stop synth</button> */}
-            <Knob value={tempo} onChange={parseTempo} />
+            <Slider
+                parameterName={'Tempo'}
+                value={tempo}
+                onChange={parseTempo}
+                minValue={30}
+                maxValue={240}
+                dragging={dragging}
+                setDragging={setDragging}
+                dragStartY={dragStartY}
+                setDragStartY={setDragStartY}
+            />
             <ParameterDiv></ParameterDiv>
 
             <ParameterDiv>

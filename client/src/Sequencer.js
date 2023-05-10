@@ -19,8 +19,8 @@ const Sequencer = () => {
     // todo make this context one object?
     // todo what gets used here in sequencer as opposed to elsewhere? mb i can skip bringing them into here
     const {
-        tempo,
-        setTempo,
+        // tempo,
+        // setTempo,
         stepCount,
         setStepCount,
         rootNote,
@@ -74,6 +74,7 @@ const Sequencer = () => {
     const { isAuthenticated, user } = useAuth0()
 
     // * the following are clearly related to JUST the sequencer. good that they're here. no refactoring needed.
+    const [tempo, setTempo] = useState(60)
     const [playing, setPlaying] = useState(false)
     // const [currentBeat, setCurrentBeat] = useState(0)
     // const [nextBeatTime, setNextBeatTime] = useState(0)
@@ -546,11 +547,12 @@ const Sequencer = () => {
 
     return (
         <>
-            I have rendered {countReRenders.current} times.
+            <span>I have rendered {countReRenders.current} times.</span>
             <Parameters
                 playing={playing}
                 setPlaying={setPlaying}
                 tempo={tempo}
+                setTempo={setTempo}
                 setAreChordBeatsChecked={setAreChordBeatsChecked}
                 generateAreChordBeatsCheckedInitialState={
                     generateAreChordBeatsCheckedInitialState
