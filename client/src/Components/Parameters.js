@@ -4,10 +4,19 @@ import { MusicParametersContext } from '../App'
 import { loadSample } from '../AudioEngine'
 import { audioTime } from '../AudioEngine'
 import Slider from './Slider'
-const Parameters = ({ playing, setPlaying, tempo, setTempo }) => {
+const Parameters = ({ playing, setPlaying }) => {
     //   const [tempo, setTempo] = useState(150)
     const [dragging, setDragging] = useState(false)
     const [dragStartY, setDragStartY] = useState(null)
+
+    const [tempo, setTempo] = useState(60)
+    const [wonk, setWonk] = useState(0)
+    const [melodyVolume, setMelodyVolume] = useState(100)
+    const [chordsVolume, setChordsVolume] = useState(100)
+    const [attack, setAttack] = useState(1)
+    const [decay, setDecay] = useState(15)
+    const [sustain, setSustain] = useState(60)
+    const [release, setRelease] = useState(5)
     const {
         audioContext,
         // tempo,
@@ -18,22 +27,22 @@ const Parameters = ({ playing, setPlaying, tempo, setTempo }) => {
         setRootNote,
         wonkFactor,
         setWonkFactor,
-        melodyVolume,
-        setMelodyVolume,
-        chordsVolume,
-        setChordsVolume,
+        // melodyVolume,
+        // setMelodyVolume,
+        // chordsVolume,
+        // setChordsVolume,
         sound,
         setSound,
         filterCutoff,
         setFilterCutoff,
-        attack,
-        setAttack,
-        decay,
-        setDecay,
-        sustain,
-        setSustain,
-        release,
-        setRelease,
+        // attack,
+        // setAttack,
+        // decay,
+        // setDecay,
+        // sustain,
+        // setSustain,
+        // release,
+        // setRelease,
     } = useContext(MusicParametersContext)
 
     // setState on parameters was finnicky at times, making separate functions helped.
@@ -100,7 +109,69 @@ const Parameters = ({ playing, setPlaying, tempo, setTempo }) => {
     const handleMouseLeave = () => {
         setDragging(false)
     }
-    const butt = 'prout'
+
+    // todo make big param obj
+
+    // ! will there be problems with an object pointing to state? when will the object update??
+    const slidersToShowObj = {
+        tempo: {
+            id: 0,
+            minValue: 30,
+            maxValue: 240,
+            title: 'Tempo',
+            stateValue: tempo,
+            // setStateFxn: setTempo,
+        },
+        wonk: {
+            id: 1,
+            minValue: 0,
+            maxValue: 100,
+            title: 'Wonk',
+            stateValue: wonk,
+        },
+        melodyVolume: {
+            id: 2,
+            minValue: 0,
+            maxValue: 100,
+            title: 'Melody',
+            stateValue: melodyVolume,
+        },
+        chordsVolume: {
+            id: 3,
+            minValue: 0,
+            maxValue: 100,
+            title: 'Chords',
+            stateValue: chordsVolume,
+        },
+        attack: {
+            id: 4,
+            minValue: 0,
+            maxValue: 100,
+            title: 'Attack',
+            stateValue: attack,
+        },
+        sustain: {
+            id: 5,
+            minValue: 0,
+            maxValue: 100,
+            title: 'Sustain',
+            stateValue: sustain,
+        },
+        decay: {
+            id: 6,
+            minValue: 0,
+            maxValue: 100,
+            title: 'Decay',
+            stateValue: decay,
+        },
+        release: {
+            id: 7,
+            minValue: 0,
+            maxValue: 100,
+            title: 'Release',
+            stateValue: release,
+        },
+    }
     // TO-DO: make a parameter component in order to avoid repetition
     return (
         <MainDiv>
@@ -121,148 +192,16 @@ const Parameters = ({ playing, setPlaying, tempo, setTempo }) => {
                 </button>
                 <span>press s</span> <span>start/stop</span>
             </StartButtonDiv>
-            {/* <button onClick={() => synth.stop()}>stop synth</button> */}
-            <Slider
-                parameterName={'Tempo'}
-                value={tempo}
-                onChange={parseTempo}
-                minValue={30}
-                maxValue={240}
-                dragging={dragging}
-                setDragging={setDragging}
-                dragStartY={dragStartY}
-                setDragStartY={setDragStartY}
-            />
-            <ParameterDiv></ParameterDiv>
 
-            <ParameterDiv>
-                {' '}
-                <span>Tempo</span>
-                <Parameter
-                    type="range"
-                    min="30.0"
-                    max="300.0"
-                    step="1"
-                    value={tempo}
-                    onInput={(e) => parseTempo(e)}
-                />
-                <span>{tempo}</span>
-            </ParameterDiv>
-            <ParameterDiv>
-                <span>Wonk</span>
-                <Parameter
-                    type="range"
-                    min="1.0"
-                    max="400.0"
-                    step="1"
-                    value={wonkFactor}
-                    onInput={(e) => parseWonk(e)}
-                />
-                <span>{wonkFactor}</span>
-            </ParameterDiv>
-            <ParameterDiv>
-                <span>Melody</span>
-                <Parameter
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value={melodyVolume}
-                    onInput={(e) => parseMelodyVolume(e)}
-                />
-                <span>{melodyVolume}</span>
-            </ParameterDiv>
-            <ParameterDiv>
-                <span>Chords</span>
-                <Parameter
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="1"
-                    value={chordsVolume}
-                    onInput={(e) => parseChordsVolume(e)}
-                />
-                <span>{chordsVolume}</span>
-            </ParameterDiv>
-            <SoundFilterDiv>
-                <ParameterDiv>
-                    <label>Sound</label>
-                    <select value={sound} onChange={parseSound}>
-                        <option value="sine">Sine Wave</option>
-                        <option value="square">Square Wave</option>
-                        <option value="sawtooth">Sawtooth Wave</option>
-                        <option value="triangle">Triangle Wave</option>
-                        <option value="sampleOohC2">Sample -- Ooh</option>
-                        <option value="samplePianoC2">Sample -- Piano</option>
-                        <option value="sampleFeltPianoC3">
-                            Sample -- Felt Piano
-                        </option>
-                        <option value="sampleRonyA2">Sample -- Rony Uhh</option>
-                    </select>
-                </ParameterDiv>
-                <SoundFilterDiv>
-                    <ParameterDiv>
-                        <span>Filter</span>
-                        <Filter
-                            type="range"
-                            min="0"
-                            max="11000"
-                            step="10"
-                            value={filterCutoff}
-                            onInput={(e) => parseFilterCutoff(e)}
-                        />
-                        <span>{filterCutoff}</span>
-                    </ParameterDiv>
-                </SoundFilterDiv>
-            </SoundFilterDiv>
-            <ParameterDiv>
-                <span>Attack</span>
-                <Parameter
-                    type="range"
-                    min="1.0"
-                    max="100.0"
-                    step="1"
-                    value={attack}
-                    onInput={(e) => parseAttack(e)}
-                />
-                <span>{attack}</span>
-            </ParameterDiv>
-            <ParameterDiv>
-                <span>Decay</span>
-                <Parameter
-                    type="range"
-                    min="1.0"
-                    max="100.0"
-                    step="1"
-                    value={decay}
-                    onInput={(e) => parseDecay(e)}
-                />
-                <span>{decay}</span>
-            </ParameterDiv>
-            <ParameterDiv>
-                <span>Sustain</span>
-                <Parameter
-                    type="range"
-                    min="1.0"
-                    max="100.0"
-                    step="1"
-                    value={sustain}
-                    onInput={(e) => parseSustain(e)}
-                />
-                <span>{sustain}</span>
-            </ParameterDiv>
-            <ParameterDiv>
-                <span>Release</span>
-                <Parameter
-                    type="range"
-                    min="1.0"
-                    max="100.0"
-                    step="1"
-                    value={release}
-                    onInput={(e) => parseRelease(e)}
-                />
-                <span>{release}</span>
-            </ParameterDiv>
+            {Object.keys(slidersToShowObj).map((slider, index) => {
+                return (
+                    <Slider
+                        key={`${index}`}
+                        slider={slidersToShowObj[slider]}
+                    />
+                )
+            })}
+
             <SoundFilterDiv>
                 <ParameterDiv>
                     <label>Steps</label>

@@ -12,7 +12,7 @@ const RowOfNotes = ({
             {areMelodyBeatsChecked[`note-${scaleIndex}`].map((check, index) => {
                 return (
                     <MelodyCheckbox
-                        key={`row-${scaleIndex}-beat-${index}`}
+                        key={`row-${scaleIndex}-beat-${index}-check${check}-beat${beatIndex}`}
                         note={note}
                         areMelodyBeatsChecked={areMelodyBeatsChecked}
                         beatIndex={index}

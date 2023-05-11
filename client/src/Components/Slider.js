@@ -3,18 +3,16 @@ import styled from 'styled-components'
 
 const Slider = ({
     parameterName,
-    value,
     onChange,
-    minValue,
-    maxValue,
     dragging,
     setDragging,
     dragStartY,
     setDragStartY,
+    slider,
 }) => {
+    const { minValue, maxValue, title, stateValue, setStateFxn } = slider
     const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
     const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
-
     const handleMouseMove = (e) => {
         console.log('mouse move', dragging)
         if (dragging) {
@@ -23,7 +21,7 @@ const Slider = ({
             const deltaY = dragStartY - e.clientY
             const newValue = Math.max(
                 minValue,
-                Math.min(maxValue, value + deltaY * valuePerPixel)
+                Math.min(maxValue, stateValue + deltaY * valuePerPixel)
             )
             console.log(newValue, 'newval')
             onChange(Math.round(newValue))
@@ -44,13 +42,13 @@ const Slider = ({
         setDragging(false)
     }
     const calculateTop = () => {
-        const valueWithinRange = value - minValue
+        const valueWithinRange = stateValue - minValue
         const percentDisplacementFromTop = (valueWithinRange / range) * 100
         return 100 - percentDisplacementFromTop
     }
     return (
-        <>
-            <span>{parameterName}</span>
+        <SliderContainer>
+            <span>{title}</span>
             <SliderBackground
                 onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown}
@@ -71,11 +69,18 @@ const Slider = ({
                     />
                 </SliderRange>
             </SliderBackground>
-        </>
+        </SliderContainer>
     )
 }
 
 export default Slider
+
+const SliderContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20px;
+`
 
 const SliderBackground = styled.div`
     display: flex;
@@ -85,6 +90,8 @@ const SliderBackground = styled.div`
     width: 50px;
     background: #5e5e5e;
     height: 90px;
+
+    margin-top: 5px;
 `
 const SliderRange = styled.div`
     position: relative;
