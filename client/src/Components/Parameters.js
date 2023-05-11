@@ -7,7 +7,6 @@ import Slider from './Slider'
 const Parameters = ({ playing, setPlaying }) => {
     //   const [tempo, setTempo] = useState(150)
     const [dragging, setDragging] = useState(false)
-    const [dragStartY, setDragStartY] = useState(null)
 
     const [tempo, setTempo] = useState(60)
     const [wonk, setWonk] = useState(0)
@@ -96,19 +95,19 @@ const Parameters = ({ playing, setPlaying }) => {
         setRelease(parseInt(e.target.value))
     }
 
-    const handleMouseUp = () => {
-        setDragging(false)
-        console.log('dragging false')
-    }
-    const handleMouseDown = (e) => {
-        setDragging(true)
-        console.log('dragging true')
-        setDragStartY(e.clientY)
-    }
+    // const handleMouseUp = () => {
+    //     setDragging(false)
+    //     console.log('dragging false')
+    // }
+    // const handleMouseDown = (e) => {
+    //     setDragging(true)
+    //     console.log('dragging true')
+    //     setDragStartY(e.clientY)
+    // }
 
-    const handleMouseLeave = () => {
-        setDragging(false)
-    }
+    // const handleMouseLeave = () => {
+    //     setDragging(false)
+    // }
 
     // todo make big param obj
 
@@ -120,7 +119,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 240,
             title: 'Tempo',
             stateValue: tempo,
-            // setStateFxn: setTempo,
+            setParameterState: setTempo,
         },
         wonk: {
             id: 1,
@@ -128,6 +127,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 100,
             title: 'Wonk',
             stateValue: wonk,
+            setParameterState: setWonk,
         },
         melodyVolume: {
             id: 2,
@@ -135,6 +135,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 100,
             title: 'Melody',
             stateValue: melodyVolume,
+            setParameterState: setMelodyVolume,
         },
         chordsVolume: {
             id: 3,
@@ -142,6 +143,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 100,
             title: 'Chords',
             stateValue: chordsVolume,
+            setParameterState: setChordsVolume,
         },
         attack: {
             id: 4,
@@ -149,6 +151,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 100,
             title: 'Attack',
             stateValue: attack,
+            setParameterState: setAttack,
         },
         sustain: {
             id: 5,
@@ -156,6 +159,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 100,
             title: 'Sustain',
             stateValue: sustain,
+            setParameterState: setSustain,
         },
         decay: {
             id: 6,
@@ -163,6 +167,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 100,
             title: 'Decay',
             stateValue: decay,
+            setParameterState: setDecay,
         },
         release: {
             id: 7,
@@ -170,6 +175,7 @@ const Parameters = ({ playing, setPlaying }) => {
             maxValue: 100,
             title: 'Release',
             stateValue: release,
+            setParameterState: setRelease,
         },
     }
     // TO-DO: make a parameter component in order to avoid repetition
@@ -198,6 +204,8 @@ const Parameters = ({ playing, setPlaying }) => {
                     <Slider
                         key={`${index}`}
                         slider={slidersToShowObj[slider]}
+                        dragging={dragging}
+                        setDragging={setDragging}
                     />
                 )
             })}
