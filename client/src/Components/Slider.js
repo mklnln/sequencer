@@ -3,79 +3,98 @@ import styled from 'styled-components'
 
 const Slider = ({
     parameterName,
-    value,
-    onChange,
-    minValue,
-    maxValue,
     dragging,
     setDragging,
-    dragStartY,
-    setDragStartY,
+    // dragStartY,
+    // setDragStartY,
+    slider,
 }) => {
+    const [dragStartY, setDragStartY] = useState(null)
+    const { minValue, maxValue, title, stateValue, setParameterState } = slider
     const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
     const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
-
     const handleMouseMove = (e) => {
-        console.log('mouse move', dragging)
         if (dragging) {
-            console.log('we draggin!')
-            console.log(e.clientY)
             const deltaY = dragStartY - e.clientY
             const newValue = Math.max(
                 minValue,
-                Math.min(maxValue, value + deltaY * valuePerPixel)
+                Math.min(maxValue, stateValue + deltaY * valuePerPixel)
             )
             console.log(newValue, 'newval')
-            onChange(Math.round(newValue))
+            setParameterState(Math.round(newValue))
             setDragStartY(e.clientY)
         }
     }
     const handleMouseUp = () => {
         setDragging(false)
-        console.log('dragging false')
     }
     const handleMouseDown = (e) => {
         setDragging(true)
-        console.log('dragging true')
         setDragStartY(e.clientY)
     }
 
     const handleMouseLeave = () => {
         setDragging(false)
     }
+
     const calculateTop = () => {
-        const valueWithinRange = value - minValue
+        const valueWithinRange = stateValue - minValue
         const percentDisplacementFromTop = (valueWithinRange / range) * 100
         return 100 - percentDisplacementFromTop
     }
+
+    const gap = calculateTop()
+    console.log(50 - gap, 'px')
+    let hover = false
+    const [hoverState, setHoverState] = useState(false)
     return (
-        <>
-            <span>{parameterName}</span>
+        <SliderContainer>
+            <span>{title}</span>
             <SliderBackground
                 onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseLeave}
             >
-                <SliderRange>
-                    <div
+                <SliderRange
+                    onMouseEnter={() => {
+                        hover = true
+                        setHoverState(true)
+                        console.log(hover)
+                    }}
+                    onMouseLeave={() => {
+                        hover = false
+                        setHoverState(false)
+                        console.log(hover)
+                    }}
+                    style={
+                        {
+                            // borderBottomColor: 'fuchsia',
+                            // borderBottom: ` solid #ff00000`,
+                        }
+                    }
+                >
+                    <SliderThumb
                         style={{
-                            position: 'relative',
-                            top: `${calculateTop()}%`,
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '10px',
-                            height: '10px',
-                            backgroundColor: '#333',
+                            borderBottomWidth: `${(100 - gap) / 2}px`,
+                            top: `${gap}%`, // required variables are out of scope if called below
+                            backgroundColor: hoverState ? '#444444' : '#111111',
                         }}
                     />
                 </SliderRange>
             </SliderBackground>
-        </>
+        </SliderContainer>
     )
 }
 
 export default Slider
+
+const SliderContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 20px;
+`
 
 const SliderBackground = styled.div`
     display: flex;
@@ -83,15 +102,35 @@ const SliderBackground = styled.div`
     justify-content: center;
     align-items: center;
     width: 50px;
-    background: #5e5e5e;
+    background: #222222;
     height: 90px;
+    margin-top: 5px;
+    padding-bottom: 10px;
 `
 const SliderRange = styled.div`
     position: relative;
     width: 10px;
     height: 50px;
     background-color: #f1f1f1;
+    // background-color: var(--secondary-color);
     cursor: pointer;
-    border-bottom: 10px solid white;
+    // border-bottom: 10px solid white;
     userselect: none;
+    :hover {
+        // opacity: 80%;
+    }
+`
+const SliderThumb = styled.div`
+    background-color: #333;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+
+    border-bottom: 1px solid var(--primary-color);
+
+    width: 10px;
+    height: 10px;
+    :hover {
+        // opacity: 85%;
+    }
 `

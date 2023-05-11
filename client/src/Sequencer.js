@@ -551,8 +551,8 @@ const Sequencer = () => {
             <Parameters
                 playing={playing}
                 setPlaying={setPlaying}
-                tempo={tempo}
-                setTempo={setTempo}
+                // tempo={tempo}
+                // setTempo={setTempo}
                 setAreChordBeatsChecked={setAreChordBeatsChecked}
                 generateAreChordBeatsCheckedInitialState={
                     generateAreChordBeatsCheckedInitialState
@@ -563,6 +563,7 @@ const Sequencer = () => {
             <MelodySequencerGrid>
                 <AllBoxesDiv>
                     {makeMelodyNotesState.map((note, index) => {
+                        console.log(note, 'scaleIndex')
                         const scaleIndex = note
                         if (note / 8 === 0 || (note > 7 && note <= 14)) {
                             note = note - 7
@@ -570,14 +571,15 @@ const Sequencer = () => {
                             note = note - 14
                         }
                         return (
-                            <TitleAndBoxesDiv>
-                                <TitleSpanDiv>
-                                    <NoteTitle>
+                            <TitleAndBoxesDiv key={scaleIndex}>
+                                <TitleSpanDiv key={scaleIndex}>
+                                    <NoteTitle key={scaleIndex}>
                                         {note}
-                                        {/* <br /> */}
                                     </NoteTitle>
                                 </TitleSpanDiv>
-                                <ChordDiv key={`row-${scaleIndex}`}>
+                                <ChordDiv
+                                    key={`row-${scaleIndex}-beat-${index}`}
+                                >
                                     <RowOfNotes
                                         key={`row-${scaleIndex}-beat-${index}`}
                                         note={note}
@@ -588,23 +590,6 @@ const Sequencer = () => {
                                         scaleIndex={scaleIndex}
                                         handleCheckbox={handleCheckbox}
                                     />
-                                    {/* {areMelodyBeatsChecked[
-                                        `note-${scaleIndex}`
-                                    ].map((check, index) => {
-                                        return (
-                                            <MelodyCheckbox
-                                                key={`row-${scaleIndex}-beat-${index}`}
-                                                note={note}
-                                                areMelodyBeatsChecked={
-                                                    areMelodyBeatsChecked
-                                                }
-                                                beatIndex={index}
-                                                scaleIndex={scaleIndex}
-                                                handleCheckbox={handleCheckbox}
-                                            />
-                                        )
-                                        // }
-                                    })} */}
                                 </ChordDiv>
                             </TitleAndBoxesDiv>
                         )
@@ -619,7 +604,7 @@ const Sequencer = () => {
                                 return (
                                     <>
                                         <BeatMarker
-                                            key={num * Math.random()}
+                                            key={num}
                                             className={
                                                 currentBeat === num ||
                                                 currentBeat === num + 1 ||
@@ -629,7 +614,7 @@ const Sequencer = () => {
                                             }
                                         >
                                             <BeatSpan
-                                                key={num * Math.random()}
+                                                key={num}
                                                 className={
                                                     currentBeat === num ||
                                                     currentBeat === num + 1 ||
@@ -655,7 +640,7 @@ const Sequencer = () => {
                         const chordIndex = chord
 
                         return (
-                            <TitleAndBoxesDiv>
+                            <TitleAndBoxesDiv key={chord}>
                                 <TitleSpanDiv>
                                     <ChordTitle>
                                         {romanNumeralReference['major'][chord]}
@@ -693,6 +678,7 @@ const Sequencer = () => {
                                 return (
                                     <>
                                         <BeatMarker
+                                            key={num}
                                             className={
                                                 currentBeat === num ||
                                                 currentBeat === num + 1 ||
