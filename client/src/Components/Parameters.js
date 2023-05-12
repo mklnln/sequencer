@@ -16,16 +16,18 @@ const Parameters = ({ playing, setPlaying }) => {
     const [decay, setDecay] = useState(15)
     const [sustain, setSustain] = useState(60)
     const [release, setRelease] = useState(5)
+    const [rootNote, setRootNote] = useState(5)
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const {
         audioContext,
         // tempo,
         // setTempo,
         stepCount,
         setStepCount,
-        rootNote,
-        setRootNote,
-        wonkFactor,
-        setWonkFactor,
+        // rootNote,
+        // setRootNote,
+        // wonkFactor,
+        // setWonkFactor,
         // melodyVolume,
         // setMelodyVolume,
         // chordsVolume,
@@ -58,7 +60,7 @@ const Parameters = ({ playing, setPlaying }) => {
         setRootNote(parseInt(e.target.value))
     }
     const parseWonk = (e) => {
-        setWonkFactor(parseInt(e.target.value))
+        setWonk(parseInt(e.target.value))
     }
     const parseMelodyVolume = (e) => {
         setMelodyVolume(parseInt(e.target.value))
@@ -108,8 +110,6 @@ const Parameters = ({ playing, setPlaying }) => {
     // const handleMouseLeave = () => {
     //     setDragging(false)
     // }
-
-    // todo make big param obj
 
     // ! will there be problems with an object pointing to state? when will the object update??
     const slidersToShowObj = {
@@ -178,6 +178,12 @@ const Parameters = ({ playing, setPlaying }) => {
             setParameterState: setRelease,
         },
     }
+    const options = ['A', 'A#']
+    const handleOptionClick = (option) => {
+        setRootNote(option)
+        setIsDropdownOpen(false)
+    }
+    console.log(tempo, wonk)
     // TO-DO: make a parameter component in order to avoid repetition
     return (
         <MainDiv>
@@ -210,34 +216,51 @@ const Parameters = ({ playing, setPlaying }) => {
                 )
             })}
 
+            {/* these dont work */}
             <SoundFilterDiv>
                 <ParameterDiv>
-                    <label>Steps</label>
-                    <select value={stepCount} onChange={parseSteps}>
+                    <ParameterLabel>Steps</ParameterLabel>
+                    <StyledSelect value={stepCount} onChange={parseSteps}>
                         <option value="8">8</option>
                         <option value="16">16</option>
                         <option value="24">24</option>
                         <option value="32">32</option>
                         <option value="64">64</option>
-                    </select>
+                    </StyledSelect>
                 </ParameterDiv>
                 <SoundFilterDiv>
                     <ParameterDiv>
-                        <label>Root</label>
-                        <select value={rootNote} onChange={parseRoot}>
-                            <option value="0">A</option>
-                            <option value="1">A#</option>
-                            <option value="2">B</option>
-                            <option value="3">C</option>
-                            <option value="4">C#</option>
-                            <option value="5">D</option>
-                            <option value="6">D#</option>
-                            <option value="7">E</option>
-                            <option value="8">F</option>
-                            <option value="9">F#</option>
-                            <option value="10">G</option>
-                            <option value="11">G#</option>
-                        </select>
+                        <ParameterLabel>Root</ParameterLabel>
+                        <ULDropdown
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        >
+                            <Option>{rootNote}</Option>
+                            {isDropdownOpen &&
+                                options.map((option) => (
+                                    <Option
+                                        key={option}
+                                        onClick={() =>
+                                            handleOptionClick(option)
+                                        }
+                                    >
+                                        {option}
+                                    </Option>
+                                ))}
+                        </ULDropdown>
+                        {/* <ULDropdown value={rootNote} onChange={parseRoot}> */}
+                        {/* <Option value="0">A</Option>
+                        <Option value="1">A#</Option>
+                        <Option value="2">B</Option>
+                        <Option value="3">C</Option>
+                        <Option value="4">C#</Option>
+                        <Option value="5">D</Option>
+                        <Option value="6">D#</Option>
+                        <Option value="7">E</Option>
+                        <Option value="8">F</Option>
+                        <Option value="9">F#</Option>
+                        <Option value="10">G</Option>
+                        <Option value="11">G#</Option> */}
+                        {/* </ULDropdown> */}
                     </ParameterDiv>
                 </SoundFilterDiv>
             </SoundFilterDiv>
@@ -251,6 +274,7 @@ const MainDiv = styled.div`
     justify-content: space-around;
     align-items: center;
     margin-bottom: 40px;
+    position: relative;
 `
 
 const Parameter = styled.input`
@@ -260,13 +284,14 @@ const Parameter = styled.input`
     height: 75px;
 `
 const ParameterDiv = styled.div`
+    position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 20px;
 `
-
+const ParameterLabel = styled.span``
 const StartButtonDiv = styled.div`
     display: flex;
     justify-content: center;
@@ -282,4 +307,34 @@ const SoundFilterDiv = styled.div`
 `
 const Filter = styled.input`
     height: 20px;
+`
+
+const StyledSelect = styled.select`
+    outline: none;
+    background-color: black;
+    color: var(--primary-color);
+    border: 1px solid var(--lightest-color);
+    width: 55px;
+    :focus {
+        border: 1px solid var(--lighter-color);
+    }
+`
+
+const ULDropdown = styled.ul`
+    // position: absolute;
+    top: 0%;
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    cursor: pointer;
+    width: 55px;
+    border: 1px solid var(--lightest-color);
+    background-color: #000000;
+`
+
+const Option = styled.li`
+    z-index: 1;
+    padding: 0 10px;
+    cursor: pointer;
 `

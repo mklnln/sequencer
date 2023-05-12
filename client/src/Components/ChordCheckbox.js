@@ -37,7 +37,7 @@ export default Checkbox
 
 const CheckboxButton = styled.input`
     border: none;
-    background-color: gray;
+    background-color: var(--lighter-color);
     width: 20px;
     opacity: 25%;
     height: 20px;
@@ -45,16 +45,19 @@ const CheckboxButton = styled.input`
 
     :hover {
         cursor: pointer;
-        background-color: #eaeae1;
-        border: 5px solid #eaeae1;
-        opacity: 25%;
+
+        // border: 5px solid #eaeae1;
+        background-color: var(--lighter-color);
+        opacity: 50%;
+        // background-color: #eaeae1;
+        // opacity: 25%;
         padding: 5px;
         border-radius: 5px;
     }
     :checked {
-        background-color: #eaeae1;
+        background-color: var(--lighter-color);
         border-radius: 10px;
-        border: 5px solid #eaeae1;
+        // border: 5px solid #eaeae1;
         opacity: 80%;
         padding: 5px;
     }

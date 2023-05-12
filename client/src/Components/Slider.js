@@ -22,6 +22,7 @@ const Slider = ({
             )
             console.log(newValue, 'newval')
             setParameterState(Math.round(newValue))
+            console.log(stateValue, newValue)
             setDragStartY(e.clientY)
         }
     }
@@ -44,7 +45,6 @@ const Slider = ({
     }
 
     const gap = calculateTop()
-    console.log(50 - gap, 'px')
     let hover = false
     const [hoverState, setHoverState] = useState(false)
     return (
@@ -78,7 +78,7 @@ const Slider = ({
                         style={{
                             borderBottomWidth: `${(100 - gap) / 2}px`,
                             top: `${gap}%`, // required variables are out of scope if called below
-                            backgroundColor: hoverState ? '#444444' : '#111111',
+                            // backgroundColor: hoverState ? '#444444' : '#111111',
                         }}
                     />
                 </SliderRange>
@@ -102,26 +102,26 @@ const SliderBackground = styled.div`
     justify-content: center;
     align-items: center;
     width: 50px;
-    background: #222222;
     height: 90px;
     margin-top: 5px;
     padding-bottom: 10px;
+    border: 3px double var(--lightest-color);
 `
 const SliderRange = styled.div`
     position: relative;
     width: 10px;
     height: 50px;
-    background-color: #f1f1f1;
-    // background-color: var(--secondary-color);
+    // background-color: #f1f1f1;
     cursor: pointer;
     // border-bottom: 10px solid white;
     userselect: none;
     :hover {
-        // opacity: 80%;
+        background-color: var(--secondary-color);
+        opacity: 60%;
     }
 `
 const SliderThumb = styled.div`
-    background-color: #333;
+    background-color: rgba(255, 231, 81, 0.25);
     position: relative;
     left: 50%;
     transform: translateX(-50%);
