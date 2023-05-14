@@ -137,7 +137,7 @@ const Sequencer = () => {
     // * timeout interval is how often the setTimeout is called with its lookahead
     // * A good place to start is probably 100ms of “lookahead” time, with intervals set to 25ms.
 
-    // may need to bring audiocontext in here and pass it over to the synth engine
+    // how to refactor this so that i am not doing hook calls and minimizing the amount of components to render?
 
     const scheduleAheadTime = 100 // ms? idk
     useEffect(() => {
@@ -563,7 +563,6 @@ const Sequencer = () => {
             <MelodySequencerGrid>
                 <AllBoxesDiv>
                     {makeMelodyNotesState.map((note, index) => {
-                        console.log(note, 'scaleIndex')
                         const scaleIndex = note
                         if (note / 8 === 0 || (note > 7 && note <= 14)) {
                             note = note - 7
@@ -786,7 +785,7 @@ const BlankDiv = styled.div`
 `
 const NoteTitle = styled.span`
     text-align: left;
-    font-size: 13.65px;
+    font-size: 17.65px;
     margin: none;
     display: inline-block;
     opacity: 75%;
@@ -818,14 +817,14 @@ const PointerContainer = styled.div`
 `
 
 const BeatMarker = styled.div`
-    border-left: 1px solid rgba(211, 211, 211, 0.25);
+    border-left: 1px solid var(--lightest-color);
     width: 53px;
     height: 20px;
     opacity: 100%;
 `
 const BeatSpan = styled.span`
     padding-left: 9px;
-    color: white;
+    color: var(--lighter-color);
     opacity: 50%;
 `
 const TitleAndBoxesDiv = styled.div`
