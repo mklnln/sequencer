@@ -21,6 +21,7 @@ const Parameters = ({
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
 
+    let root = 1
     const [tempo, setTempo] = useState(60)
     const [wonk, setWonk] = useState(0)
     const [melodyVolume, setMelodyVolume] = useState(100)
@@ -29,7 +30,7 @@ const Parameters = ({
     const [decay, setDecay] = useState(15)
     const [sustain, setSustain] = useState(60)
     const [release, setRelease] = useState(5)
-    const [rootNote, setRootNote] = useState(5)
+    const [rootNote, setRootNote] = useState('A')
     const [filterCutoff, setFilterCutoff] = useState(7500)
     const [sound, setSound] = useState('sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -63,6 +64,9 @@ const Parameters = ({
 
     const scheduleAheadTime = 100 // ms? idk
     useEffect(() => {
+        console.log(playing, 'playing changed in playSynth useFX')
+        // setInterval continues even after react refreshes. we need it to restart after a refresh
+        // .. but still respect audioContext time
         const interval = setInterval(() => {
             if (playing) {
                 currentBeat <= 0 || currentBeat >= stepCount
@@ -86,7 +90,7 @@ const Parameters = ({
                         playSynth(
                             makeMelodyNotesState.length - index,
                             playing,
-                            rootNote,
+                            root,
                             wonk,
                             melodyVolume,
                             chordsVolume,
@@ -102,7 +106,7 @@ const Parameters = ({
                         playSample(
                             makeMelodyNotesState.length - index,
                             playing,
-                            rootNote,
+                            root,
                             wonk,
                             'melody'
                         )
@@ -121,7 +125,7 @@ const Parameters = ({
                         playSynth(
                             makeChordNotesState.length - index,
                             playing,
-                            rootNote,
+                            root,
                             wonk,
                             melodyVolume,
                             chordsVolume,
@@ -137,7 +141,7 @@ const Parameters = ({
                         playSample(
                             makeChordNotesState.length - index,
                             playing,
-                            rootNote,
+                            root,
                             wonk,
                             'chords'
                         )
@@ -146,7 +150,62 @@ const Parameters = ({
             })
         }, scheduleAheadTime)
         return () => clearInterval(interval)
-    }, [playing, currentBeat])
+    }, [playing])
+
+    // ! if i render the page based on playing, then i don't need a useEffect??
+    useEffect(() => {
+        const detectKeyDown = (e) => {
+            console.log('a key was pressed!!')
+            if (e.key === 's' && e.target.type !== 'text') {
+                console.log(
+                    'if keydown condition MET, should now toggle playing'
+                )
+
+                console.log(playingRef.current, 'BEFORE toggle')
+                playingRef.current = !playingRef.current
+                console.log(
+                    playingRef.current,
+                    'now set to in eventListener AFTER toggle'
+                )
+                setPlaying(playingRef.current)
+                document.removeEventListener('keydown', detectKeyDown, true)
+            }
+        }
+        document.addEventListener('keydown', detectKeyDown, true)
+        console.log('key listener ADDED')
+        return () => {
+            document.removeEventListener('keydown', detectKeyDown, true)
+            console.log('key listener REMOVED')
+        }
+    })
+
+    // todo trying to minimize useEffect use, see here tryna get rid of eventListener guy
+    // * had trouble with the eventlisteners and re-renders adding a million extra ones.
+    // ? how to keep just one eventlistener over react re-renders??
+    // const detectKeyDown = (e) => {
+    //     if (e.key === 's' && e.target.type !== 'text') {
+    //         console.log(playingRef.current, 'BEFORE toggle')
+    //         playingRef.current = !playingRef.current
+    //         console.log(
+    //             playingRef.current,
+    //             'now set to in eventListener AFTER toggle'
+    //         )
+    //         setPlaying(playingRef.current)
+    //         document.removeEventListener('keydown', detectKeyDown, true)
+    //         console.log('key listener REMOVED')
+    //     }
+    // }
+    // useEffect(() => {
+    //     document.addEventListener('keydown', detectKeyDown, true)
+    //     console.log('key listener ADDED')
+    //     return () => {
+    //         console.log('key listener REMOVED')
+    //         document.removeEventListener('keydown', detectKeyDown, true)
+    //     }
+    // }, [])
+
+    // console.log('key listener removed')
+    // console.log('key listener added')
 
     // setState on parameters was finnicky at times, making separate functions helped.
     // TO-DO: cut down on this bloat and keep setState calls as anonymous callbacks within the below returns.
@@ -288,77 +347,118 @@ const Parameters = ({
             setParameterState: setFilterCutoff,
         },
     }
-    const options = ['A', 'A#']
-    const handleOptionClick = (option) => {
+    // want to show a list of the note names C D E F# etc, but want the state to be a number.
+    const options = [
+        'A',
+        'A#',
+        'B',
+        'C',
+        'C#',
+        'D',
+        'D#',
+        'E',
+        'F',
+        'F#',
+        'G',
+        'G#',
+    ]
+    const handleOptionClick = (option, index) => {
         setRootNote(option)
         setIsDropdownOpen(false)
+        console.log(options.indexOf(option), 'bybybyb')
+        root = options.indexOf(option) + 1
     }
     console.log(tempo, wonk)
+
+    const countReRenders = useRef(1)
+
+    useEffect(() => {
+        countReRenders.current = countReRenders.current + 1
+    })
     // TO-DO: make a parameter component in order to avoid repetition
     return (
-        <MainDiv>
-            <StartButtonDiv>
-                <button
-                    onClick={() => {
-                        if (!playing) {
-                            setPlaying(true)
-                            // playing = true
-                        } else {
-                            setPlaying(false)
-                            // playing = false
-                        }
-                        console.log(playing, 'playing')
-                    }}
-                >
-                    <span> {playing ? 'stop' : 'start'}</span>
-                </button>
-                <span>press s</span> <span>start/stop</span>
-            </StartButtonDiv>
+        <>
+            <MainDiv>
+                <StartButtonDiv>
+                    <button
+                        onClick={() => {
+                            if (!playing) {
+                                setPlaying(true)
+                                playingRef.current = !playingRef.current
+                                // playing = true
+                            } else {
+                                setPlaying(false)
+                                playingRef.current = !playingRef.current
+                                // playing = false
+                            }
+                            console.log(playing, 'playing')
+                        }}
+                    >
+                        <span> {playing ? 'stop' : 'start'}</span>
+                    </button>
+                    <span>press s</span> <span>start/stop</span>
+                </StartButtonDiv>
 
-            {Object.keys(slidersToShowObj).map((slider, index) => {
-                return (
-                    <Slider
-                        key={`${index}`}
-                        slider={slidersToShowObj[slider]}
-                        dragging={dragging}
-                        setDragging={setDragging}
-                    />
-                )
-            })}
+                {Object.keys(slidersToShowObj).map((slider, index) => {
+                    return (
+                        <Slider
+                            key={`${index}`}
+                            slider={slidersToShowObj[slider]}
+                            dragging={dragging}
+                            setDragging={setDragging}
+                        />
+                    )
+                })}
 
-            {/* these dont work */}
-            <SoundFilterDiv>
-                <ParameterDiv>
-                    <ParameterLabel>Steps</ParameterLabel>
-                    <StyledSelect value={stepCount} onChange={parseSteps}>
-                        <option value="8">8</option>
-                        <option value="16">16</option>
-                        <option value="24">24</option>
-                        <option value="32">32</option>
-                        <option value="64">64</option>
-                    </StyledSelect>
-                </ParameterDiv>
+                {/* these dont work */}
                 <SoundFilterDiv>
-                    <ParameterDiv>
-                        <ParameterLabel>Root</ParameterLabel>
-                        <ULDropdown
-                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        >
-                            <Option>{rootNote}</Option>
-                            {isDropdownOpen &&
-                                options.map((option) => (
-                                    <Option
-                                        key={option}
-                                        onClick={() =>
-                                            handleOptionClick(option)
-                                        }
-                                    >
-                                        {option}
-                                    </Option>
-                                ))}
-                        </ULDropdown>
-                        {/* <ULDropdown value={rootNote} onChange={parseRoot}> */}
-                        {/* <Option value="0">A</Option>
+                    <DropdownContainer>
+                        <ParameterLabel>Steps</ParameterLabel>
+                        <StyledSelect value={stepCount} onChange={parseSteps}>
+                            <StyledOption value="8">8</StyledOption>
+                            <StyledOption value="16">16</StyledOption>
+                            <StyledOption value="24">24</StyledOption>
+                            <StyledOption value="32">32</StyledOption>
+                            <StyledOption value="64">64</StyledOption>
+                        </StyledSelect>
+                    </DropdownContainer>
+                    <SoundFilterDiv>
+                        <DropdownContainer>
+                            <ParameterLabel>Root</ParameterLabel>
+                            <ULDropdown
+                                onClick={() =>
+                                    setIsDropdownOpen(!isDropdownOpen)
+                                }
+                            >
+                                {isDropdownOpen ? (
+                                    options.map((option, index) => (
+                                        <Option
+                                            key={option}
+                                            onClick={() =>
+                                                handleOptionClick(option, index)
+                                            }
+                                        >
+                                            {option}
+                                        </Option>
+                                    ))
+                                ) : (
+                                    <ChosenOption>{rootNote}</ChosenOption>
+                                )}
+
+                                {/* {isDropdownOpen &&
+                                    options.map((option) => (
+                                        <Option
+                                            key={option}
+                                            onClick={() =>
+                                                handleOptionClick(option)
+                                            }
+                                        >
+                                            {option}
+                                        </Option>
+                                    ))} */}
+                            </ULDropdown>
+                            {/* <ULDropdown value={rootNote} onChange={parseRoot}> */}
+                            {/* <Option value="0">A</Option>
                         <Option value="1">A#</Option>
                         <Option value="2">B</Option>
                         <Option value="3">C</Option>
@@ -370,15 +470,25 @@ const Parameters = ({
                         <Option value="9">F#</Option>
                         <Option value="10">G</Option>
                         <Option value="11">G#</Option> */}
-                        {/* </ULDropdown> */}
-                    </ParameterDiv>
+                            {/* </ULDropdown> */}
+                        </DropdownContainer>
+                    </SoundFilterDiv>
                 </SoundFilterDiv>
-            </SoundFilterDiv>
-        </MainDiv>
+            </MainDiv>
+            <Ref>
+                <span>
+                    Parameters.js has rendered {countReRenders.current} times.
+                </span>
+            </Ref>
+        </>
     )
 }
 
 export default Parameters
+const Ref = styled.div`
+    margin-top: -30px;
+    margin-bottom: 15px;
+`
 const MainDiv = styled.div`
     display: flex;
     justify-content: space-around;
@@ -393,7 +503,8 @@ const Parameter = styled.input`
     margin: 8px;
     height: 75px;
 `
-const ParameterDiv = styled.div`
+
+const DropdownContainer = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
@@ -401,6 +512,7 @@ const ParameterDiv = styled.div`
     align-items: center;
     width: 20px;
 `
+
 const ParameterLabel = styled.span``
 const StartButtonDiv = styled.div`
     display: flex;
@@ -431,8 +543,12 @@ const StyledSelect = styled.select`
 `
 
 const ULDropdown = styled.ul`
-    // position: absolute;
-    top: 0%;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    top: 100%;
     display: inline-block;
     padding: 0;
     margin: 0;
@@ -443,8 +559,25 @@ const ULDropdown = styled.ul`
     background-color: #000000;
 `
 
-const Option = styled.li`
+const Option = styled.span`
     z-index: 1;
     padding: 0 10px;
     cursor: pointer;
+    display: block;
+    :hover {
+        background-color: var(--primary-color);
+        color: black;
+    }
+`
+
+const ChosenOption = styled.span`
+    z-index: 1;
+    padding: 0 10px;
+    cursor: pointer;
+    display: block;
+`
+// user select doesn't work, likely due to select dropdown finnickiness
+const StyledOption = styled.option`
+    user-select: none;
+    border: 1px solid fuchsia;
 `

@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
+import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 const MelodyCheckbox = ({
     handleCheckbox,
     beatIndex,
@@ -29,14 +30,17 @@ const MelodyCheckbox = ({
 
     return (
         <>
-            <CheckboxButton
-                type="checkbox"
-                checked={checked ? 'checked' : ''}
-                onChange={() => {
-                    handleCheckbox(scaleIndex, beatIndex, 'Melody')
-                    setChecked(!checked)
-                }}
-            />
+            <SVGContainer>
+                <CheckboxButton
+                    type="checkbox"
+                    checked={checked ? 'checked' : ''}
+                    onChange={() => {
+                        handleCheckbox(scaleIndex, beatIndex, 'Melody')
+                        setChecked(!checked)
+                    }}
+                />
+                <CheckboxNoiseSVG />
+            </SVGContainer>
         </>
     )
 }
@@ -51,6 +55,7 @@ const CheckboxButton = styled.input`
     height: 4px;
     padding: 5px 10px;
     appearance: none;
+    margin: 0px;
 
     :hover {
         cursor: pointer;
@@ -74,4 +79,9 @@ const CheckboxButton = styled.input`
     :checked && :hover {
         background-color: white;
     }
+`
+const SVGContainer = styled.div`
+    position: relative;
+    // border: 1px solid fuchsia;
+    margin: 1px 3.5px;
 `

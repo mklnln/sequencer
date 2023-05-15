@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import NoiseSVG from '../assets/SVGs/SliderNoiseSVG.js'
+import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG.js'
 
 const Slider = ({
     parameterName,
@@ -75,44 +77,8 @@ const Slider = ({
                     }
                 >
                     {/* <NoiseFill>wwwwwwwwwwwwwwwwwww</NoiseFill> */}
-                    <NoiseSVG
-                        // width="100"
-                        // height="100"
-                        viewBox="0 0 10 8"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <defs>
-                            <pattern
-                                id="noise-pattern"
-                                width="4"
-                                height="4"
-                                patternUnits="userSpaceOnUse"
-                            >
-                                <rect
-                                    x="0"
-                                    y="0"
-                                    width="2"
-                                    height="2"
-                                    fill="rgba(255,231,81,0.25)"
-                                />
-                                <rect
-                                    x="2"
-                                    y="2"
-                                    width="2"
-                                    height="2"
-                                    fill="rgba(255,231,81,0.25)"
-                                />
-                            </pattern>
-                        </defs>
-
-                        <rect
-                            x="0"
-                            y="0"
-                            width="120"
-                            height="120"
-                            fill="url(#noise-pattern)"
-                        />
-                    </NoiseSVG>
+                    <NoiseSVG />
+                    {/* <CheckboxNoiseSVG /> */}
                     <SliderThumb
                         style={{
                             borderBottomWidth: `${(100 - gap) / 2}px`,
@@ -183,16 +149,6 @@ const NoiseFill = styled.span`
     color: var(--lightest-color);
 `
 
-// CSS can be finnicky eh
-const NoiseSVG = styled.svg`
-    // z-index: -5;
-    // overflow: hidden;
-    position: absolute;
-    left: 25%;
-    top: -58%;
-    height: 110px;
-    width: 50%;
-`
 const SliderThumb = styled.div`
     // opacity: 0%;
     background-color: rgb(120, 94, 35);
