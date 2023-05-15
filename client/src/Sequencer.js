@@ -68,14 +68,12 @@ const Sequencer = () => {
         setAmtOfNotes,
         hookTheoryChords,
         setHookTheoryChords,
-        hugeParametersObject,
-        hugeSetStateObject,
     } = useContext(MusicParametersContext)
     const { isAuthenticated, user } = useAuth0()
 
     // * the following are clearly related to JUST the sequencer. good that they're here. no refactoring needed.
     const [tempo, setTempo] = useState(60)
-    const [playing, setPlaying] = useState(false)
+    // const [playing, setPlaying] = useState(false)
     // const [currentBeat, setCurrentBeat] = useState(0)
     // const [nextBeatTime, setNextBeatTime] = useState(0)
 
@@ -84,7 +82,7 @@ const Sequencer = () => {
     let nextBeatTime = 0
 
     // todo find out what these are used for
-    const playingRef = useRef(playing)
+    // const playingRef = useRef(playing)
     const currentBeatRef = useRef(currentBeat)
 
     const romanNumeralReference = {
@@ -139,106 +137,107 @@ const Sequencer = () => {
 
     // how to refactor this so that i am not doing hook calls and minimizing the amount of components to render?
 
-    const scheduleAheadTime = 100 // ms? idk
-    useEffect(() => {
-        // ! mb prefer setTimeout? if the useEffect gets called every time, a new interval will be made and may consistently keep going, looping over and over on itself.
-        const interval = setInterval(() => {
-            // * a tale of two clocks
-            // I’m not keeping track of “sequence time” - that is, time since the beginning of starting the metronome. All we have to do is remember when we played the last note, and figure out when the next note is scheduled to play.
-            // e.g. fxn nextNote = const secondsPerBeat = 60/tempo, nextNoteTime += 0.25 *secondsPerBeat (1/4 note resolution)
-            // if you calculate next beat time for each note, you don't have to worry about keeping track of global time, only need nextNoteTime
+    // ! engine
+    // const scheduleAheadTime = 100 // ms? idk
+    // useEffect(() => {
+    //     // ! mb prefer setTimeout? if the useEffect gets called every time, a new interval will be made and may consistently keep going, looping over and over on itself.
+    //     const interval = setInterval(() => {
+    //         // * a tale of two clocks
+    //         // I’m not keeping track of “sequence time” - that is, time since the beginning of starting the metronome. All we have to do is remember when we played the last note, and figure out when the next note is scheduled to play.
+    //         // e.g. fxn nextNote = const secondsPerBeat = 60/tempo, nextNoteTime += 0.25 *secondsPerBeat (1/4 note resolution)
+    //         // if you calculate next beat time for each note, you don't have to worry about keeping track of global time, only need nextNoteTime
 
-            if (playing) {
-                currentBeat <= 0 || currentBeat >= stepCount
-                    ? (currentBeat = 1)
-                    : (currentBeat = currentBeat + 1)
-                scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-            } else {
-                currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
-            }
-            currentBeatRef.current = currentBeat
-            // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
-            const currentNoteStartTime = nextBeatTime
-            // console.log(makeMelodyNotesState)
-            // console.log(makeChordNotesState)
-            makeMelodyNotesState.forEach((noteRow, index) => {
-                if (
-                    areMelodyBeatsChecked[`note-${noteRow}`][
-                        currentBeat - 1
-                    ] === 1 &&
-                    playing
-                ) {
-                    if (!sound.includes('sample')) {
-                        console.log('play melody!!!!!!!!')
-                        playSynth(
-                            makeMelodyNotesState.length - index,
-                            playing,
-                            rootNote,
-                            wonkFactor,
-                            melodyVolume,
-                            chordsVolume,
-                            sound,
-                            filterCutoff,
-                            attack,
-                            decay,
-                            sustain,
-                            release,
-                            'melody'
-                        )
-                    } else {
-                        playSample(
-                            makeMelodyNotesState.length - index,
-                            playing,
-                            rootNote,
-                            wonkFactor,
-                            'melody'
-                        )
-                    }
-                }
-            })
+    //         if (playing) {
+    //             currentBeat <= 0 || currentBeat >= stepCount
+    //                 ? (currentBeat = 1)
+    //                 : (currentBeat = currentBeat + 1)
+    //             scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+    //         } else {
+    //             currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+    //         }
+    //         currentBeatRef.current = currentBeat
+    //         // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
+    //         const currentNoteStartTime = nextBeatTime
+    //         // console.log(makeMelodyNotesState)
+    //         // console.log(makeChordNotesState)
+    //         makeMelodyNotesState.forEach((noteRow, index) => {
+    //             if (
+    //                 areMelodyBeatsChecked[`note-${noteRow}`][
+    //                     currentBeat - 1
+    //                 ] === 1 &&
+    //                 playing
+    //             ) {
+    //                 if (!sound.includes('sample')) {
+    //                     console.log('play melody!!!!!!!!')
+    //                     playSynth(
+    //                         makeMelodyNotesState.length - index,
+    //                         playing,
+    //                         rootNote,
+    //                         wonkFactor,
+    //                         melodyVolume,
+    //                         chordsVolume,
+    //                         sound,
+    //                         filterCutoff,
+    //                         attack,
+    //                         decay,
+    //                         sustain,
+    //                         release,
+    //                         'melody'
+    //                     )
+    //                 } else {
+    //                     playSample(
+    //                         makeMelodyNotesState.length - index,
+    //                         playing,
+    //                         rootNote,
+    //                         wonkFactor,
+    //                         'melody'
+    //                     )
+    //                 }
+    //             }
+    //         })
 
-            makeChordNotesState.forEach((noteRow, index) => {
-                if (
-                    areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
-                        1 &&
-                    playing
-                ) {
-                    if (!sound.includes('sample')) {
-                        console.log('play chords!!!!!!!!!!!!')
-                        playSynth(
-                            makeChordNotesState.length - index,
-                            playing,
-                            rootNote,
-                            wonkFactor,
-                            melodyVolume,
-                            chordsVolume,
-                            sound,
-                            filterCutoff,
-                            attack,
-                            decay,
-                            sustain,
-                            release,
-                            'chords'
-                        )
-                    } else {
-                        playSample(
-                            makeChordNotesState.length - index,
-                            playing,
-                            rootNote,
-                            wonkFactor,
-                            'chords'
-                        )
-                    }
-                }
-            })
+    //         makeChordNotesState.forEach((noteRow, index) => {
+    //             if (
+    //                 areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
+    //                     1 &&
+    //                 playing
+    //             ) {
+    //                 if (!sound.includes('sample')) {
+    //                     console.log('play chords!!!!!!!!!!!!')
+    //                     playSynth(
+    //                         makeChordNotesState.length - index,
+    //                         playing,
+    //                         rootNote,
+    //                         wonkFactor,
+    //                         melodyVolume,
+    //                         chordsVolume,
+    //                         sound,
+    //                         filterCutoff,
+    //                         attack,
+    //                         decay,
+    //                         sustain,
+    //                         release,
+    //                         'chords'
+    //                     )
+    //                 } else {
+    //                     playSample(
+    //                         makeChordNotesState.length - index,
+    //                         playing,
+    //                         rootNote,
+    //                         wonkFactor,
+    //                         'chords'
+    //                     )
+    //                 }
+    //             }
+    //         })
 
-            // ! the below line's interval timing was secondsPerBeat * 1000, but i noticed that the stated value of 150 was in truth more like 130. 150/130 is 1.15, thus i thought a 15% decrease in the interval would give me a more accurate time. this is true, but i'm not sure what's going on exactly. that's why 850 is used as its 15% less
-            // old value
-            // }, (secondsPerBeat * 850) / 2)
-        }, scheduleAheadTime)
-        // ! even set manually at 1000ms (i.e. one second), this will oscillate in and out of rhythm with a clock ticking each second. the 2 refers to how many subdivisions a quarter note gives. our stepCount is 8th notes.
-        return () => clearInterval(interval)
-    }, [playing, currentBeat])
+    //         // ! the below line's interval timing was secondsPerBeat * 1000, but i noticed that the stated value of 150 was in truth more like 130. 150/130 is 1.15, thus i thought a 15% decrease in the interval would give me a more accurate time. this is true, but i'm not sure what's going on exactly. that's why 850 is used as its 15% less
+    //         // old value
+    //         // }, (secondsPerBeat * 850) / 2)
+    //     }, scheduleAheadTime)
+    //     // ! even set manually at 1000ms (i.e. one second), this will oscillate in and out of rhythm with a clock ticking each second. the 2 refers to how many subdivisions a quarter note gives. our stepCount is 8th notes.
+    //     return () => clearInterval(interval)
+    // }, [playing, currentBeat])
 
     const handleCheckbox = (noteIndex, beatIndex, type) => {
         // ? not sure i need type as a parameter. chord/melody now dealt with, but just need ot set the proper state
@@ -452,36 +451,30 @@ const Sequencer = () => {
     // todo sometimes, after a long pause, pressing S will instantly flip playing to true then not true. this only works when playing is false. when playing is true, S will turn it off and not instantly flip back to playing is true. weird.
     // -> tried turning off the remove/add listeners within detectKeyDown function
     // ! -> every time i save this file, the DOM has effectively another event listener. try saving it again, you'll find another. odd numbers will make it seem like its working properly, but the console will show responses from multiple listeners.
-    useEffect(() => {
-        const detectKeyDown = (e) => {
-            // ? can't access current state with event listener
-            if (e.key === 's' && e.target.type !== 'text') {
-                // document.removeEventListener('keydown', detectKeyDown, true)
-                // console.log('that key was s')
-                // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
-                // reason why we needed useRef: when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
-                // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
-
-                // playing = !playing
-                // todo is ok??
-                playingRef.current = !playingRef.current
-                setPlaying(playingRef.current)
-
-                // document.addEventListener('keydown', detectKeyDown, true)
-                // console.log('key listener added')
-                // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
-                // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
-            }
-        }
-        document.removeEventListener('keydown', detectKeyDown, true)
-        console.log('key listener removed')
-        document.addEventListener('keydown', detectKeyDown, true)
-        console.log('key listener added')
-    }, [])
-    // used to monitor the event listener. not necessary in final product
-    useEffect(() => {
-        console.log(playingRef, 'usefx playingref changed???!!', playing)
-    }, [playing])
+    // useEffect(() => {
+    //     const detectKeyDown = (e) => {
+    //         // ? can't access current state with event listener
+    //         if (e.key === 's' && e.target.type !== 'text') {
+    //             // document.removeEventListener('keydown', detectKeyDown, true)
+    //             // console.log('that key was s')
+    //             // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
+    //             // reason why we needed useRef: when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
+    //             // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
+    //             // playing = !playing
+    //             // todo is ok??
+    //             // playingRef.current = !playingRef.current
+    //             // setPlaying(playingRef.current)
+    //             // document.addEventListener('keydown', detectKeyDown, true)
+    //             // console.log('key listener added')
+    //             // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
+    //             // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
+    //         }
+    //     }
+    //     // document.removeEventListener('keydown', detectKeyDown, true)
+    //     // console.log('key listener removed')
+    //     // document.addEventListener('keydown', detectKeyDown, true)
+    //     // console.log('key listener added')
+    // }, [])
 
     // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
     useEffect(() => {
@@ -547,18 +540,25 @@ const Sequencer = () => {
 
     return (
         <>
-            <span>I have rendered {countReRenders.current} times.</span>
+            <span>
+                Sequencer.js has rendered {countReRenders.current} times.
+            </span>
             <Parameters
-                playing={playing}
-                setPlaying={setPlaying}
+                currentBeat={currentBeat}
+                // playing={playing}
+                // setPlaying={setPlaying}
+                makeChordNotesState={makeChordNotesState}
+                makeMelodyNotesState={makeMelodyNotesState}
+                areMelodyBeatsChecked={areMelodyBeatsChecked}
+                areChordBeatsChecked={areChordBeatsChecked}
                 // tempo={tempo}
                 // setTempo={setTempo}
-                setAreChordBeatsChecked={setAreChordBeatsChecked}
-                generateAreChordBeatsCheckedInitialState={
-                    generateAreChordBeatsCheckedInitialState
-                }
-                makeChordNotesState={makeChordNotesState}
-                blankStepCountArray={blankStepCountArray}
+                // setAreChordBeatsChecked={setAreChordBeatsChecked}
+                // generateAreChordBeatsCheckedInitialState={
+                //     generateAreChordBeatsCheckedInitialState
+                // }
+                // makeChordNotesState={makeChordNotesState}
+                // blankStepCountArray={blankStepCountArray}
             />
             <MelodySequencerGrid>
                 <AllBoxesDiv>
@@ -789,13 +789,14 @@ const NoteTitle = styled.span`
     margin: none;
     display: inline-block;
     opacity: 75%;
+    padding-right: 8px;
 `
 
 const ChordTitle = styled.span`
-    text-align: left;
+    text-align: right;
     font-size: 22px;
     opacity: 75%;
-    padding: 2px;
+    padding-right: 8px;
     margin: none;
 `
 

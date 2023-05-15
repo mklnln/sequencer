@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import NoiseSVG from '../assets/SVGs/SliderNoiseSVG.js'
+import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG.js'
 
 const Slider = ({
     parameterName,
@@ -21,7 +23,7 @@ const Slider = ({
                 Math.min(maxValue, stateValue + deltaY * valuePerPixel)
             )
             console.log(newValue, 'newval')
-            setParameterState(Math.round(newValue))
+            setParameterState(Math.round(newValue), stateValue)
             console.log(stateValue, newValue)
             setDragStartY(e.clientY)
         }
@@ -74,6 +76,9 @@ const Slider = ({
                         }
                     }
                 >
+                    {/* <NoiseFill>wwwwwwwwwwwwwwwwwww</NoiseFill> */}
+                    <NoiseSVG />
+                    {/* <CheckboxNoiseSVG /> */}
                     <SliderThumb
                         style={{
                             borderBottomWidth: `${(100 - gap) / 2}px`,
@@ -107,11 +112,19 @@ const SliderBackground = styled.div`
     padding-bottom: 10px;
     border: 3px double var(--lightest-color);
 `
+
 const SliderRange = styled.div`
+    // overflow: hidden;
+    // display: flex;
+    // justify-content: center;
     position: relative;
-    width: 10px;
+    // left: 5%;
+    // z-index: 1;
+    padding: 10px 0px;
+    margin: 0px;
+    width: 20px;
     height: 50px;
-    // background-color: #f1f1f1;
+    // background-color: var(--secondary-color);
     cursor: pointer;
     // border-bottom: 10px solid white;
     userselect: none;
@@ -120,8 +133,25 @@ const SliderRange = styled.div`
         opacity: 60%;
     }
 `
+
+const NoiseFill = styled.span`
+    position: relative;
+    top: -5%;
+    margin: auto;
+    height: 100px;
+    user-select: none;
+    word-break: break-all;
+    width: 10px;
+    // letter-spacing: em;
+    line-height: 3.5px;
+    position: absolute;
+    font-size: 22px;
+    color: var(--lightest-color);
+`
+
 const SliderThumb = styled.div`
-    background-color: rgba(255, 231, 81, 0.25);
+    // opacity: 0%;
+    background-color: rgb(120, 94, 35);
     position: relative;
     left: 50%;
     transform: translateX(-50%);

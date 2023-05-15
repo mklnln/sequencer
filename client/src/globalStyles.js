@@ -1,6 +1,14 @@
 import { createGlobalStyle } from 'styled-components'
+import NouveauIBM from './assets/fonts/Nouveau_IBM.ttf'
+import NouveauIBMStretch from './assets/fonts/Nouveau_IBM_Stretch.ttf'
 
 const GlobalStyle = createGlobalStyle`
+@font-face {
+    font-family: 'MS-DOS';
+    src: url(${NouveauIBM}) format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
 
 head {
     
@@ -16,7 +24,8 @@ body {
     margin: 10px;
     background-color: #000000;
     color: var(--primary-color);
-    font-family: 'IBM Plex Mono', monospace;
+    // font-family: 'IBM Plex Mono', monospace;
+    font-family: 'MS-DOS';
     font-weight: 400;
     letter-spacing: 0.125em;
     display: flex; justify-content: center; align-items: center;
@@ -25,7 +34,7 @@ body {
 span {
     color: var(--primary-color);
     user-select: none;
-    letter-spacing: 0em;
+    letter-spacing: 0.00em;
 }
 option {
     :hover{

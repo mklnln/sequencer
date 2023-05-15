@@ -138,7 +138,6 @@ export const playSynth = (
         voicing.push(scale[index + 1])
         voicing.push(scale[index + 3])
     }
-    console.log(currentNoteStartTime, 'start time')
     // we want index, index+2, index+4 notes played.
     // ? this could be a state KEY as in major, minor, harmonic minor
     voicing.forEach((monophone) => {
@@ -154,7 +153,6 @@ export const playSynth = (
         lowPassFilter.frequency.value = filterCutoff
         lowPassFilter.type = 'lowpass'
         const now = audioCtx.currentTime
-        console.log(now, 'now')
         osc.connect(lowPassFilter)
         const synthGain = audioCtx.createGain()
         // shape the ADSR (attack, decay, sustain, release) envelope of the sound
