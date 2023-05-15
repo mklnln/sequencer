@@ -1,12 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import { loadSample } from '../AudioEngine'
 import { audioTime } from '../AudioEngine'
 import Slider from './Slider'
-const Parameters = ({ playing, setPlaying }) => {
+import { playSample, getFile, setupSample, playSynth } from '../AudioEngine'
+const Parameters = ({
+    currentBeat,
+    areMelodyBeatsChecked,
+    areChordBeatsChecked,
+    makeMelodyNotesState,
+    makeChordNotesState,
+}) => {
     //   const [tempo, setTempo] = useState(150)
     const [dragging, setDragging] = useState(false)
+    const [playing, setPlaying] = useState(false)
+    const playingRef = useRef(playing)
+    // ! can some of these parameters be regular const so that i dont lag with the drag??
+    // ! can some of these parameters be regular const so that i dont lag with the drag??
+    // ! can some of these parameters be regular const so that i dont lag with the drag??
+    // ! can some of these parameters be regular const so that i dont lag with the drag??
 
     const [tempo, setTempo] = useState(60)
     const [wonk, setWonk] = useState(0)
@@ -17,6 +30,8 @@ const Parameters = ({ playing, setPlaying }) => {
     const [sustain, setSustain] = useState(60)
     const [release, setRelease] = useState(5)
     const [rootNote, setRootNote] = useState(5)
+    const [filterCutoff, setFilterCutoff] = useState(7500)
+    const [sound, setSound] = useState('sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const {
         audioContext,
@@ -26,16 +41,16 @@ const Parameters = ({ playing, setPlaying }) => {
         setStepCount,
         // rootNote,
         // setRootNote,
-        // wonkFactor,
-        // setWonkFactor,
+        // wonk,
+        // setwonk,
         // melodyVolume,
         // setMelodyVolume,
         // chordsVolume,
         // setChordsVolume,
-        sound,
-        setSound,
-        filterCutoff,
-        setFilterCutoff,
+        // sound,
+        // setSound,
+        // filterCutoff,
+        // setFilterCutoff,
         // attack,
         // setAttack,
         // decay,
@@ -45,6 +60,93 @@ const Parameters = ({ playing, setPlaying }) => {
         // release,
         // setRelease,
     } = useContext(MusicParametersContext)
+
+    const scheduleAheadTime = 100 // ms? idk
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (playing) {
+                currentBeat <= 0 || currentBeat >= stepCount
+                    ? (currentBeat = 1)
+                    : (currentBeat = currentBeat + 1)
+                // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+            } else {
+                currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+            }
+            // currentBeatRef.current = currentBeat
+            // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
+            makeMelodyNotesState.forEach((noteRow, index) => {
+                if (
+                    areMelodyBeatsChecked[`note-${noteRow}`][
+                        currentBeat - 1
+                    ] === 1 &&
+                    playing
+                ) {
+                    if (!sound.includes('sample')) {
+                        console.log('play melody!!!!!!!!')
+                        playSynth(
+                            makeMelodyNotesState.length - index,
+                            playing,
+                            rootNote,
+                            wonk,
+                            melodyVolume,
+                            chordsVolume,
+                            sound,
+                            filterCutoff,
+                            attack,
+                            decay,
+                            sustain,
+                            release,
+                            'melody'
+                        )
+                    } else {
+                        playSample(
+                            makeMelodyNotesState.length - index,
+                            playing,
+                            rootNote,
+                            wonk,
+                            'melody'
+                        )
+                    }
+                }
+            })
+
+            makeChordNotesState.forEach((noteRow, index) => {
+                if (
+                    areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
+                        1 &&
+                    playing
+                ) {
+                    if (!sound.includes('sample')) {
+                        console.log('play chords!!!!!!!!!!!!')
+                        playSynth(
+                            makeChordNotesState.length - index,
+                            playing,
+                            rootNote,
+                            wonk,
+                            melodyVolume,
+                            chordsVolume,
+                            sound,
+                            filterCutoff,
+                            attack,
+                            decay,
+                            sustain,
+                            release,
+                            'chords'
+                        )
+                    } else {
+                        playSample(
+                            makeChordNotesState.length - index,
+                            playing,
+                            rootNote,
+                            wonk,
+                            'chords'
+                        )
+                    }
+                }
+            })
+        }, scheduleAheadTime)
+        return () => clearInterval(interval)
+    }, [playing, currentBeat])
 
     // setState on parameters was finnicky at times, making separate functions helped.
     // TO-DO: cut down on this bloat and keep setState calls as anonymous callbacks within the below returns.
@@ -176,6 +278,14 @@ const Parameters = ({ playing, setPlaying }) => {
             title: 'Release',
             stateValue: release,
             setParameterState: setRelease,
+        },
+        filter: {
+            id: 7,
+            minValue: 100,
+            maxValue: 10000,
+            title: 'Filter',
+            stateValue: filterCutoff,
+            setParameterState: setFilterCutoff,
         },
     }
     const options = ['A', 'A#']

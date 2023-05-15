@@ -52,17 +52,16 @@ const App = () => {
             'melody'
         )
     )
-    // const [tempo, setTempo] = useState(60)
-    const [rootNote, setRootNote] = useState(0)
-    const [wonkFactor, setWonkFactor] = useState(1)
-    const [attack, setAttack] = useState(2)
-    const [melodyVolume, setMelodyVolume] = useState(75)
-    const [chordsVolume, setChordsVolume] = useState(50)
-    const [sound, setSound] = useState('sine')
-    const [filterCutoff, setFilterCutoff] = useState(7500)
-    const [decay, setDecay] = useState(20)
-    const [sustain, setSustain] = useState(20)
-    const [release, setRelease] = useState(20)
+    // // const [tempo, setTempo] = useState(60)
+    // const [rootNote, setRootNote] = useState(0)
+    // const [wonkFactor, setWonkFactor] = useState(1)
+    // const [attack, setAttack] = useState(2)
+    // const [melodyVolume, setMelodyVolume] = useState(75)
+    // const [chordsVolume, setChordsVolume] = useState(50)
+
+    // const [decay, setDecay] = useState(20)
+    // const [sustain, setSustain] = useState(20)
+    // const [release, setRelease] = useState(20)
     const [chordInputStep, setChordInputStep] = useState(1)
     const [chosenAPIChords, setChosenAPIChords] = useState([])
     const [hookTheoryChords, setHookTheoryChords] = useState([])
@@ -86,60 +85,6 @@ const App = () => {
         return newState
     }
 
-    // const hugeParametersObject = {
-    //     // do these only contain the values of state when the object is called? how does this update? can this lead to bugs?
-    //     amtOfNotes: amtOfNotes,
-    //     stepCount: stepCount,
-    //     areChordBeatsChecked: areChordBeatsChecked,
-    //     areMelodyBeatsChecked: areMelodyBeatsChecked,
-    //     tempo: tempo,
-    //     rootNote: rootNote,
-    //     wonkFactor: wonkFactor,
-    //     attack: attack,
-    //     melodyVolume: melodyVolume,
-    //     chordsVolume: chordsVolume,
-    //     sound: sound,
-    //     filterCutoff: filterCutoff,
-    //     decay: decay,
-    //     sustain: sustain,
-    //     release: release,
-    //     chordInputStep: chordInputStep,
-    //     chosenAPIChords: chosenAPIChords,
-    //     hookTheoryChords: hookTheoryChords,
-    //     loadUserSongs: loadUserSongs,
-    //     loadSong: loadSong,
-    //     songName: songName,
-    //     songSavedOrDeleted: songSavedOrDeleted,
-    //     songDeleted: songDeleted,
-    // }
-
-    // const hugeSetStateObject = {
-    //     setTempo: setTempo,
-    //     setStepCount: setStepCount,
-    //     setRootNote: setRootNote,
-    //     setWonkFactor: setWonkFactor,
-    //     setChordInputStep: setChordInputStep,
-    //     setLoadUserSongs: setLoadUserSongs,
-    //     setLoadSong: setLoadSong,
-    //     setSongName: setSongName,
-    //     setMelodyVolume: setMelodyVolume,
-    //     setChordsVolume: setChordsVolume,
-    //     setSound: setSound,
-    //     setFilterCutoff: setFilterCutoff,
-    //     setAttack: setAttack,
-    //     setDecay: setDecay,
-
-    //     setSustain: setSustain,
-    //     setRelease: setRelease,
-    //     setSongSavedOrDeleted: setSongSavedOrDeleted,
-    //     setSongDeleted: setSongDeleted,
-    //     setAreChordBeatsChecked: setAreChordBeatsChecked,
-    //     setAmtOfNotes: setAmtOfNotes,
-    //     setAreMelodyBeatsChecked: setAreMelodyBeatsChecked,
-    //     setHookTheoryChords: setHookTheoryChords,
-    //     setChosenAPIChords: setChosenAPIChords,
-    // }
-
     return (
         <BrowserRouter>
             <MusicParametersContext.Provider
@@ -149,10 +94,10 @@ const App = () => {
                     // setTempo,
                     stepCount,
                     setStepCount,
-                    rootNote,
-                    setRootNote,
-                    wonkFactor,
-                    setWonkFactor,
+                    // rootNote,
+                    // setRootNote,
+                    // wonkFactor,
+                    // setWonkFactor,
                     chordInputStep,
                     setChordInputStep,
                     loadUserSongs,
@@ -161,22 +106,22 @@ const App = () => {
                     setLoadSong,
                     songName,
                     setSongName,
-                    melodyVolume,
-                    setMelodyVolume,
-                    chordsVolume,
-                    setChordsVolume,
-                    sound,
-                    setSound,
-                    filterCutoff,
-                    setFilterCutoff,
-                    attack,
-                    setAttack,
-                    decay,
-                    setDecay,
-                    sustain,
-                    setSustain,
-                    release,
-                    setRelease,
+                    // melodyVolume,
+                    // setMelodyVolume,
+                    // chordsVolume,
+                    // setChordsVolume,
+                    // sound,
+                    // setSound,
+                    // filterCutoff,
+                    // setFilterCutoff,
+                    // attack,
+                    // setAttack,
+                    // decay,
+                    // setDecay,
+                    // sustain,
+                    // setSustain,
+                    // release,
+                    // setRelease,
                     songSavedOrDeleted,
                     setSongSavedOrDeleted,
                     songDeleted,
@@ -195,8 +140,6 @@ const App = () => {
                     hookTheoryChords,
                     setHookTheoryChords,
                     setChosenAPIChords,
-                    // hugeParametersObject,
-                    // hugeSetStateObject,
                 }}
             >
                 <GlobalStyle />

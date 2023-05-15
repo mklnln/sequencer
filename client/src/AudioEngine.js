@@ -119,6 +119,7 @@ export const playSynth = (
     polyphony,
     currentNoteStartTime
 ) => {
+    console.log(attack, decay, sustain, release, 'ADSR')
     let rootFrequency = 220 * 2 ** (rootNote / 12) // instead of accessing a big object with note frequency values, we can just calculate them based off of A3 = 220Hz
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
     // take index, voice chord based off the starting note of the scale
