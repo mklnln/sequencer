@@ -7,6 +7,7 @@ const CheckboxNoiseSVG = () => {
             // height="100"
             viewBox="0 0 10 8"
             xmlns="http://www.w3.org/2000/svg"
+            // transform="rotate(22.5)"
         >
             <defs>
                 <pattern
@@ -59,11 +60,11 @@ const CheckboxNoiseSVG = () => {
 
 // CSS can be finnicky eh
 const NoiseStyle = styled.svg`
-    // z-index: -5;
+    z-index: -5;
     // overflow: hidden;
     position: absolute;
-    left: 25%;
-    top: -58%;
+    left: 0%;
+    top: 0%;
     height: 100%;
     width: 100%;
     // border: 1px solid fuchsia;
