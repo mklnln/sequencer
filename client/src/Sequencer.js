@@ -359,85 +359,85 @@ const Sequencer = () => {
         }
     }
 
-    useEffect(() => {
-        fetch('https://api.hooktheory.com/v1/trends/nodes', {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-            },
-            // body: JSON.stringify({ order: formData }),
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }, [chosenAPIChords])
+    // useEffect(() => {
+    //     fetch('https://api.hooktheory.com/v1/trends/nodes', {
+    //         method: 'GET',
+    //         headers: {
+    //             Accept: 'application/json',
+    //             'Content-Type': 'application/json',
+    //             Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+    //         },
+    //         // body: JSON.stringify({ order: formData }),
+    //     })
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
+    //         })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }, [chosenAPIChords])
 
     // todo ? show songs with the given chord progression
-    useEffect(() => {
-        // todo fit chosen chords in format 1,4 in ${}
-        if (chosenAPIChords.length > 0) {
-            fetch(
-                `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        Authorization:
-                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-                    },
-                    // body: JSON.stringify({ order: formData }),
-                }
-            )
-                .then((res) => res.json())
-                .then((data) => {
-                    // i only take chords from the api that match those i've put in the sequencer
-                    const removeUnsupportedChords = data.filter((chord) => {
-                        return chord['chord_ID'].length <= 1
-                    })
-                    console.log(removeUnsupportedChords)
-                    setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        }
+    // useEffect(() => {
+    //     // todo fit chosen chords in format 1,4 in ${}
+    //     if (chosenAPIChords.length > 0) {
+    //         fetch(
+    //             `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
+    //             {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     Accept: 'application/json',
+    //                     'Content-Type': 'application/json',
+    //                     Authorization:
+    //                         'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+    //                 },
+    //                 // body: JSON.stringify({ order: formData }),
+    //             }
+    //         )
+    //             .then((res) => res.json())
+    //             .then((data) => {
+    //                 // i only take chords from the api that match those i've put in the sequencer
+    //                 const removeUnsupportedChords = data.filter((chord) => {
+    //                     return chord['chord_ID'].length <= 1
+    //                 })
+    //                 console.log(removeUnsupportedChords)
+    //                 setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
+    //             })
+    //             .catch((error) => {
+    //                 console.log(error)
+    //             })
+    //     }
 
-        // * the below is for getting songs with the specific chord progression.
-        if (chosenAPIChords.length >= 4) {
-            // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
-            const APISongs = []
-            let page = 1
-            fetch(
-                `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        Authorization:
-                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-                    },
-                }
-            )
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data, 'hook API givin songs w chords')
-                    data.forEach((song) => {
-                        APISongs.push(song)
-                    })
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        }
-    }, [chosenAPIChords])
+    //     // * the below is for getting songs with the specific chord progression.
+    //     if (chosenAPIChords.length >= 4) {
+    //         // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
+    //         const APISongs = []
+    //         let page = 1
+    //         fetch(
+    //             `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
+    //             {
+    //                 method: 'GET',
+    //                 headers: {
+    //                     Accept: 'application/json',
+    //                     'Content-Type': 'application/json',
+    //                     Authorization:
+    //                         'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+    //                 },
+    //             }
+    //         )
+    //             .then((res) => res.json())
+    //             .then((data) => {
+    //                 console.log(data, 'hook API givin songs w chords')
+    //                 data.forEach((song) => {
+    //                     APISongs.push(song)
+    //                 })
+    //             })
+    //             .catch((error) => {
+    //                 console.log(error)
+    //             })
+    //     }
+    // }, [chosenAPIChords])
 
     // todo sometimes, after a long pause, pressing S will instantly flip playing to true then not true. this only works when playing is false. when playing is true, S will turn it off and not instantly flip back to playing is true. weird.
     // -> tried turning off the remove/add listeners within detectKeyDown function
