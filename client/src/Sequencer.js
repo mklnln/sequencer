@@ -739,7 +739,6 @@ const Sequencer = () => {
 export default Sequencer
 
 const ChordSequencerGrid = styled.div`
-    /* padding: 20px 20px 0px 20px; */
     height: 300px;
     display: flex;
     flex-direction: row;
@@ -747,7 +746,6 @@ const ChordSequencerGrid = styled.div`
     align-items: center;
 `
 const MelodySequencerGrid = styled.div`
-    /* height: 400px; */ // used to be needed to not overlap parameters, but seems to be ok.
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -761,6 +759,7 @@ const ChordDiv = styled.div`
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
+    // border: 1px solid fuchsia;
 `
 
 const AllBoxesDiv = styled.div`

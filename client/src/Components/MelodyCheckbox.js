@@ -48,12 +48,12 @@ const MelodyCheckbox = ({
 export default MelodyCheckbox
 
 const CheckboxButton = styled.input`
+    position: absolute;
     z-index: 1;
     border: none;
-    background-color: var(--lighter-color);
-    background-image: url(${CheckboxNoiseSVG});
+    // background-color: var(--lighter-color);
     width: 4px;
-    opacity: 25%;
+    opacity: 0%;
     height: 10px;
     width: 20px;
     // padding: 5px 10px;
@@ -87,8 +87,9 @@ const SVGContainer = styled.div`
     position: relative;
     // border: 1px solid fuchsia;
     margin: 0px 3.5px;
+    // background-color: var(--lighter-color);
     overflow: hidden;
     // ! might be useful to change the containing div height/width, no idea what im doin tho
-    // height: 10px;
-    // width: 20px;
+    height: 10px;
+    width: 20px;
 `

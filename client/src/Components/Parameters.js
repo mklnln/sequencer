@@ -5,6 +5,13 @@ import { loadSample } from '../AudioEngine'
 import { audioTime } from '../AudioEngine'
 import Slider from './Slider'
 import { playSample, getFile, setupSample, playSynth } from '../AudioEngine'
+import {
+    slidersToShowObj,
+    rootNoteOptions,
+    stepCountOptions,
+} from '../BigObjectsAndArrays'
+import CustomDropdown from './CustomDropdown'
+import { AbortedDeferredError } from 'react-router-dom'
 const Parameters = ({
     currentBeat,
     areMelodyBeatsChecked,
@@ -347,28 +354,21 @@ const Parameters = ({
             setParameterState: setFilterCutoff,
         },
     }
+
     // want to show a list of the note names C D E F# etc, but want the state to be a number.
-    const options = [
-        'A',
-        'A#',
-        'B',
-        'C',
-        'C#',
-        'D',
-        'D#',
-        'E',
-        'F',
-        'F#',
-        'G',
-        'G#',
-    ]
-    const handleOptionClick = (option, index) => {
-        setRootNote(option)
-        setIsDropdownOpen(false)
-        console.log(options.indexOf(option), 'bybybyb')
-        root = options.indexOf(option) + 1
-    }
-    console.log(tempo, wonk)
+
+    // const handleOptionClick = (option, index) => {
+    //     setRootNote(option)
+    //     setIsDropdownOpen(false)
+    //     console.log(rootNoteOptions.indexOf(option), 'bybybyb')
+    //     root = rootNoteOptions.indexOf(option) + 1
+    // }
+    // console.log(tempo, wonk)
+
+    // const mouseLeave = () => {
+    //     console.log('mouse left')
+    //     setIsDropdownOpen(false)
+    // }
 
     const countReRenders = useRef(1)
 
@@ -411,69 +411,36 @@ const Parameters = ({
                 })}
 
                 {/* these dont work */}
-                <SoundFilterDiv>
-                    <DropdownContainer>
-                        <ParameterLabel>Steps</ParameterLabel>
-                        <StyledSelect value={stepCount} onChange={parseSteps}>
-                            <StyledOption value="8">8</StyledOption>
-                            <StyledOption value="16">16</StyledOption>
-                            <StyledOption value="24">24</StyledOption>
-                            <StyledOption value="32">32</StyledOption>
-                            <StyledOption value="64">64</StyledOption>
-                        </StyledSelect>
-                    </DropdownContainer>
-                    <SoundFilterDiv>
-                        <DropdownContainer>
-                            <ParameterLabel>Root</ParameterLabel>
-                            <ULDropdown
-                                onClick={() =>
-                                    setIsDropdownOpen(!isDropdownOpen)
-                                }
-                            >
-                                {isDropdownOpen ? (
-                                    options.map((option, index) => (
-                                        <Option
-                                            key={option}
-                                            onClick={() =>
-                                                handleOptionClick(option, index)
-                                            }
-                                        >
-                                            {option}
-                                        </Option>
-                                    ))
-                                ) : (
-                                    <ChosenOption>{rootNote}</ChosenOption>
-                                )}
-
-                                {/* {isDropdownOpen &&
-                                    options.map((option) => (
-                                        <Option
-                                            key={option}
-                                            onClick={() =>
-                                                handleOptionClick(option)
-                                            }
-                                        >
-                                            {option}
-                                        </Option>
-                                    ))} */}
-                            </ULDropdown>
-                            {/* <ULDropdown value={rootNote} onChange={parseRoot}> */}
-                            {/* <Option value="0">A</Option>
-                        <Option value="1">A#</Option>
-                        <Option value="2">B</Option>
-                        <Option value="3">C</Option>
-                        <Option value="4">C#</Option>
-                        <Option value="5">D</Option>
-                        <Option value="6">D#</Option>
-                        <Option value="7">E</Option>
-                        <Option value="8">F</Option>
-                        <Option value="9">F#</Option>
-                        <Option value="10">G</Option>
-                        <Option value="11">G#</Option> */}
-                            {/* </ULDropdown> */}
-                        </DropdownContainer>
+                <DropdownsDiv>
+                    <SoundFilterDiv
+                    // onMouseLeave={mouseLeave}
+                    >
+                        <CustomDropdown
+                            title="Steps"
+                            stateValue={stepCount}
+                            stateValueOptions={stepCountOptions}
+                            setState={setStepCount}
+                            // handleOptionClick={handleOptionClick}
+                            isDropdownOpen={isDropdownOpen}
+                            setIsDropdownOpen={setIsDropdownOpen}
+                            // onMouseLeave={mouseLeave()}
+                        />
                     </SoundFilterDiv>
-                </SoundFilterDiv>
+                    <SoundFilterDiv
+                    // onMouseLeave={mouseLeave}
+                    >
+                        <CustomDropdown
+                            title="Root"
+                            stateValue={rootNote}
+                            stateValueOptions={rootNoteOptions}
+                            setState={setRootNote}
+                            // // handleOptionClick={handleOptionClick}
+                            isDropdownOpen={isDropdownOpen}
+                            setIsDropdownOpen={setIsDropdownOpen}
+                            // onMouseLeave={mouseLeave()}
+                        />
+                    </SoundFilterDiv>
+                </DropdownsDiv>
             </MainDiv>
             <Ref>
                 <span>
@@ -519,6 +486,15 @@ const StartButtonDiv = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
+`
+
+const DropdownsDiv = styled.div`
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
+    // align-items: flex-start;
+    border: 1px solid fuchsia;
+    height: 100%;
 `
 const SoundFilterDiv = styled.div`
     padding: 10px;

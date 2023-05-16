@@ -3,17 +3,19 @@ import styled from 'styled-components'
 const CheckboxNoiseSVG = () => {
     return (
         <NoiseStyle
-            // width="100"
-            // height="100"
-            viewBox="0 0 10 8"
+            width="100%"
+            height="100%"
+            viewBox="-10 2 20 10"
             xmlns="http://www.w3.org/2000/svg"
-            // transform="rotate(22.5)"
+            // style={{ fill: 'rgb(255, 0, 255)' }}
+            // fill="rgb(255, 0, 255)"
+            // transform="rotate(45)"
         >
             <defs>
                 <pattern
                     id="noise-pattern"
-                    width="4"
-                    height="4"
+                    width="10"
+                    height="10"
                     patternUnits="userSpaceOnUse"
                 >
                     <rect
@@ -21,16 +23,19 @@ const CheckboxNoiseSVG = () => {
                         y="0"
                         width="2"
                         height="2"
-                        fill="rgba(255,22,81,0.25)"
+                        // fill="rgba(255,22,81,0.25)"
+                        // fill="rgb(255, 0, 255)"
                     />
                     <rect
                         x="2"
                         y="2"
                         width="2"
                         height="2"
-                        fill="rgba(255,2,81,0.25)"
+                        // style={{ fill: 'rgb(255, 0, 255)' }}
+                        // fill="rgb(255, 0, 255)"
+                        // fill="rgba(255,2,81,0.25)"
                     />
-                    <rect
+                    {/* <rect
                         x="2"
                         y="0"
                         width="2"
@@ -43,16 +48,17 @@ const CheckboxNoiseSVG = () => {
                         width="2"
                         height="2"
                         fill="rgba(255,31,42,0.8)"
-                    />
+                    /> */}
                 </pattern>
             </defs>
 
             <rect
-                x="0"
-                y="0"
-                width="120"
-                height="120"
+                x="-6"
+                y="-6"
+                width="20"
+                height="20"
                 fill="url(#noise-pattern)"
+                transform="rotate(45)"
             />
         </NoiseStyle>
     )
@@ -60,13 +66,20 @@ const CheckboxNoiseSVG = () => {
 
 // CSS can be finnicky eh
 const NoiseStyle = styled.svg`
+    // rect {
+    //     fill: inherit;
+    // }
     z-index: -5;
     // overflow: hidden;
     position: absolute;
     left: 0%;
-    top: 0%;
+    // top: 20%;
     height: 100%;
     width: 100%;
+    // fill: gray !important;
+    // color: fuchsia;
+
     // border: 1px solid fuchsia;
+    // background-color: yellow;
 `
 export default CheckboxNoiseSVG
