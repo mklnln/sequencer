@@ -100,10 +100,10 @@ const Option = styled.li`
 
 const ChosenOptionDiv = styled.div`
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    padding: 5px 0;
+    padding: 5px 8px;
 `
 const ChosenOptionSpan = styled.span`
     z-index: 1;

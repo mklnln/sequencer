@@ -244,7 +244,6 @@ const Sequencer = () => {
         // ? how to refer dynamically to the state i need to set? mb just return?
         // // todo change initialization of each state to say note
         const arrayKey = `note-${noteIndex}`
-        console.log(type, 'which type')
         const checkboxObjCopy =
             type === 'Chords'
                 ? { ...areChordBeatsChecked }
@@ -252,11 +251,6 @@ const Sequencer = () => {
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
             setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
         // set the
-        console.log(checkboxObjCopy[arrayKey], 'arrayKey')
-        console.log(
-            areMelodyBeatsChecked,
-            'MELODYBEATS WITHIN HANDLECHECKBOX BEFORRREEEEEEEEEEE'
-        )
         // ? access areChordBeatsChecked and simply flip the value using  (checked ? 0 : 1).
         // ? ORRR since if its 0 thats falsy, we can just ask the value then switch to the opposite
         checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][
@@ -268,9 +262,6 @@ const Sequencer = () => {
         // ? all the array keys are being changed, as if there was a forEach with each arrayKey and the one specific beatIndex flips
         // ? this shouldnt happen! idk why it happens.
         // * mb bc in generateAreChordBeatsCheckedInitialState im referencing the same blankStepCountArray for each array, thus each of them points to the same place in memoery. if im copying it, im pointing to the same place for each array
-        console.log(arrayKey)
-        // checkboxObjCopy[arrayKey] = 3 // this changes only the specific beatIndex, not each arrayKEy but only one
-        console.log(checkboxObjCopy, 'after')
     }
 
     // todo make helper

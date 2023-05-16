@@ -20,9 +20,11 @@ const Parameters = ({
     makeChordNotesState,
 }) => {
     //   const [tempo, setTempo] = useState(150)
+    const audioContext = new AudioContext() // restarts upon every re-render due to playing changing state
     const [dragging, setDragging] = useState(false)
     const [playing, setPlaying] = useState(false)
-    const playingRef = useRef(playing)
+    const intervalRunningRef = useRef(false)
+    const intervalIDRef = useRef('')
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
@@ -41,8 +43,9 @@ const Parameters = ({
     const [filterCutoff, setFilterCutoff] = useState(7500)
     const [sound, setSound] = useState('sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    // const [intervalID, setIntervalID] = useState(null)
     const {
-        audioContext,
+        // audioContext,
         // tempo,
         // setTempo,
         stepCount,
@@ -69,7 +72,70 @@ const Parameters = ({
         // setRelease,
     } = useContext(MusicParametersContext)
 
-    const scheduleAheadTime = 100 // ms? idk
+    // ! want to avoid setTimeout or setInterval calls, they only send state at their instantiation, no update
+
+    // if playing
+    // first note should be sent to audioEngine ASAP if its on beat 1
+    // calculate second note time, store in nextNoteTime
+    // ask while loop, is this time less than currentTime + lookahead
+    // schedule note if so
+    // move to next note
+    // repeat process
+
+    // * setInterval I've made allows me to send note scheduling with react
+    // ? idk if it would send up to date state, i;d guess not.
+    // ? wtf am i doing with intervalRunningRef?
+    // ! it may need to be a useEffect after all
+
+    // ! for each re-render, previous setInterval calls continue
+    // can i change it so that i have a whole cascade of logic as long as playing remains true, but doesnt repeat with endless renders?
+    // todo ugly AF, refactor
+    useEffect(() => {
+        let id
+        if (playing && !intervalRunningRef.current) {
+            console.log('WE CREATE A SETINTERVAL NOW')
+            intervalRunningRef.current = true
+            id = setInterval(() => {
+                console.log('inteeeeeeeeeeeeeeeeeeeeeeeeeeeeeerval')
+                console.log(audioContext.currentTime, 'time')
+                console.log(decay, 'decay')
+            }, 500)
+
+            intervalIDRef.current = id
+        } else if (playing && intervalRunningRef.current) {
+            console.log('playing true and intervalRunningRef true')
+            clearInterval(intervalIDRef.current)
+            id = setInterval(() => {
+                console.log('inteeeeeeeeeeeeeeeeeeeeeeeeeeeeeerval')
+                console.log(audioContext.currentTime, 'time')
+                console.log(decay, 'decay')
+            }, 500)
+
+            intervalIDRef.current = id
+        } else if (!playing && intervalRunningRef.current) {
+            console.log('made intervalRunningRef false')
+            clearInterval(intervalIDRef.current)
+            intervalRunningRef.current = false
+            console.log('CLEAR INTERVAL cuz no longer playing')
+        } else if (!playing && !intervalRunningRef.current) {
+            clearInterval(intervalIDRef.current)
+            intervalRunningRef.current = false
+            console.log('not sure i need this, but both are false')
+        }
+    })
+    // ? where do setTimeout calls come in? is there a way to make them update quickly?
+
+    // todo calculate nextNoteTime
+    // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime) {
+    //     scheduleNote(current16thNote, nextNoteTime)
+    //     nextNote()
+    // }
+
+    // setInterval(() => {
+    //     console.log('timeout 100ms')
+    // }, 500)
+
+    const scheduleAheadTime = 100 // i think it's seconds
     useEffect(() => {
         console.log(playing, 'playing changed in playSynth useFX')
         // setInterval continues even after react refreshes. we need it to restart after a refresh
@@ -162,80 +228,20 @@ const Parameters = ({
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {
         const detectKeyDown = (e) => {
-            console.log('a key was pressed!!')
             if (e.key === 's' && e.target.type !== 'text') {
-                console.log(
-                    'if keydown condition MET, should now toggle playing'
-                )
-
-                console.log(playingRef.current, 'BEFORE toggle')
-                playingRef.current = !playingRef.current
-                console.log(
-                    playingRef.current,
-                    'now set to in eventListener AFTER toggle'
-                )
-                setPlaying(playingRef.current)
+                // intervalRunningRef.current = !intervalRunningRef.current
+                // setPlaying(intervalRunningRef.current)
+                setPlaying(!playing)
                 document.removeEventListener('keydown', detectKeyDown, true)
             }
         }
         document.addEventListener('keydown', detectKeyDown, true)
-        console.log('key listener ADDED')
         return () => {
             document.removeEventListener('keydown', detectKeyDown, true)
-            console.log('key listener REMOVED')
         }
     })
 
-    // todo trying to minimize useEffect use, see here tryna get rid of eventListener guy
-    // * had trouble with the eventlisteners and re-renders adding a million extra ones.
-    // ? how to keep just one eventlistener over react re-renders??
-    // const detectKeyDown = (e) => {
-    //     if (e.key === 's' && e.target.type !== 'text') {
-    //         console.log(playingRef.current, 'BEFORE toggle')
-    //         playingRef.current = !playingRef.current
-    //         console.log(
-    //             playingRef.current,
-    //             'now set to in eventListener AFTER toggle'
-    //         )
-    //         setPlaying(playingRef.current)
-    //         document.removeEventListener('keydown', detectKeyDown, true)
-    //         console.log('key listener REMOVED')
-    //     }
-    // }
-    // useEffect(() => {
-    //     document.addEventListener('keydown', detectKeyDown, true)
-    //     console.log('key listener ADDED')
-    //     return () => {
-    //         console.log('key listener REMOVED')
-    //         document.removeEventListener('keydown', detectKeyDown, true)
-    //     }
-    // }, [])
-
-    // console.log('key listener removed')
-    // console.log('key listener added')
-
-    // setState on parameters was finnicky at times, making separate functions helped.
-    // TO-DO: cut down on this bloat and keep setState calls as anonymous callbacks within the below returns.
-    const parseTempo = (e) => {
-        setTempo(e)
-    }
-
-    const parseSteps = (e) => {
-        setStepCount(parseInt(e.target.value))
-    }
-
-    const parseRoot = (e) => {
-        setRootNote(parseInt(e.target.value))
-    }
-    const parseWonk = (e) => {
-        setWonk(parseInt(e.target.value))
-    }
-    const parseMelodyVolume = (e) => {
-        setMelodyVolume(parseInt(e.target.value))
-    }
-    const parseChordsVolume = (e) => {
-        setChordsVolume(parseInt(e.target.value))
-    }
+    // ? mb a vestige of an older build. needs to wait until sounds are re-integrated
     const parseSound = (e) => {
         console.log(audioTime(), 'audiotime')
         setSound(e.target.value)
@@ -248,36 +254,6 @@ const Parameters = ({
             loadSample(e.target.value, audioContext)
         }
     }
-    const parseFilterCutoff = (e) => {
-        setFilterCutoff(parseInt(e.target.value))
-    }
-    const parseAttack = (e) => {
-        setAttack(parseInt(e.target.value))
-    }
-
-    const parseDecay = (e) => {
-        setDecay(parseInt(e.target.value))
-    }
-    const parseSustain = (e) => {
-        setSustain(parseInt(e.target.value))
-    }
-    const parseRelease = (e) => {
-        setRelease(parseInt(e.target.value))
-    }
-
-    // const handleMouseUp = () => {
-    //     setDragging(false)
-    //     console.log('dragging false')
-    // }
-    // const handleMouseDown = (e) => {
-    //     setDragging(true)
-    //     console.log('dragging true')
-    //     setDragStartY(e.clientY)
-    // }
-
-    // const handleMouseLeave = () => {
-    //     setDragging(false)
-    // }
 
     // ! will there be problems with an object pointing to state? when will the object update??
     const slidersToShowObj = {
@@ -355,27 +331,11 @@ const Parameters = ({
         },
     }
 
-    // want to show a list of the note names C D E F# etc, but want the state to be a number.
-
-    // const handleOptionClick = (option, index) => {
-    //     setRootNote(option)
-    //     setIsDropdownOpen(false)
-    //     console.log(rootNoteOptions.indexOf(option), 'bybybyb')
-    //     root = rootNoteOptions.indexOf(option) + 1
-    // }
-    // console.log(tempo, wonk)
-
-    // const mouseLeave = () => {
-    //     console.log('mouse left')
-    //     setIsDropdownOpen(false)
-    // }
-
     const countReRenders = useRef(1)
-
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
     })
-    // TO-DO: make a parameter component in order to avoid repetition
+
     return (
         <>
             <MainDiv>
@@ -384,11 +344,13 @@ const Parameters = ({
                         onClick={() => {
                             if (!playing) {
                                 setPlaying(true)
-                                playingRef.current = !playingRef.current
+                                intervalRunningRef.current =
+                                    !intervalRunningRef.current
                                 // playing = true
                             } else {
                                 setPlaying(false)
-                                playingRef.current = !playingRef.current
+                                intervalRunningRef.current =
+                                    !intervalRunningRef.current
                                 // playing = false
                             }
                             console.log(playing, 'playing')
@@ -397,6 +359,8 @@ const Parameters = ({
                         <span> {playing ? 'stop' : 'start'}</span>
                     </button>
                     <span>press s</span> <span>start/stop</span>
+                    <p>Already playing: </p>
+                    <p>{intervalRunningRef.current}</p>
                 </StartButtonDiv>
 
                 {Object.keys(slidersToShowObj).map((slider, index) => {
@@ -410,7 +374,6 @@ const Parameters = ({
                     )
                 })}
 
-                {/* these dont work */}
                 <DropdownsDiv>
                     <SoundFilterDiv
                     // onMouseLeave={mouseLeave}
