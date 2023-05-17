@@ -12,8 +12,9 @@ import styled from 'styled-components'
 import HookTheoryChordButton from './Components/HookTheoryChordButton'
 import Parameters from './Components/Parameters'
 import { useAuth0 } from '@auth0/auth0-react'
-import MelodyCheckbox from './Components/MelodyCheckbox'
 import RowOfNotes from './Components/RowOfNotes'
+import BeatMarkers from './Components/BeatMarkers'
+import CheckboxRow from './Components/CheckboxRow'
 const Sequencer = () => {
     // const [tempo, setTempo] = useState(150)
     // todo make this context one object?
@@ -240,12 +241,13 @@ const Sequencer = () => {
     // }, [playing, currentBeat])
 
     const handleCheckbox = (noteIndex, beatIndex, type) => {
+        console.log('handling')
         // ? not sure i need type as a parameter. chord/melody now dealt with, but just need ot set the proper state
         // ? how to refer dynamically to the state i need to set? mb just return?
         // // todo change initialization of each state to say note
         const arrayKey = `note-${noteIndex}`
         const checkboxObjCopy =
-            type === 'Chords'
+            type === 'chords'
                 ? { ...areChordBeatsChecked }
                 : { ...areMelodyBeatsChecked }
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
@@ -359,113 +361,85 @@ const Sequencer = () => {
         }
     }
 
-    // useEffect(() => {
-    //     fetch('https://api.hooktheory.com/v1/trends/nodes', {
-    //         method: 'GET',
-    //         headers: {
-    //             Accept: 'application/json',
-    //             'Content-Type': 'application/json',
-    //             Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-    //         },
-    //         // body: JSON.stringify({ order: formData }),
-    //     })
-    //         .then((res) => res.json())
-    //         .then((data) => {
-    //             setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
-    //         })
-    //         .catch((error) => {
-    //             console.log(error)
-    //         })
-    // }, [chosenAPIChords])
+    useEffect(() => {
+        fetch('https://api.hooktheory.com/v1/trends/nodes', {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+            },
+            // body: JSON.stringify({ order: formData }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }, [chosenAPIChords])
 
     // todo ? show songs with the given chord progression
-    // useEffect(() => {
-    //     // todo fit chosen chords in format 1,4 in ${}
-    //     if (chosenAPIChords.length > 0) {
-    //         fetch(
-    //             `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
-    //             {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     Accept: 'application/json',
-    //                     'Content-Type': 'application/json',
-    //                     Authorization:
-    //                         'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-    //                 },
-    //                 // body: JSON.stringify({ order: formData }),
-    //             }
-    //         )
-    //             .then((res) => res.json())
-    //             .then((data) => {
-    //                 // i only take chords from the api that match those i've put in the sequencer
-    //                 const removeUnsupportedChords = data.filter((chord) => {
-    //                     return chord['chord_ID'].length <= 1
-    //                 })
-    //                 console.log(removeUnsupportedChords)
-    //                 setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error)
-    //             })
-    //     }
+    useEffect(() => {
+        // todo fit chosen chords in format 1,4 in ${}
+        if (chosenAPIChords.length > 0) {
+            fetch(
+                `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        Authorization:
+                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+                    },
+                    // body: JSON.stringify({ order: formData }),
+                }
+            )
+                .then((res) => res.json())
+                .then((data) => {
+                    // i only take chords from the api that match those i've put in the sequencer
+                    const removeUnsupportedChords = data.filter((chord) => {
+                        return chord['chord_ID'].length <= 1
+                    })
+                    console.log(removeUnsupportedChords)
+                    setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        }
 
-    //     // * the below is for getting songs with the specific chord progression.
-    //     if (chosenAPIChords.length >= 4) {
-    //         // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
-    //         const APISongs = []
-    //         let page = 1
-    //         fetch(
-    //             `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
-    //             {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     Accept: 'application/json',
-    //                     'Content-Type': 'application/json',
-    //                     Authorization:
-    //                         'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-    //                 },
-    //             }
-    //         )
-    //             .then((res) => res.json())
-    //             .then((data) => {
-    //                 console.log(data, 'hook API givin songs w chords')
-    //                 data.forEach((song) => {
-    //                     APISongs.push(song)
-    //                 })
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error)
-    //             })
-    //     }
-    // }, [chosenAPIChords])
-
-    // todo sometimes, after a long pause, pressing S will instantly flip playing to true then not true. this only works when playing is false. when playing is true, S will turn it off and not instantly flip back to playing is true. weird.
-    // -> tried turning off the remove/add listeners within detectKeyDown function
-    // ! -> every time i save this file, the DOM has effectively another event listener. try saving it again, you'll find another. odd numbers will make it seem like its working properly, but the console will show responses from multiple listeners.
-    // useEffect(() => {
-    //     const detectKeyDown = (e) => {
-    //         // ? can't access current state with event listener
-    //         if (e.key === 's' && e.target.type !== 'text') {
-    //             // document.removeEventListener('keydown', detectKeyDown, true)
-    //             // console.log('that key was s')
-    //             // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
-    //             // reason why we needed useRef: when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
-    //             // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
-    //             // playing = !playing
-    //             // todo is ok??
-    //             // playingRef.current = !playingRef.current
-    //             // setPlaying(playingRef.current)
-    //             // document.addEventListener('keydown', detectKeyDown, true)
-    //             // console.log('key listener added')
-    //             // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
-    //             // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
-    //         }
-    //     }
-    //     // document.removeEventListener('keydown', detectKeyDown, true)
-    //     // console.log('key listener removed')
-    //     // document.addEventListener('keydown', detectKeyDown, true)
-    //     // console.log('key listener added')
-    // }, [])
+        // * the below is for getting songs with the specific chord progression.
+        if (chosenAPIChords.length >= 4) {
+            // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
+            const APISongs = []
+            let page = 1
+            fetch(
+                `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        Authorization:
+                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+                    },
+                }
+            )
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data, 'hook API givin songs w chords')
+                    data.forEach((song) => {
+                        APISongs.push(song)
+                    })
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        }
+    }, [chosenAPIChords])
 
     // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
     useEffect(() => {
@@ -555,6 +529,28 @@ const Sequencer = () => {
                 <AllBoxesDiv>
                     {makeMelodyNotesState.map((note, index) => {
                         const scaleIndex = note
+                        // make the below into a function call or something
+                        if (note / 8 === 0 || (note > 7 && note <= 14)) {
+                            note = note - 7
+                        } else if (note > 14) {
+                            note = note - 14
+                        }
+                        return (
+                            <CheckboxRow
+                                // makeXNotesState={makeMelodyNotesState}
+                                areXBeatsChecked={areMelodyBeatsChecked}
+                                note={note}
+                                index={index}
+                                scaleIndex={scaleIndex}
+                                beatIndex={index}
+                                whichGrid="melody"
+                                noteTitle={note}
+                                handleCheckbox={handleCheckbox}
+                            />
+                        )
+                    })}
+                    {/* {makeMelodyNotesState.map((note, index) => {
+                        const scaleIndex = note
                         if (note / 8 === 0 || (note > 7 && note <= 14)) {
                             note = note - 7
                         } else if (note > 14) {
@@ -583,11 +579,17 @@ const Sequencer = () => {
                                 </ChordDiv>
                             </TitleAndBoxesDiv>
                         )
-                    })}
+                    })} */}
 
                     <PointerContainer>
-                        <BlankDiv />
-                        {blankStepCountArray.map((step, index) => {
+                        {/* make component, pass it blankstepcountarray, bob uncle */}
+                        <BeatMarkers
+                            blankStepCountArray={blankStepCountArray}
+                            currentBeat={currentBeat}
+                            currentBeatRef={currentBeatRef}
+                        />
+                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
+                        {/* {blankStepCountArray.map((step, index) => {
                             const num = index + 1
                             // every 2 beats make a div
                             if ((index + 1) % 2 === 0) {
@@ -620,13 +622,29 @@ const Sequencer = () => {
                                     </>
                                 )
                             }
-                        })}
+                        })} */}
+                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
                     </PointerContainer>
                 </AllBoxesDiv>
             </MelodySequencerGrid>
             <ChordSequencerGrid>
                 <AllBoxesDiv>
-                    {makeChordNotesState.map((chord) => {
+                    {makeChordNotesState.map((note, index) => {
+                        const scaleIndex = note
+                        return (
+                            <CheckboxRow
+                                areXBeatsChecked={areChordBeatsChecked}
+                                note={note}
+                                index={index}
+                                scaleIndex={scaleIndex}
+                                beatIndex={index}
+                                whichGrid="chords"
+                                noteTitle={romanNumeralReference['major'][note]}
+                                handleCheckbox={handleCheckbox}
+                            />
+                        )
+                    })}
+                    {/* {makeChordNotesState.map((chord) => {
                         const chordIndex = chord
 
                         return (
@@ -658,42 +676,13 @@ const Sequencer = () => {
                                 </ChordDiv>
                             </TitleAndBoxesDiv>
                         )
-                    })}
+                    })} */}
                     <PointerContainer>
-                        <BlankDiv />
-                        {blankStepCountArray.map((step, index) => {
-                            const num = index + 1
-                            // every 2 beats make a div
-                            if ((index + 1) % 2 === 0) {
-                                return (
-                                    <>
-                                        <BeatMarker
-                                            key={num}
-                                            className={
-                                                currentBeat === num ||
-                                                currentBeat === num + 1 ||
-                                                num === currentBeatRef.current
-                                                    ? 'current'
-                                                    : ''
-                                            }
-                                        >
-                                            <BeatSpan
-                                                className={
-                                                    currentBeat === num ||
-                                                    currentBeat === num + 1 ||
-                                                    num ===
-                                                        currentBeatRef.current
-                                                        ? 'current'
-                                                        : ''
-                                                }
-                                            >
-                                                {num / 2}
-                                            </BeatSpan>
-                                        </BeatMarker>
-                                    </>
-                                )
-                            }
-                        })}
+                        <BeatMarkers
+                            blankStepCountArray={blankStepCountArray}
+                            currentBeat={currentBeat}
+                            currentBeatRef={currentBeatRef}
+                        />
                     </PointerContainer>
                 </AllBoxesDiv>
             </ChordSequencerGrid>
@@ -750,7 +739,6 @@ const ChordDiv = styled.div`
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    // border: 1px solid fuchsia;
 `
 
 const AllBoxesDiv = styled.div`
@@ -769,10 +757,7 @@ const TitleDiv = styled.div`
     justify-content: space-between;
     align-items: flex-end;
 `
-const BlankDiv = styled.div`
-    height: 50px;
-    width: 52px;
-`
+
 const NoteTitle = styled.span`
     text-align: left;
     font-size: 17.65px;
@@ -783,7 +768,7 @@ const NoteTitle = styled.span`
 `
 
 const ChordTitle = styled.span`
-    text-align: right;
+    text-align: left;
     font-size: 22px;
     opacity: 75%;
     padding-right: 8px;
@@ -805,16 +790,20 @@ const PointerContainer = styled.div`
     margin-top: 10px;
     align-items: center;
     height: 10px;
+    padding-left: 20px;
 `
 
 const BeatMarker = styled.div`
     border-left: 1px solid var(--lightest-color);
-    width: 53px;
+    width: 26.5px;
     height: 20px;
     opacity: 100%;
+    padding-right: 26.5px;
+    display: flex;
+    justify-content: center;
 `
 const BeatSpan = styled.span`
-    padding-left: 9px;
+    // padding-left: 9px;
     color: var(--lighter-color);
     opacity: 50%;
 `
@@ -822,8 +811,11 @@ const TitleAndBoxesDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    // border: 1px solid fuchsia;
 `
 const TitleSpanDiv = styled.div`
-    width: 50px;
+    width: 20px;
     text-align: right;
+    display: flex;
+    justify-content: flex-end;
 `

@@ -12,6 +12,8 @@ import {
 } from '../BigObjectsAndArrays'
 import CustomDropdown from './CustomDropdown'
 import { AbortedDeferredError } from 'react-router-dom'
+import PlayButton from '../assets/SVGs/PlayButton'
+import StopButton from '../assets/SVGs/StopButton'
 const Parameters = ({
     currentBeat,
     areMelodyBeatsChecked,
@@ -340,7 +342,10 @@ const Parameters = ({
         <>
             <MainDiv>
                 <StartButtonDiv>
-                    <button
+                    <StartStopTextDiv>
+                        <span>Start/Stop</span> <span>Press S</span>
+                    </StartStopTextDiv>
+                    <StartStopButton
                         onClick={() => {
                             if (!playing) {
                                 setPlaying(true)
@@ -356,11 +361,9 @@ const Parameters = ({
                             console.log(playing, 'playing')
                         }}
                     >
-                        <span> {playing ? 'stop' : 'start'}</span>
-                    </button>
-                    <span>press s</span> <span>start/stop</span>
-                    <p>Already playing: </p>
-                    <p>{intervalRunningRef.current}</p>
+                        {playing ? <StopButton /> : <PlayButton />}
+                        {/* <PlayingSpan> {playing ? 'stop' : 'start'}</PlayingSpan> */}
+                    </StartStopButton>
                 </StartButtonDiv>
 
                 {Object.keys(slidersToShowObj).map((slider, index) => {
@@ -415,6 +418,36 @@ const Parameters = ({
 }
 
 export default Parameters
+const StartStopTextDiv = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 1px;
+`
+const StartStopButton = styled.button`
+    background-color: black;
+    color: var(--primary-color);
+    width: 80px;
+    height: 90px;
+    border: 3px double var(--lightest-color);
+    padding-top: 8px;
+    margin-top: 4px;
+
+    :hover {
+        opacity: 75%;
+    }
+    :active {
+        border: 6px double var(--lightest-color);
+        opacity: 50%;
+    }
+`
+const PlayingSpan = styled.span`
+    position: absolute;
+    top: 55%;
+    left: 35%;
+`
 const Ref = styled.div`
     margin-top: -30px;
     margin-bottom: 15px;
@@ -424,6 +457,7 @@ const MainDiv = styled.div`
     justify-content: space-around;
     align-items: center;
     margin-bottom: 40px;
+    height: 128px;
     position: relative;
 `
 
@@ -449,6 +483,7 @@ const StartButtonDiv = styled.div`
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    position: relative;
 `
 
 const DropdownsDiv = styled.div`
@@ -456,8 +491,8 @@ const DropdownsDiv = styled.div`
     // flex-direction: column;
     // justify-content: center;
     // align-items: flex-start;
-    border: 1px solid fuchsia;
-    height: 100%;
+    // border: 1px solid fuchsia;
+    // height: 100%;
 `
 const SoundFilterDiv = styled.div`
     padding: 10px;

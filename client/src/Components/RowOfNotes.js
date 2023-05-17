@@ -1,4 +1,4 @@
-import MelodyCheckbox from './MelodyCheckbox'
+import MelodyCheckbox from './SingleCheckbox'
 
 const RowOfNotes = ({
     note,

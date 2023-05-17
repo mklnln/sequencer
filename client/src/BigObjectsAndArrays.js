@@ -23,5 +23,5 @@ export const stepCountOptions = [
     '11',
     '22',
     '33',
-    '64',
+    '65',
 ]

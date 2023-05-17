@@ -23,7 +23,10 @@ const Header = () => {
 
     return (
         <Banner>
-            <h2>Sequencer</h2>
+            <TitleDiv>
+                <h1>Sequencer</h1>
+                <ShadowH1>Sequencer</ShadowH1>
+            </TitleDiv>
             <button
                 onClick={() => {
                     console.log(user)
@@ -58,6 +61,17 @@ const Header = () => {
 }
 
 export default Header
+
+const TitleDiv = styled.div`
+    position: relative;
+`
+const ShadowH1 = styled.h1`
+    position: absolute;
+    // border: 1px solid fuchsia;
+    top: 2.5%;
+    left: 2%;
+    opacity: 45%;
+`
 
 const Banner = styled.div`
     display: flex;
