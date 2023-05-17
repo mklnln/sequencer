@@ -359,113 +359,85 @@ const Sequencer = () => {
         }
     }
 
-    // useEffect(() => {
-    //     fetch('https://api.hooktheory.com/v1/trends/nodes', {
-    //         method: 'GET',
-    //         headers: {
-    //             Accept: 'application/json',
-    //             'Content-Type': 'application/json',
-    //             Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-    //         },
-    //         // body: JSON.stringify({ order: formData }),
-    //     })
-    //         .then((res) => res.json())
-    //         .then((data) => {
-    //             setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
-    //         })
-    //         .catch((error) => {
-    //             console.log(error)
-    //         })
-    // }, [chosenAPIChords])
+    useEffect(() => {
+        fetch('https://api.hooktheory.com/v1/trends/nodes', {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+            },
+            // body: JSON.stringify({ order: formData }),
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
+            })
+            .catch((error) => {
+                console.log(error)
+            })
+    }, [chosenAPIChords])
 
     // todo ? show songs with the given chord progression
-    // useEffect(() => {
-    //     // todo fit chosen chords in format 1,4 in ${}
-    //     if (chosenAPIChords.length > 0) {
-    //         fetch(
-    //             `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
-    //             {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     Accept: 'application/json',
-    //                     'Content-Type': 'application/json',
-    //                     Authorization:
-    //                         'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-    //                 },
-    //                 // body: JSON.stringify({ order: formData }),
-    //             }
-    //         )
-    //             .then((res) => res.json())
-    //             .then((data) => {
-    //                 // i only take chords from the api that match those i've put in the sequencer
-    //                 const removeUnsupportedChords = data.filter((chord) => {
-    //                     return chord['chord_ID'].length <= 1
-    //                 })
-    //                 console.log(removeUnsupportedChords)
-    //                 setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error)
-    //             })
-    //     }
+    useEffect(() => {
+        // todo fit chosen chords in format 1,4 in ${}
+        if (chosenAPIChords.length > 0) {
+            fetch(
+                `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        Authorization:
+                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+                    },
+                    // body: JSON.stringify({ order: formData }),
+                }
+            )
+                .then((res) => res.json())
+                .then((data) => {
+                    // i only take chords from the api that match those i've put in the sequencer
+                    const removeUnsupportedChords = data.filter((chord) => {
+                        return chord['chord_ID'].length <= 1
+                    })
+                    console.log(removeUnsupportedChords)
+                    setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        }
 
-    //     // * the below is for getting songs with the specific chord progression.
-    //     if (chosenAPIChords.length >= 4) {
-    //         // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
-    //         const APISongs = []
-    //         let page = 1
-    //         fetch(
-    //             `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
-    //             {
-    //                 method: 'GET',
-    //                 headers: {
-    //                     Accept: 'application/json',
-    //                     'Content-Type': 'application/json',
-    //                     Authorization:
-    //                         'Bearer 6253102743c64eb2313c2c56d40bf6a6',
-    //                 },
-    //             }
-    //         )
-    //             .then((res) => res.json())
-    //             .then((data) => {
-    //                 console.log(data, 'hook API givin songs w chords')
-    //                 data.forEach((song) => {
-    //                     APISongs.push(song)
-    //                 })
-    //             })
-    //             .catch((error) => {
-    //                 console.log(error)
-    //             })
-    //     }
-    // }, [chosenAPIChords])
-
-    // todo sometimes, after a long pause, pressing S will instantly flip playing to true then not true. this only works when playing is false. when playing is true, S will turn it off and not instantly flip back to playing is true. weird.
-    // -> tried turning off the remove/add listeners within detectKeyDown function
-    // ! -> every time i save this file, the DOM has effectively another event listener. try saving it again, you'll find another. odd numbers will make it seem like its working properly, but the console will show responses from multiple listeners.
-    // useEffect(() => {
-    //     const detectKeyDown = (e) => {
-    //         // ? can't access current state with event listener
-    //         if (e.key === 's' && e.target.type !== 'text') {
-    //             // document.removeEventListener('keydown', detectKeyDown, true)
-    //             // console.log('that key was s')
-    //             // * call backs (e.g. detectKeyDown fxn) and event listeners don't have access to up to date state, so we needed useRef
-    //             // reason why we needed useRef: when initializing this event listener, detectKeyDown only has the value of playing at the time it was initialized, because callbacks are dinosaurs and cant really access up-to-date state variables
-    //             // for some goshderned reason this would, when setPlaying(!playing), it turns to be false all the time, despite being able to click a button and clg the value of playing and see true. bashu helped a lot with this
-    //             // playing = !playing
-    //             // todo is ok??
-    //             // playingRef.current = !playingRef.current
-    //             // setPlaying(playingRef.current)
-    //             // document.addEventListener('keydown', detectKeyDown, true)
-    //             // console.log('key listener added')
-    //             // ! bashu: unclear why it wasnt able to update and use the correct, up-to-date version of the variable given that a normal js function would be able to do so. especially since react is all about having up to date stuff, it should be able to do that! why didn't that work?
-    //             // ! this is a peculiarity unique to hooks/functional components (what we use, i.e. not class). class react would indeed have access to up to date state variables. this is mainly an edge case given we're using an event listener. generally they're up to date, no issue.
-    //         }
-    //     }
-    //     // document.removeEventListener('keydown', detectKeyDown, true)
-    //     // console.log('key listener removed')
-    //     // document.addEventListener('keydown', detectKeyDown, true)
-    //     // console.log('key listener added')
-    // }, [])
+        // * the below is for getting songs with the specific chord progression.
+        if (chosenAPIChords.length >= 4) {
+            // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
+            const APISongs = []
+            let page = 1
+            fetch(
+                `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                        Authorization:
+                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+                    },
+                }
+            )
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data, 'hook API givin songs w chords')
+                    data.forEach((song) => {
+                        APISongs.push(song)
+                    })
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        }
+    }, [chosenAPIChords])
 
     // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
     useEffect(() => {
