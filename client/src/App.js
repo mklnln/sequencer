@@ -6,7 +6,6 @@ import GlobalStyle from './globalStyles'
 import { generateAreChordBeatsCheckedInitialState } from './Helpers'
 export const MusicParametersContext = createContext()
 const App = () => {
-    const audioContext = new AudioContext()
     const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
     const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
     const makeMelodyNotesState = []
@@ -89,7 +88,7 @@ const App = () => {
         <BrowserRouter>
             <MusicParametersContext.Provider
                 value={{
-                    audioContext,
+                    // audioContext,
                     // tempo,
                     // setTempo,
                     stepCount,
