@@ -457,6 +457,7 @@ const MainDiv = styled.div`
     justify-content: space-around;
     align-items: center;
     margin-bottom: 40px;
+    height: 128px;
     position: relative;
 `
 
@@ -490,8 +491,8 @@ const DropdownsDiv = styled.div`
     // flex-direction: column;
     // justify-content: center;
     // align-items: flex-start;
-    border: 1px solid fuchsia;
-    height: 100%;
+    // border: 1px solid fuchsia;
+    // height: 100%;
 `
 const SoundFilterDiv = styled.div`
     padding: 10px;

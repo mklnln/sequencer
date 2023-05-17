@@ -28,17 +28,29 @@ const CustomDropdown = ({
     return (
         <DropdownContainer onMouseLeave={mouseLeave}>
             <ParameterLabel>{title}</ParameterLabel>
-            <ULDropdown onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
+            <ULDropdown
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                style={
+                    isDropdownOpen
+                        ? {
+                              zIndex: '2',
+                          }
+                        : { zIndex: '0' }
+                }
+            >
                 {isDropdownOpen ? (
                     stateValueOptions.map((option, index) => (
                         <Option
                             key={option}
                             onClick={() => handleOptionClick(option, index)}
-                            style={
-                                isDropdownOpen
-                                    ? { zIndex: '200' }
-                                    : { zIndex: '1' }
-                            }
+                            // style={
+                            //     isDropdownOpen
+                            //         ? {
+                            //               zIndex: '200',
+                            //               //   border: '2px solid fuchsia',
+                            //           }
+                            //         : { zIndex: '0' }
+                            // }
                         >
                             {option}
                         </Option>
@@ -61,13 +73,14 @@ const DropdownContainer = styled.div`
     justify-content: center;
     align-items: center;
     // width: 20px;
-    // height: full;
+    height: 100%;
+    margin: 8px 0px;
 `
 const ParameterLabel = styled.span``
 
 const ULDropdown = styled.ul`
     position: absolute;
-    // top: 100%;
+    top: 100%;
     // left: 0;
     width: 55px;
 
@@ -106,7 +119,7 @@ const ChosenOptionDiv = styled.div`
     padding: 5px 8px;
 `
 const ChosenOptionSpan = styled.span`
-    z-index: 1;
+    // z-index: 1;
     padding: 2px 0 0 0;
     cursor: pointer;
     display: block;
