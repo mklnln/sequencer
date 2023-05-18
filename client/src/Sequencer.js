@@ -6,11 +6,12 @@ import {
     makeNewChordMaster,
     makeNewMelodyMaster,
     loadChangedSongList,
+    giveOctaveNumber,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
 import HookTheoryChordButton from './Components/HookTheoryChordButton'
-import Parameters from './Components/Parameters'
+import Parameters from './Parameters'
 import { useAuth0 } from '@auth0/auth0-react'
 import RowOfNotes from './Components/RowOfNotes'
 import BeatMarkers from './Components/BeatMarkers'
@@ -74,10 +75,8 @@ const Sequencer = () => {
 
     // * the following are clearly related to JUST the sequencer. good that they're here. no refactoring needed.
     const [tempo, setTempo] = useState(60)
-    // const [playing, setPlaying] = useState(false)
-    // const [currentBeat, setCurrentBeat] = useState(0)
-    // const [nextBeatTime, setNextBeatTime] = useState(0)
 
+    const notesToPlay = {}
     // let playing = false
     let currentBeat = 0
     let nextBeatTime = 0
@@ -240,11 +239,14 @@ const Sequencer = () => {
     //     return () => clearInterval(interval)
     // }, [playing, currentBeat])
 
-    const handleCheckbox = (noteIndex, beatIndex, type) => {
-        console.log('handling')
-        // ? not sure i need type as a parameter. chord/melody now dealt with, but just need ot set the proper state
-        // ? how to refer dynamically to the state i need to set? mb just return?
-        // // todo change initialization of each state to say note
+    const handleCheckbox = (
+        noteIndex,
+        beatIndex,
+        areXBeatsChecked,
+        setAreXBeatsChecked,
+        type
+    ) => {
+        console.log(areMelodyBeatsChecked)
         const arrayKey = `note-${noteIndex}`
         const checkboxObjCopy =
             type === 'chords'
@@ -252,18 +254,16 @@ const Sequencer = () => {
                 : { ...areMelodyBeatsChecked }
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
             setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
-        // set the
-        // ? access areChordBeatsChecked and simply flip the value using  (checked ? 0 : 1).
-        // ? ORRR since if its 0 thats falsy, we can just ask the value then switch to the opposite
+
         checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][
             beatIndex
-        ]
+        ] // toggle  the value
             ? 0
             : 1
-        // ! this is 1000% whats setting the object but idfky
-        // ? all the array keys are being changed, as if there was a forEach with each arrayKey and the one specific beatIndex flips
-        // ? this shouldnt happen! idk why it happens.
-        // * mb bc in generateAreChordBeatsCheckedInitialState im referencing the same blankStepCountArray for each array, thus each of them points to the same place in memoery. if im copying it, im pointing to the same place for each array
+        setAreMelodyBeatsChecked(checkboxObjCopy)
+        // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
+        // i suppose that a copy is being made of the original and now the new one points to it
+        // toggling the value to a string 'hi' will make that string show up in the console.logs before it should..
     }
 
     // todo make helper
@@ -460,7 +460,6 @@ const Sequencer = () => {
             blankStepCountArray
         )
         setAreMelodyBeatsChecked(newMelodyMaster)
-        console.log('step count?!?!?!?!')
     }, [stepCount])
 
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
@@ -529,16 +528,13 @@ const Sequencer = () => {
                 <AllBoxesDiv>
                     {makeMelodyNotesState.map((note, index) => {
                         const scaleIndex = note
-                        // make the below into a function call or something
-                        if (note / 8 === 0 || (note > 7 && note <= 14)) {
-                            note = note - 7
-                        } else if (note > 14) {
-                            note = note - 14
-                        }
+
+                        note = giveOctaveNumber(note)
                         return (
                             <CheckboxRow
                                 // makeXNotesState={makeMelodyNotesState}
                                 areXBeatsChecked={areMelodyBeatsChecked}
+                                setAreXBeatsChecked={setAreMelodyBeatsChecked}
                                 note={note}
                                 index={index}
                                 scaleIndex={scaleIndex}
@@ -549,37 +545,6 @@ const Sequencer = () => {
                             />
                         )
                     })}
-                    {/* {makeMelodyNotesState.map((note, index) => {
-                        const scaleIndex = note
-                        if (note / 8 === 0 || (note > 7 && note <= 14)) {
-                            note = note - 7
-                        } else if (note > 14) {
-                            note = note - 14
-                        }
-                        return (
-                            <TitleAndBoxesDiv key={scaleIndex}>
-                                <TitleSpanDiv key={scaleIndex}>
-                                    <NoteTitle key={scaleIndex}>
-                                        {note}
-                                    </NoteTitle>
-                                </TitleSpanDiv>
-                                <ChordDiv
-                                    key={`row-${scaleIndex}-beat-${index}`}
-                                >
-                                    <RowOfNotes
-                                        key={`row-${scaleIndex}-beat-${index}`}
-                                        note={note}
-                                        areMelodyBeatsChecked={
-                                            areMelodyBeatsChecked
-                                        }
-                                        beatIndex={index}
-                                        scaleIndex={scaleIndex}
-                                        handleCheckbox={handleCheckbox}
-                                    />
-                                </ChordDiv>
-                            </TitleAndBoxesDiv>
-                        )
-                    })} */}
 
                     <PointerContainer>
                         {/* make component, pass it blankstepcountarray, bob uncle */}
@@ -634,6 +599,7 @@ const Sequencer = () => {
                         return (
                             <CheckboxRow
                                 areXBeatsChecked={areChordBeatsChecked}
+                                setAreXBeatsChecked={setAreChordBeatsChecked}
                                 note={note}
                                 index={index}
                                 scaleIndex={scaleIndex}

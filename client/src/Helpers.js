@@ -131,3 +131,13 @@ export const loadChangedSongList = (
     }
     return newSongList
 }
+
+export const giveOctaveNumber = (note) => {
+    // change numbers 8 and above into their equivalents in the octave below (e.g. 9 becomes 2)
+    if (note > 14) {
+        note = note - 14
+    } else if (note > 7) {
+        note = note - 7
+    }
+    return note
+}

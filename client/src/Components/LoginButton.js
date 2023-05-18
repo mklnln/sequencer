@@ -5,7 +5,6 @@ import styled from 'styled-components'
 
 const LoginButton = () => {
     const { loginWithRedirect, isAuthenticated } = useAuth0()
-    console.log(loginWithRedirect, isAuthenticated)
     return (
         !isAuthenticated && (
             <>
