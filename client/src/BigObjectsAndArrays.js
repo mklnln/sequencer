@@ -13,15 +13,4 @@ export const rootNoteOptions = [
     'G#',
 ]
 
-export const stepCountOptions = [
-    '8',
-    '16',
-    '24',
-    '32',
-    '64',
-    '0',
-    '11',
-    '22',
-    '33',
-    '65',
-]
+export const stepCountOptions = ['8', '16', '24', '32', '64']

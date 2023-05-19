@@ -3,14 +3,15 @@ import styled from 'styled-components'
 const StopButton = () => {
     return (
         <SVG
-            viewBox="0 0 40 40"
+            viewBox="0 0 50 50"
             height="40"
             width="40"
-            style={{ padding: '8px' }}
+            // style={{ padding: '8px' }}
         >
-            {/* // <SVG height="62" viewBox="0 0 80 80" width="96"> */}
+            {/* for the filled shape */}
             <path d="M0 0h48v48H0z" fill="var(--primary-color)" />
-            <path d="M12 12h24v24H12z" fill="var(--primary-color)" />
+            {/* for just the outline vv */}
+            {/* <path d="M0 0h48v48H0z" stroke="var(--primary-color)" />  */}
         </SVG>
     )
 }
@@ -24,4 +25,5 @@ const SVG = styled.svg`
     //     border-top: 3px solid black;
     //     border-left: 3px solid black;
     // }
+    filter: drop-shadow(3px 4px 3px rgba(255, 176, 0, 0.3));
 `

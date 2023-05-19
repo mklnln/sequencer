@@ -6,12 +6,10 @@ const SingleCheckbox = ({
     handleCheckbox,
     beatIndex,
     areXBeatsChecked,
+    setAreXBeatsChecked,
     scaleIndex,
     whichGrid,
 }) => {
-    console.log(beatIndex, 'beatbeat')
-    console.log(areXBeatsChecked)
-    console.log(areXBeatsChecked[`note-${scaleIndex}`], 'melody')
     const [checked, setChecked] = useState(
         // used for styling, see bottom :checked class
         areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
@@ -38,7 +36,14 @@ const SingleCheckbox = ({
                         type="checkbox"
                         checked={checked ? 'checked' : ''}
                         onChange={() => {
-                            handleCheckbox(scaleIndex, beatIndex, 'melody')
+                            console.log('check,', areXBeatsChecked)
+                            handleCheckbox(
+                                scaleIndex,
+                                beatIndex,
+                                areXBeatsChecked,
+                                setAreXBeatsChecked,
+                                'melody'
+                            )
                             setChecked(!checked)
                         }}
                     />
@@ -47,7 +52,13 @@ const SingleCheckbox = ({
                         type="checkbox"
                         checked={checked ? 'checked' : ''}
                         onChange={() => {
-                            handleCheckbox(scaleIndex, beatIndex, 'chords')
+                            handleCheckbox(
+                                scaleIndex,
+                                beatIndex,
+                                areXBeatsChecked,
+                                setAreXBeatsChecked,
+                                'chords'
+                            )
                             setChecked(!checked)
                         }}
                         className={whichGrid}

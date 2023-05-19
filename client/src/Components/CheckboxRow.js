@@ -3,9 +3,10 @@ import styled from 'styled-components'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 import MelodyCheckbox from './SingleCheckbox'
 import SingleCheckbox from './SingleCheckbox'
-const Checkboxes = ({
+const CheckboxRow = ({
     // makeXNotesState,
     areXBeatsChecked,
+    setAreXBeatsChecked,
     handleCheckbox,
     note,
     // row,
@@ -16,7 +17,6 @@ const Checkboxes = ({
     noteTitle,
 }) => {
     // todo dynamically bring in makeXstate and areXbeats
-    console.log(areXBeatsChecked, 'areXX', scaleIndex, beatIndex)
     const [checked, setChecked] = useState(
         // used for styling, see bottom :checked class
         areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
@@ -47,6 +47,7 @@ const Checkboxes = ({
                                 <SingleCheckbox
                                     key={`row-${scaleIndex}-beat-${index}`}
                                     areXBeatsChecked={areXBeatsChecked}
+                                    setAreXBeatsChecked={setAreXBeatsChecked}
                                     beatIndex={index}
                                     scaleIndex={scaleIndex}
                                     handleCheckbox={handleCheckbox}
@@ -61,7 +62,7 @@ const Checkboxes = ({
     )
 }
 
-export default Checkboxes
+export default CheckboxRow
 const TitleAndBoxesDiv = styled.div`
     display: flex;
     justify-content: center;

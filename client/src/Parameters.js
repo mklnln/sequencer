@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { MusicParametersContext } from '../App'
-import { loadSample } from '../AudioEngine'
-import { audioTime } from '../AudioEngine'
-import Slider from './Slider'
-import { playSample, getFile, setupSample, playSynth } from '../AudioEngine'
+import { MusicParametersContext } from './App'
+import { loadSample } from './AudioEngine'
+import { audioTime } from './AudioEngine'
+import Slider from './Components/Slider'
+import { playSample, getFile, setupSample, playSynth } from './AudioEngine'
 import {
     slidersToShowObj,
     rootNoteOptions,
     stepCountOptions,
-} from '../BigObjectsAndArrays'
-import CustomDropdown from './CustomDropdown'
+} from './BigObjectsAndArrays'
+import CustomDropdown from './Components/CustomDropdown'
 import { AbortedDeferredError } from 'react-router-dom'
-import PlayButton from '../assets/SVGs/PlayButton'
-import StopButton from '../assets/SVGs/StopButton'
+import PlayButton from './assets/SVGs/PlayButton'
+import StopButton from './assets/SVGs/StopButton'
 const Parameters = ({
     currentBeat,
     areMelodyBeatsChecked,
@@ -27,6 +27,7 @@ const Parameters = ({
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
     const intervalIDRef = useRef('')
+    const currentBeatRef = useRef(currentBeat)
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
@@ -45,37 +46,11 @@ const Parameters = ({
     const [filterCutoff, setFilterCutoff] = useState(7500)
     const [sound, setSound] = useState('sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-    // const [intervalID, setIntervalID] = useState(null)
-    const {
-        // audioContext,
-        // tempo,
-        // setTempo,
-        stepCount,
-        setStepCount,
-        // rootNote,
-        // setRootNote,
-        // wonk,
-        // setwonk,
-        // melodyVolume,
-        // setMelodyVolume,
-        // chordsVolume,
-        // setChordsVolume,
-        // sound,
-        // setSound,
-        // filterCutoff,
-        // setFilterCutoff,
-        // attack,
-        // setAttack,
-        // decay,
-        // setDecay,
-        // sustain,
-        // setSustain,
-        // release,
-        // setRelease,
-    } = useContext(MusicParametersContext)
+    const { stepCount, setStepCount } = useContext(MusicParametersContext)
 
     // ! want to avoid setTimeout or setInterval calls, they only send state at their instantiation, no update
 
+    // * Chris Wilson:::
     // if playing
     // first note should be sent to audioEngine ASAP if its on beat 1
     // calculate second note time, store in nextNoteTime
@@ -84,34 +59,196 @@ const Parameters = ({
     // move to next note
     // repeat process
 
-    // * setInterval I've made allows me to send note scheduling with react
-    // ? idk if it would send up to date state, i;d guess not.
-    // ? wtf am i doing with intervalRunningRef?
-    // ! it may need to be a useEffect after all
+    // todo interval may be calculated based off of tempo
+    let interval = 200 // in milliseconds
 
-    // ! for each re-render, previous setInterval calls continue
-    // can i change it so that i have a whole cascade of logic as long as playing remains true, but doesnt repeat with endless renders?
+    // ! problems: restarts playback from beginning, potentially doesnt need intervalRunning
+    // have to refactor playSynth anyways, might as well rebuild the whole dang thing
+    // do i want an object telling me about the notes getting played?
+    // -> otherwise have to ask each note upon currentBeat, which seems tedious AF to do that constantly everytime
+    // -> just put it in an object called notesToPlay
+
+    // * atm i do seem to need intervalRunningRef in order to not send a million instances of playSynth
+
     // todo ugly AF, refactor
     useEffect(() => {
         let id
         if (playing && !intervalRunningRef.current) {
-            console.log('WE CREATE A SETINTERVAL NOW')
             intervalRunningRef.current = true
+            console.log(currentBeatRef.current, 'currentbeatref')
             id = setInterval(() => {
-                console.log('inteeeeeeeeeeeeeeeeeeeeeeeeeeeeeerval')
-                console.log(audioContext.currentTime, 'time')
-                console.log(decay, 'decay')
-            }, 500)
+                console.log('WE CREATE A SETINTERVAL NOW')
+                if (playing) {
+                    // if currentBeat is 0 OR if currentBeat is greater than stepCount, reset to 1
+                    // otherwise,
+                    currentBeat <= 0 || currentBeat >= stepCount
+                        ? (currentBeat = 1)
+                        : currentBeat++
+                    // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+                } else {
+                    console.log('yo wdadpadpapda')
+                    currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+                }
+                console.log(currentBeat, id, 'id')
+                makeMelodyNotesState.forEach((noteRow, index) => {
+                    if (
+                        areMelodyBeatsChecked[`note-${noteRow}`][
+                            currentBeat - 1
+                        ] === 1 &&
+                        playing
+                    ) {
+                        if (!sound.includes('sample')) {
+                            console.log('play melody!!!!!!!!')
+                            playSynth(
+                                makeMelodyNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                melodyVolume,
+                                chordsVolume,
+                                sound,
+                                filterCutoff,
+                                attack,
+                                decay,
+                                sustain,
+                                release,
+                                'melody'
+                            )
+                        } else {
+                            playSample(
+                                makeMelodyNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                'melody'
+                            )
+                        }
+                    }
+                })
+
+                makeChordNotesState.forEach((noteRow, index) => {
+                    if (
+                        areChordBeatsChecked[`note-${noteRow}`][
+                            currentBeat - 1
+                        ] === 1 &&
+                        playing
+                    ) {
+                        if (!sound.includes('sample')) {
+                            console.log('play chords!!!!!!!!!!!!')
+                            playSynth(
+                                makeChordNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                melodyVolume,
+                                chordsVolume,
+                                sound,
+                                filterCutoff,
+                                attack,
+                                decay,
+                                sustain,
+                                release,
+                                'chords'
+                            )
+                        } else {
+                            playSample(
+                                makeChordNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                'chords'
+                            )
+                        }
+                    }
+                })
+            }, interval)
 
             intervalIDRef.current = id
         } else if (playing && intervalRunningRef.current) {
-            console.log('playing true and intervalRunningRef true')
             clearInterval(intervalIDRef.current)
             id = setInterval(() => {
-                console.log('inteeeeeeeeeeeeeeeeeeeeeeeeeeeeeerval')
-                console.log(audioContext.currentTime, 'time')
-                console.log(decay, 'decay')
-            }, 500)
+                console.log('playing true and intervalRunningRef true')
+                if (playing) {
+                    currentBeat <= 0 || currentBeat >= stepCount
+                        ? (currentBeat = 1)
+                        : currentBeat++
+                    // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+                } else {
+                    console.log('yoootyoyoyowaddapdpa')
+                    currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+                }
+                makeMelodyNotesState.forEach((noteRow, index) => {
+                    if (
+                        areMelodyBeatsChecked[`note-${noteRow}`][
+                            currentBeat - 1
+                        ] === 1 &&
+                        playing
+                    ) {
+                        if (!sound.includes('sample')) {
+                            console.log('play melody!!!!!!!!')
+                            playSynth(
+                                makeMelodyNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                melodyVolume,
+                                chordsVolume,
+                                sound,
+                                filterCutoff,
+                                attack,
+                                decay,
+                                sustain,
+                                release,
+                                'melody'
+                            )
+                        } else {
+                            playSample(
+                                makeMelodyNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                'melody'
+                            )
+                        }
+                    }
+                })
+
+                makeChordNotesState.forEach((noteRow, index) => {
+                    if (
+                        areChordBeatsChecked[`note-${noteRow}`][
+                            currentBeat - 1
+                        ] === 1 &&
+                        playing
+                    ) {
+                        if (!sound.includes('sample')) {
+                            console.log('play chords!!!!!!!!!!!!')
+                            playSynth(
+                                makeChordNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                melodyVolume,
+                                chordsVolume,
+                                sound,
+                                filterCutoff,
+                                attack,
+                                decay,
+                                sustain,
+                                release,
+                                'chords'
+                            )
+                        } else {
+                            playSample(
+                                makeChordNotesState.length - index,
+                                playing,
+                                root,
+                                wonk,
+                                'chords'
+                            )
+                        }
+                    }
+                })
+            }, interval)
 
             intervalIDRef.current = id
         } else if (!playing && intervalRunningRef.current) {
@@ -133,99 +270,95 @@ const Parameters = ({
     //     nextNote()
     // }
 
-    // setInterval(() => {
-    //     console.log('timeout 100ms')
-    // }, 500)
-
     const scheduleAheadTime = 100 // i think it's seconds
-    useEffect(() => {
-        console.log(playing, 'playing changed in playSynth useFX')
-        // setInterval continues even after react refreshes. we need it to restart after a refresh
-        // .. but still respect audioContext time
-        const interval = setInterval(() => {
-            if (playing) {
-                currentBeat <= 0 || currentBeat >= stepCount
-                    ? (currentBeat = 1)
-                    : (currentBeat = currentBeat + 1)
-                // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-            } else {
-                currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
-            }
-            // currentBeatRef.current = currentBeat
-            // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
-            makeMelodyNotesState.forEach((noteRow, index) => {
-                if (
-                    areMelodyBeatsChecked[`note-${noteRow}`][
-                        currentBeat - 1
-                    ] === 1 &&
-                    playing
-                ) {
-                    if (!sound.includes('sample')) {
-                        console.log('play melody!!!!!!!!')
-                        playSynth(
-                            makeMelodyNotesState.length - index,
-                            playing,
-                            root,
-                            wonk,
-                            melodyVolume,
-                            chordsVolume,
-                            sound,
-                            filterCutoff,
-                            attack,
-                            decay,
-                            sustain,
-                            release,
-                            'melody'
-                        )
-                    } else {
-                        playSample(
-                            makeMelodyNotesState.length - index,
-                            playing,
-                            root,
-                            wonk,
-                            'melody'
-                        )
-                    }
-                }
-            })
+    // useEffect(() => {
+    //     console.log(playing, 'playing changed in playSynth useFX')
+    //     // setInterval continues even after react refreshes. we need it to restart after a refresh
+    //     // .. but still respect audioContext time
+    //     const interval = setInterval(() => {
+    //         if (playing) {
+    //             currentBeat <= 0 || currentBeat >= stepCount
+    //                 ? (currentBeat = 1)
+    //                 : (currentBeat = currentBeat + 1)
+    //             // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+    //         } else {
+    //             currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+    //         }
+    //         // currentBeatRef.current = currentBeat
+    //         // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
+    //         makeMelodyNotesState.forEach((noteRow, index) => {
+    //             if (
+    //                 areMelodyBeatsChecked[`note-${noteRow}`][
+    //                     currentBeat - 1
+    //                 ] === 1 &&
+    //                 playing
+    //             ) {
+    //                 if (!sound.includes('sample')) {
+    //                     console.log('play melody!!!!!!!!')
+    //                     playSynth(
+    //                         makeMelodyNotesState.length - index,
+    //                         playing,
+    //                         root,
+    //                         wonk,
+    //                         melodyVolume,
+    //                         chordsVolume,
+    //                         sound,
+    //                         filterCutoff,
+    //                         attack,
+    //                         decay,
+    //                         sustain,
+    //                         release,
+    //                         'melody'
+    //                     )
+    //                 } else {
+    //                     playSample(
+    //                         makeMelodyNotesState.length - index,
+    //                         playing,
+    //                         root,
+    //                         wonk,
+    //                         'melody'
+    //                     )
+    //                 }
+    //             }
+    //         })
 
-            makeChordNotesState.forEach((noteRow, index) => {
-                if (
-                    areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
-                        1 &&
-                    playing
-                ) {
-                    if (!sound.includes('sample')) {
-                        console.log('play chords!!!!!!!!!!!!')
-                        playSynth(
-                            makeChordNotesState.length - index,
-                            playing,
-                            root,
-                            wonk,
-                            melodyVolume,
-                            chordsVolume,
-                            sound,
-                            filterCutoff,
-                            attack,
-                            decay,
-                            sustain,
-                            release,
-                            'chords'
-                        )
-                    } else {
-                        playSample(
-                            makeChordNotesState.length - index,
-                            playing,
-                            root,
-                            wonk,
-                            'chords'
-                        )
-                    }
-                }
-            })
-        }, scheduleAheadTime)
-        return () => clearInterval(interval)
-    }, [playing])
+    //         makeChordNotesState.forEach((noteRow, index) => {
+    //             if (
+    //                 areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
+    //                     1 &&
+    //                 playing
+    //             ) {
+    //                 if (!sound.includes('sample')) {
+    //                     console.log('play chords!!!!!!!!!!!!')
+    //                     playSynth(
+    //                         makeChordNotesState.length - index,
+    //                         playing,
+    //                         root,
+    //                         wonk,
+    //                         melodyVolume,
+    //                         chordsVolume,
+    //                         sound,
+    //                         filterCutoff,
+    //                         attack,
+    //                         decay,
+    //                         sustain,
+    //                         release,
+    //                         'chords'
+    //                     )
+    //                 } else {
+    //                     playSample(
+    //                         makeChordNotesState.length - index,
+    //                         playing,
+    //                         root,
+    //                         wonk,
+    //                         'chords'
+    //                     )
+    //                 }
+    //             }
+    //         })
+    //     }, scheduleAheadTime)
+    //     return () => clearInterval(interval)
+    // }, [playing])
 
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {
