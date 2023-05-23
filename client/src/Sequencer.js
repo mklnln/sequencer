@@ -178,12 +178,13 @@ const Sequencer = () => {
     }
 
     useEffect(() => {
+        console.log(process.env.REACT_APP_HOOK_THEORY_BEARER, 'token?!?!')
         fetch('https://api.hooktheory.com/v1/trends/nodes', {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+                Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
             },
         })
             .then((res) => res.json())
@@ -206,8 +207,7 @@ const Sequencer = () => {
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        Authorization:
-                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+                        Authorization: process.env.HOOK_THEORY_BEARER,
                     },
                 }
             )
@@ -237,8 +237,7 @@ const Sequencer = () => {
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        Authorization:
-                            'Bearer 6253102743c64eb2313c2c56d40bf6a6',
+                        Authorization: process.env.HOOK_THEORY_BEARER,
                     },
                 }
             )
