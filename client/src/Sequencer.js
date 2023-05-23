@@ -239,54 +239,6 @@ const Sequencer = () => {
     //     return () => clearInterval(interval)
     // }, [playing, currentBeat])
 
-    const handleCheckbox = (
-        noteIndex,
-        beatIndex,
-        areXBeatsChecked,
-        setAreXBeatsChecked,
-        type
-    ) => {
-        console.log(areMelodyBeatsChecked)
-        const arrayKey = `note-${noteIndex}`
-        const checkboxObjCopy =
-            type === 'chords'
-                ? { ...areChordBeatsChecked }
-                : { ...areMelodyBeatsChecked }
-        if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
-            setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
-
-        checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][
-            beatIndex
-        ] // toggle  the value
-            ? 0
-            : 1
-        setAreMelodyBeatsChecked(checkboxObjCopy)
-        // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
-        // i suppose that a copy is being made of the original and now the new one points to it
-        // toggling the value to a string 'hi' will make that string show up in the console.logs before it should..
-    }
-
-    // todo make helper
-    const handleMelodyBeatCheckbox = (scaleIndex, beatIndex, checked) => {
-        const chordShortcut = `note-${scaleIndex}`
-        const arrayReplacement = []
-        if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
-            setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
-        blankStepCountArray.forEach((step, index) => {
-            if (beatIndex !== index) {
-                arrayReplacement.push(
-                    areMelodyBeatsChecked[chordShortcut][index]
-                )
-            } else {
-                arrayReplacement.push(checked ? 0 : 1)
-            }
-        })
-        // setAreMelodyBeatsChecked({
-        //     ...areMelodyBeatsChecked,
-        //     [chordShortcut]: [...arrayReplacement],
-        // })
-    }
-
     // todo make helper
     const handleChordClick = (chordID, index) => {
         setHookTheoryChords([])
@@ -541,7 +493,7 @@ const Sequencer = () => {
                                 beatIndex={index}
                                 whichGrid="melody"
                                 noteTitle={note}
-                                handleCheckbox={handleCheckbox}
+                                // handleCheckbox={handleCheckbox}
                             />
                         )
                     })}
@@ -596,6 +548,10 @@ const Sequencer = () => {
                 <AllBoxesDiv>
                     {makeChordNotesState.map((note, index) => {
                         const scaleIndex = note
+                        console.log(
+                            scaleIndex,
+                            'scaleindex sent from chord seq in seuqencer'
+                        )
                         return (
                             <CheckboxRow
                                 areXBeatsChecked={areChordBeatsChecked}
@@ -606,7 +562,7 @@ const Sequencer = () => {
                                 beatIndex={index}
                                 whichGrid="chords"
                                 noteTitle={romanNumeralReference['major'][note]}
-                                handleCheckbox={handleCheckbox}
+                                // handleCheckbox={handleCheckbox}
                             />
                         )
                     })}
@@ -634,7 +590,7 @@ const Sequencer = () => {
                                                 }
                                                 beatIndex={index}
                                                 chordIndex={chordIndex}
-                                                handleCheckbox={handleCheckbox}
+                                                // // handleCheckbox={handleCheckbox}
                                             />
                                         )
                                         // }

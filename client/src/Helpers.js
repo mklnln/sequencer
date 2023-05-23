@@ -141,3 +141,24 @@ export const giveOctaveNumber = (note) => {
     }
     return note
 }
+
+export const handleCheckbox = (
+    noteIndex,
+    beatIndex,
+    areXBeatsChecked,
+    setAreXBeatsChecked,
+    type
+) => {
+    const arrayKey = `note-${noteIndex}`
+    const checkboxObjCopy = { ...areXBeatsChecked }
+    // if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
+    //     setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
+
+    checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][beatIndex] // toggle  the value
+        ? 0
+        : 1
+    setAreXBeatsChecked(checkboxObjCopy)
+    // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
+    // i suppose that a copy is being made of the original and now the new one points to it
+    // toggling the value to a string 'hi' will make that string show up in the console.logs before it should..
+}
