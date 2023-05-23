@@ -398,10 +398,6 @@ const Sequencer = () => {
                 <AllBoxesDiv>
                     {makeChordNotesState.map((note, index) => {
                         const scaleIndex = note
-                        console.log(
-                            scaleIndex,
-                            'scaleindex sent from chord seq in seuqencer'
-                        )
                         return (
                             <CheckboxRow
                                 areXBeatsChecked={areChordBeatsChecked}

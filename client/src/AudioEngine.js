@@ -49,7 +49,14 @@ export const loadSample = (sample) => {
         })
 }
 
-export const playSample = (index, playing, rootNote, wonkFactor, voiceQty) => {
+export const playSample = (
+    // audioCtx,
+    index,
+    playing,
+    rootNote,
+    wonkFactor,
+    voiceQty
+) => {
     // C3 sounds best
     const rootFrequency = 1
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24]
@@ -104,6 +111,7 @@ export const playSample = (index, playing, rootNote, wonkFactor, voiceQty) => {
 }
 
 export const playSynth = (
+    // audioCtx,
     index,
     playing,
     rootNote,

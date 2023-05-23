@@ -21,7 +21,7 @@ const Parameters = ({
     makeChordNotesState,
 }) => {
     //   const [tempo, setTempo] = useState(150)
-    const audioContext = new AudioContext() // restarts upon every re-render due to playing changing state
+    // const audioCtx = new AudioContext() // restarts upon every re-render due to playing changing state
     const [dragging, setDragging] = useState(false)
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
@@ -77,7 +77,10 @@ const Parameters = ({
             ) {
                 if (!sound.includes('sample')) {
                     console.log('play melody!!!!!!!!')
+                    console.log(currentBeat, 'beat')
+                    console.log(audioTime())
                     playSynth(
+                        // audioCtx,
                         makeMelodyNotesState.length - index,
                         playing,
                         root,
@@ -94,6 +97,7 @@ const Parameters = ({
                     )
                 } else {
                     playSample(
+                        // audioCtx,
                         makeMelodyNotesState.length - index,
                         playing,
                         root,
@@ -113,6 +117,7 @@ const Parameters = ({
                 if (!sound.includes('sample')) {
                     console.log('play chords!!!!!!!!!!!!')
                     playSynth(
+                        // audioCtx,
                         makeChordNotesState.length - index,
                         playing,
                         root,
@@ -129,6 +134,7 @@ const Parameters = ({
                     )
                 } else {
                     playSample(
+                        // audioCtx,
                         makeChordNotesState.length - index,
                         playing,
                         root,
@@ -141,6 +147,8 @@ const Parameters = ({
     }
 
     const advanceCurrentBeat = () => {
+        // console.log(audioCtx.currentTime, 'time')
+        console.log(currentBeat)
         currentBeat <= 0 || currentBeat >= stepCount
             ? (currentBeat = 1)
             : currentBeat++
@@ -160,38 +168,32 @@ const Parameters = ({
             intervalRunningRef.current = true
             console.log(currentBeatRef.current, 'currentbeatref')
             id = setInterval(() => {
-                console.log('WE CREATE A SETINTERVAL NOW')
                 if (playing) {
-                    // if currentBeat is 0 OR if currentBeat is greater than stepCount, reset to 1
-                    // otherwise,
                     advanceCurrentBeat()
                     // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
                 } else {
-                    console.log('yo wdadpadpapda')
+                    console.log('yoyoyoyo!!!!!!!!!!!')
                     currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
                 }
-                console.log(currentBeat, id, 'id')
 
                 sendToPlayFxns()
             }, interval)
 
             intervalIDRef.current = id
         } else if (playing && intervalRunningRef.current) {
-            console.log('i was betting i didnt need this!!!!!!!!!!')
-            // clearInterval(intervalIDRef.current)
-            // id = setInterval(() => {
-            //     console.log('playing true and intervalRunningRef true')
-            //     if (playing) {
-            //         advanceCurrentBeat()
-            //         // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-            //     } else {
-            //         console.log('yoootyoyoyowaddapdpa')
-            //         currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
-            //     }
-            //     sendToPlayFxns()
-            // }, interval)
+            // ! without this, the other setInterval will play newly added notes, but wont update parameters
+            clearInterval(intervalIDRef.current)
+            id = setInterval(() => {
+                if (playing) {
+                    advanceCurrentBeat()
+                    // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+                } else {
+                    currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+                }
+                sendToPlayFxns()
+            }, interval)
 
-            // intervalIDRef.current = id
+            intervalIDRef.current = id
         } else if (!playing && intervalRunningRef.current) {
             stopIntervalAndFalsifyRef()
         }
@@ -317,7 +319,7 @@ const Parameters = ({
 
     // ? mb a vestige of an older build. needs to wait until sounds are re-integrated
     const parseSound = (e) => {
-        console.log(audioTime(), 'audiotime')
+        // console.log(audioTime(), 'audiotime')
         setSound(e.target.value)
         if (
             e.target.value === 'samplePianoC2' ||
@@ -325,7 +327,7 @@ const Parameters = ({
             e.target.value === 'sampleRonyA2' ||
             e.target.value === 'sampleFeltPianoC3'
         ) {
-            loadSample(e.target.value, audioContext)
+            loadSample(e.target.value)
         }
     }
 

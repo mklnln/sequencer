@@ -36,7 +36,6 @@ const SingleCheckbox = ({
                         type="checkbox"
                         checked={checked ? 'checked' : ''}
                         onChange={() => {
-                            console.log('check,', areXBeatsChecked)
                             handleCheckbox(
                                 scaleIndex,
                                 beatIndex,

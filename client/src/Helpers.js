@@ -1,7 +1,5 @@
 // ? trying to use useContext, i can only import those things inside of a custom hook or a react function component. otherwise, it may need to be tons of arguments passed to JS functions.
 
-// ideally i can make things super pretty by having all the ugly shit over here. mb thats not realistic though. who knows.
-
 export const generateAreChordBeatsCheckedInitialState = (
     makeChordNotesState,
     makeMelodyNotesState,
@@ -142,6 +140,17 @@ export const giveOctaveNumber = (note) => {
     return note
 }
 
+const makeDeepCopy = (areXBeatsChecked) => {
+    const obj = {}
+    Object.keys(areXBeatsChecked).forEach((note) => {
+        const arr = []
+        areXBeatsChecked[note].forEach((beat) => {
+            arr.push(beat)
+        })
+        obj[note] = arr
+    })
+    return obj
+}
 export const handleCheckbox = (
     noteIndex,
     beatIndex,
@@ -149,15 +158,15 @@ export const handleCheckbox = (
     setAreXBeatsChecked,
     type
 ) => {
+    console.log(areXBeatsChecked, 'before ANYTHING')
     const arrayKey = `note-${noteIndex}`
-    const checkboxObjCopy = { ...areXBeatsChecked }
-
-    // if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
-    //     setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
+    // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
+    const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)
 
     checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][beatIndex] // toggle  the value
         ? 0
         : 1
+
     setAreXBeatsChecked(checkboxObjCopy)
     // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
     // i suppose that a copy is being made of the original and now the new one points to it
