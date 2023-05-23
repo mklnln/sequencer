@@ -4,7 +4,6 @@ import { MusicParametersContext } from '../App'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 import { handleCheckbox } from '../Helpers'
 const SingleCheckbox = ({
-    // handleCheckbox,
     beatIndex,
     areXBeatsChecked,
     setAreXBeatsChecked,

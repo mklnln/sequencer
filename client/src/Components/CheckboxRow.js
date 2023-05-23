@@ -7,7 +7,6 @@ const CheckboxRow = ({
     // makeXNotesState,
     areXBeatsChecked,
     setAreXBeatsChecked,
-    handleCheckbox,
     note,
     // row,
     index,
@@ -50,7 +49,6 @@ const CheckboxRow = ({
                                     setAreXBeatsChecked={setAreXBeatsChecked}
                                     beatIndex={index}
                                     scaleIndex={scaleIndex}
-                                    handleCheckbox={handleCheckbox}
                                     whichGrid={whichGrid}
                                 />
                             )

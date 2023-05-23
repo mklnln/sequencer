@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef, useState } from 'react'
-import Checkbox from './Components/ChordCheckbox'
 import { MusicParametersContext } from './App.js'
 import {
     generateAreChordBeatsCheckedInitialState,
@@ -73,7 +72,6 @@ const Sequencer = () => {
     } = useContext(MusicParametersContext)
     const { isAuthenticated, user } = useAuth0()
 
-    // * the following are clearly related to JUST the sequencer. good that they're here. no refactoring needed.
     const [tempo, setTempo] = useState(60)
 
     const notesToPlay = {}
@@ -104,140 +102,6 @@ const Sequencer = () => {
         notesInQueue.push({ note: beatNumber, time })
     }
     const secondsPerBeat = tempo / 60
-    // ?
-    // how do we math into seconds per bpm? beats per minute. divided by 60, thats beats per second.
-    // 120bpm / 60 = 2 beats per second.
-    // want ms? need to divide further, so by 2000 in total
-    // 120 / 60000 = 0.002 beats per ms
-    // audioContext.currentTime gives seconds but to 16 decimals of precision i.e. 1.3893333333333333s
-    // ? is beat a quarter note or eighth? cuz my resolution is 8th seemingly. mb just leave bpm quarter but behind the scenes i call it 8th
-
-    // * a tale of two clocks
-    // setTimeout looks ahead and finds if any notes are due to be played
-    // ? math'ly, what does that look like?
-    // ? startTime + secondsPerBeat.
-    // okay if its delayed because it looks at an interval of time in the future
-    // it schedules web audio events in the future
-    // "The setTimeout timer basically just checks to see if any notes are going to need to be scheduled “soon” based on the current tempo, and then schedules them"
-    // the setTimeout plays any notes that need to be played now as well as in its future interval
-    // How much the lookahead overlaps with the next interval’s start time is determines how resilient your app will be across different machines, and as it becomes more complex (and layout and garbage collection may take longer).
-    //  resilient to slower machines and operating systems, it’s best to have a large overall lookahead and a reasonably short interval
-    //
-    //
-    // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
-    //   scheduleNote( current16thNote, nextNoteTime );
-    //   nextNote();
-    // }
-    // ? need fxn nextNote that will change the time value of nextNoteTime such that the while condition evaluates true if any notes are to be scheduled
-    // ? scheduleNote sends the appropriate time to the AudioEngine. not sure what current16thNote is for
-
-    // * lookahead is the amt of the future interval
-    // * timeout interval is how often the setTimeout is called with its lookahead
-    // * A good place to start is probably 100ms of “lookahead” time, with intervals set to 25ms.
-
-    // how to refactor this so that i am not doing hook calls and minimizing the amount of components to render?
-
-    // ! engine
-    // const scheduleAheadTime = 100 // ms? idk
-    // useEffect(() => {
-    //     // ! mb prefer setTimeout? if the useEffect gets called every time, a new interval will be made and may consistently keep going, looping over and over on itself.
-    //     const interval = setInterval(() => {
-    //         // * a tale of two clocks
-    //         // I’m not keeping track of “sequence time” - that is, time since the beginning of starting the metronome. All we have to do is remember when we played the last note, and figure out when the next note is scheduled to play.
-    //         // e.g. fxn nextNote = const secondsPerBeat = 60/tempo, nextNoteTime += 0.25 *secondsPerBeat (1/4 note resolution)
-    //         // if you calculate next beat time for each note, you don't have to worry about keeping track of global time, only need nextNoteTime
-
-    //         if (playing) {
-    //             currentBeat <= 0 || currentBeat >= stepCount
-    //                 ? (currentBeat = 1)
-    //                 : (currentBeat = currentBeat + 1)
-    //             scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-    //         } else {
-    //             currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
-    //         }
-    //         currentBeatRef.current = currentBeat
-    //         // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
-    //         const currentNoteStartTime = nextBeatTime
-    //         // console.log(makeMelodyNotesState)
-    //         // console.log(makeChordNotesState)
-    //         makeMelodyNotesState.forEach((noteRow, index) => {
-    //             if (
-    //                 areMelodyBeatsChecked[`note-${noteRow}`][
-    //                     currentBeat - 1
-    //                 ] === 1 &&
-    //                 playing
-    //             ) {
-    //                 if (!sound.includes('sample')) {
-    //                     console.log('play melody!!!!!!!!')
-    //                     playSynth(
-    //                         makeMelodyNotesState.length - index,
-    //                         playing,
-    //                         rootNote,
-    //                         wonkFactor,
-    //                         melodyVolume,
-    //                         chordsVolume,
-    //                         sound,
-    //                         filterCutoff,
-    //                         attack,
-    //                         decay,
-    //                         sustain,
-    //                         release,
-    //                         'melody'
-    //                     )
-    //                 } else {
-    //                     playSample(
-    //                         makeMelodyNotesState.length - index,
-    //                         playing,
-    //                         rootNote,
-    //                         wonkFactor,
-    //                         'melody'
-    //                     )
-    //                 }
-    //             }
-    //         })
-
-    //         makeChordNotesState.forEach((noteRow, index) => {
-    //             if (
-    //                 areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
-    //                     1 &&
-    //                 playing
-    //             ) {
-    //                 if (!sound.includes('sample')) {
-    //                     console.log('play chords!!!!!!!!!!!!')
-    //                     playSynth(
-    //                         makeChordNotesState.length - index,
-    //                         playing,
-    //                         rootNote,
-    //                         wonkFactor,
-    //                         melodyVolume,
-    //                         chordsVolume,
-    //                         sound,
-    //                         filterCutoff,
-    //                         attack,
-    //                         decay,
-    //                         sustain,
-    //                         release,
-    //                         'chords'
-    //                     )
-    //                 } else {
-    //                     playSample(
-    //                         makeChordNotesState.length - index,
-    //                         playing,
-    //                         rootNote,
-    //                         wonkFactor,
-    //                         'chords'
-    //                     )
-    //                 }
-    //             }
-    //         })
-
-    //         // ! the below line's interval timing was secondsPerBeat * 1000, but i noticed that the stated value of 150 was in truth more like 130. 150/130 is 1.15, thus i thought a 15% decrease in the interval would give me a more accurate time. this is true, but i'm not sure what's going on exactly. that's why 850 is used as its 15% less
-    //         // old value
-    //         // }, (secondsPerBeat * 850) / 2)
-    //     }, scheduleAheadTime)
-    //     // ! even set manually at 1000ms (i.e. one second), this will oscillate in and out of rhythm with a clock ticking each second. the 2 refers to how many subdivisions a quarter note gives. our stepCount is 8th notes.
-    //     return () => clearInterval(interval)
-    // }, [playing, currentBeat])
 
     // todo make helper
     const handleChordClick = (chordID, index) => {
@@ -321,7 +185,6 @@ const Sequencer = () => {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer 6253102743c64eb2313c2c56d40bf6a6',
             },
-            // body: JSON.stringify({ order: formData }),
         })
             .then((res) => res.json())
             .then((data) => {
@@ -346,7 +209,6 @@ const Sequencer = () => {
                         Authorization:
                             'Bearer 6253102743c64eb2313c2c56d40bf6a6',
                     },
-                    // body: JSON.stringify({ order: formData }),
                 }
             )
                 .then((res) => res.json())
@@ -461,20 +323,10 @@ const Sequencer = () => {
             </span>
             <Parameters
                 currentBeat={currentBeat}
-                // playing={playing}
-                // setPlaying={setPlaying}
                 makeChordNotesState={makeChordNotesState}
                 makeMelodyNotesState={makeMelodyNotesState}
                 areMelodyBeatsChecked={areMelodyBeatsChecked}
                 areChordBeatsChecked={areChordBeatsChecked}
-                // tempo={tempo}
-                // setTempo={setTempo}
-                // setAreChordBeatsChecked={setAreChordBeatsChecked}
-                // generateAreChordBeatsCheckedInitialState={
-                //     generateAreChordBeatsCheckedInitialState
-                // }
-                // makeChordNotesState={makeChordNotesState}
-                // blankStepCountArray={blankStepCountArray}
             />
             <MelodySequencerGrid>
                 <AllBoxesDiv>
@@ -484,7 +336,6 @@ const Sequencer = () => {
                         note = giveOctaveNumber(note)
                         return (
                             <CheckboxRow
-                                // makeXNotesState={makeMelodyNotesState}
                                 areXBeatsChecked={areMelodyBeatsChecked}
                                 setAreXBeatsChecked={setAreMelodyBeatsChecked}
                                 note={note}
@@ -493,7 +344,6 @@ const Sequencer = () => {
                                 beatIndex={index}
                                 whichGrid="melody"
                                 noteTitle={note}
-                                // handleCheckbox={handleCheckbox}
                             />
                         )
                     })}
@@ -562,43 +412,10 @@ const Sequencer = () => {
                                 beatIndex={index}
                                 whichGrid="chords"
                                 noteTitle={romanNumeralReference['major'][note]}
-                                // handleCheckbox={handleCheckbox}
                             />
                         )
                     })}
-                    {/* {makeChordNotesState.map((chord) => {
-                        const chordIndex = chord
 
-                        return (
-                            <TitleAndBoxesDiv key={chord}>
-                                <TitleSpanDiv>
-                                    <ChordTitle>
-                                        {romanNumeralReference['major'][chord]}
-                                        <br />
-                                    </ChordTitle>
-                                </TitleSpanDiv>
-                                <ChordDiv key={`row-${chordIndex}`}>
-                                    {areChordBeatsChecked[
-                                        `note-${chordIndex}`
-                                    ].map((check, index) => {
-                                        return (
-                                            <Checkbox
-                                                key={`row-${chordIndex}-beat-${index}`}
-                                                chord={chord}
-                                                areChordBeatsChecked={
-                                                    areChordBeatsChecked
-                                                }
-                                                beatIndex={index}
-                                                chordIndex={chordIndex}
-                                                // // handleCheckbox={handleCheckbox}
-                                            />
-                                        )
-                                        // }
-                                    })}
-                                </ChordDiv>
-                            </TitleAndBoxesDiv>
-                        )
-                    })} */}
                     <PointerContainer>
                         <BeatMarkers
                             blankStepCountArray={blankStepCountArray}
@@ -655,46 +472,12 @@ const MelodySequencerGrid = styled.div`
     flex-wrap: wrap;
 `
 
-const ChordDiv = styled.div`
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-`
-
 const AllBoxesDiv = styled.div`
     display: flex;
     height: 300px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-`
-
-const TitleDiv = styled.div`
-    height: 270px;
-    padding-right: 8px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-`
-
-const NoteTitle = styled.span`
-    text-align: left;
-    font-size: 17.65px;
-    margin: none;
-    display: inline-block;
-    opacity: 75%;
-    padding-right: 8px;
-`
-
-const ChordTitle = styled.span`
-    text-align: left;
-    font-size: 22px;
-    opacity: 75%;
-    padding-right: 8px;
-    margin: none;
 `
 
 const HookTheoryChordsDiv = styled.div`
@@ -713,31 +496,4 @@ const PointerContainer = styled.div`
     align-items: center;
     height: 10px;
     padding-left: 20px;
-`
-
-const BeatMarker = styled.div`
-    border-left: 1px solid var(--lightest-color);
-    width: 26.5px;
-    height: 20px;
-    opacity: 100%;
-    padding-right: 26.5px;
-    display: flex;
-    justify-content: center;
-`
-const BeatSpan = styled.span`
-    // padding-left: 9px;
-    color: var(--lighter-color);
-    opacity: 50%;
-`
-const TitleAndBoxesDiv = styled.div`
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    // border: 1px solid fuchsia;
-`
-const TitleSpanDiv = styled.div`
-    width: 20px;
-    text-align: right;
-    display: flex;
-    justify-content: flex-end;
 `

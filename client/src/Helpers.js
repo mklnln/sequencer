@@ -151,6 +151,7 @@ export const handleCheckbox = (
 ) => {
     const arrayKey = `note-${noteIndex}`
     const checkboxObjCopy = { ...areXBeatsChecked }
+
     // if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f')
     //     setLoadSong('75442486-0878-440c-9db1-a7006c25a39f')
 
