@@ -160,6 +160,7 @@ export const handleCheckbox = (
     notesToPlay,
     setNotesToPlay
 ) => {
+    // todo dont forget about chords!!
     const arrayKey = `note-${noteIndex}`
     // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
     const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)

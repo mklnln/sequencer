@@ -325,6 +325,7 @@ const Sequencer = () => {
                 makeMelodyNotesState={makeMelodyNotesState}
                 areMelodyBeatsChecked={areMelodyBeatsChecked}
                 areChordBeatsChecked={areChordBeatsChecked}
+                notesToPlay={notesToPlay}
             />
             <MelodySequencerGrid>
                 <AllBoxesDiv>

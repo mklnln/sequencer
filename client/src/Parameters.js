@@ -20,6 +20,7 @@ const Parameters = ({
     areChordBeatsChecked,
     makeMelodyNotesState,
     makeChordNotesState,
+    notesToPlay,
 }) => {
     //   const [tempo, setTempo] = useState(150)
     // const audioCtx = new AudioContext() // restarts upon every re-render due to playing changing state
@@ -48,8 +49,6 @@ const Parameters = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const { stepCount, setStepCount } = useContext(MusicParametersContext)
 
-    // ! want to avoid setTimeout or setInterval calls, they only send state at their instantiation, no update
-
     // * Chris Wilson:::
     // if playing
     // first note should be sent to audioEngine ASAP if its on beat 1
@@ -62,15 +61,8 @@ const Parameters = ({
     // todo interval may be calculated based off of tempo
     let interval = 200 // in milliseconds
 
-    // ! problems: restarts playback from beginning, potentially doesnt need intervalRunning
-    // have to refactor playSynth anyways, might as well rebuild the whole dang thing
-    // do i want an object telling me about the notes getting played?
-    // -> otherwise have to ask each note upon currentBeat, which seems tedious AF to do that constantly everytime
-    // -> just put it in an object called notesToPlay
-
     // * gets called every tick of setInterval when playing
     // wont make sound unless playing
-
     const playFxn = () => {
         // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
         //     scheduleNote( current16thNote, nextNoteTime );
@@ -80,7 +72,6 @@ const Parameters = ({
     }
 
     const sendToPlayFxns = () => {
-        // ? getting called, areMelodyBeatsChecked is normal
         makeMelodyNotesState.forEach((noteRow, index) => {
             if (
                 areMelodyBeatsChecked[`note-${noteRow}`][
@@ -89,7 +80,6 @@ const Parameters = ({
                 playing
             ) {
                 if (!sound.includes('sample')) {
-                    // console.log(currentBeat, 'beat')
                     console.log(audioTime())
                     playSynth(
                         // audioCtx,
@@ -218,103 +208,8 @@ const Parameters = ({
         //     console.log('not sure i need this, but both are false')
         // }
     })
-    // ? where do setTimeout calls come in? is there a way to make them update quickly?
-
-    // todo calculate nextNoteTime
-    // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime) {
-    //     scheduleNote(current16thNote, nextNoteTime)
-    //     nextNote()
-    // }
 
     const scheduleAheadTime = 100 // i think it's seconds
-    // useEffect(() => {
-    //     console.log(playing, 'playing changed in playSynth useFX')
-    //     // setInterval continues even after react refreshes. we need it to restart after a refresh
-    //     // .. but still respect audioContext time
-    //     const interval = setInterval(() => {
-    //         if (playing) {
-    //             currentBeat <= 0 || currentBeat >= stepCount
-    //                 ? (currentBeat = 1)
-    //                 : (currentBeat = currentBeat + 1)
-    //             // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-    //         } else {
-    //             currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
-    //         }
-    //         // currentBeatRef.current = currentBeat
-    //         // setNextBeatTime(nextBeatTime + secondsPerBeat) // todo need for visual
-    //         makeMelodyNotesState.forEach((noteRow, index) => {
-    //             if (
-    //                 areMelodyBeatsChecked[`note-${noteRow}`][
-    //                     currentBeat - 1
-    //                 ] === 1 &&
-    //                 playing
-    //             ) {
-    //                 if (!sound.includes('sample')) {
-    //                     console.log('play melody!!!!!!!!')
-    //                     playSynth(
-    //                         makeMelodyNotesState.length - index,
-    //                         playing,
-    //                         root,
-    //                         wonk,
-    //                         melodyVolume,
-    //                         chordsVolume,
-    //                         sound,
-    //                         filterCutoff,
-    //                         attack,
-    //                         decay,
-    //                         sustain,
-    //                         release,
-    //                         'melody'
-    //                     )
-    //                 } else {
-    //                     playSample(
-    //                         makeMelodyNotesState.length - index,
-    //                         playing,
-    //                         root,
-    //                         wonk,
-    //                         'melody'
-    //                     )
-    //                 }
-    //             }
-    //         })
-
-    //         makeChordNotesState.forEach((noteRow, index) => {
-    //             if (
-    //                 areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
-    //                     1 &&
-    //                 playing
-    //             ) {
-    //                 if (!sound.includes('sample')) {
-    //                     console.log('play chords!!!!!!!!!!!!')
-    //                     playSynth(
-    //                         makeChordNotesState.length - index,
-    //                         playing,
-    //                         root,
-    //                         wonk,
-    //                         melodyVolume,
-    //                         chordsVolume,
-    //                         sound,
-    //                         filterCutoff,
-    //                         attack,
-    //                         decay,
-    //                         sustain,
-    //                         release,
-    //                         'chords'
-    //                     )
-    //                 } else {
-    //                     playSample(
-    //                         makeChordNotesState.length - index,
-    //                         playing,
-    //                         root,
-    //                         wonk,
-    //                         'chords'
-    //                     )
-    //                 }
-    //             }
-    //         })
-    //     }, scheduleAheadTime)
-    //     return () => clearInterval(interval)
-    // }, [playing])
 
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {
@@ -332,7 +227,7 @@ const Parameters = ({
         }
     })
 
-    // ? mb a vestige of an older build. needs to wait until sounds are re-integrated
+    // ? mb a vestige of an older build. needs to wait until samples are re-integrated
     const parseSound = (e) => {
         // console.log(audioTime(), 'audiotime')
         setSound(e.target.value)
@@ -532,11 +427,7 @@ const StartStopButton = styled.button`
         opacity: 50%;
     }
 `
-const PlayingSpan = styled.span`
-    position: absolute;
-    top: 55%;
-    left: 35%;
-`
+
 const Ref = styled.div`
     margin-top: -30px;
     margin-bottom: 15px;
@@ -550,23 +441,6 @@ const MainDiv = styled.div`
     position: relative;
 `
 
-const Parameter = styled.input`
-    -webkit-appearance: slider-vertical;
-
-    margin: 8px;
-    height: 75px;
-`
-
-const DropdownContainer = styled.div`
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 20px;
-`
-
-const ParameterLabel = styled.span``
 const StartButtonDiv = styled.div`
     display: flex;
     justify-content: center;
@@ -589,58 +463,4 @@ const SoundFilterDiv = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
-`
-const Filter = styled.input`
-    height: 20px;
-`
-
-const StyledSelect = styled.select`
-    outline: none;
-    background-color: black;
-    color: var(--primary-color);
-    border: 1px solid var(--lightest-color);
-    width: 55px;
-    :focus {
-        border: 1px solid var(--lighter-color);
-    }
-`
-
-const ULDropdown = styled.ul`
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    top: 100%;
-    display: inline-block;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-    cursor: pointer;
-    width: 55px;
-    border: 1px solid var(--lightest-color);
-    background-color: #000000;
-`
-
-const Option = styled.span`
-    z-index: 1;
-    padding: 0 10px;
-    cursor: pointer;
-    display: block;
-    :hover {
-        background-color: var(--primary-color);
-        color: black;
-    }
-`
-
-const ChosenOption = styled.span`
-    z-index: 1;
-    padding: 0 10px;
-    cursor: pointer;
-    display: block;
-`
-// user select doesn't work, likely due to select dropdown finnickiness
-const StyledOption = styled.option`
-    user-select: none;
-    border: 1px solid fuchsia;
 `

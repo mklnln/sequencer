@@ -60,7 +60,9 @@ const SingleCheckbox = ({
                                 beatIndex,
                                 areXBeatsChecked,
                                 setAreXBeatsChecked,
-                                'chords'
+                                'chords',
+                                notesToPlay,
+                                setNotesToPlay
                             )
                             setChecked(!checked)
                         }}
