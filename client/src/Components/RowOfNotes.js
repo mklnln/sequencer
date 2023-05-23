@@ -1,12 +1,6 @@
 import MelodyCheckbox from './SingleCheckbox'
 
-const RowOfNotes = ({
-    note,
-    areMelodyBeatsChecked,
-    beatIndex,
-    scaleIndex,
-    handleCheckbox,
-}) => {
+const RowOfNotes = ({ note, areMelodyBeatsChecked, beatIndex, scaleIndex }) => {
     return (
         <>
             {areMelodyBeatsChecked[`note-${scaleIndex}`].map((check, index) => {
@@ -17,7 +11,6 @@ const RowOfNotes = ({
                         areMelodyBeatsChecked={areMelodyBeatsChecked}
                         beatIndex={index}
                         scaleIndex={scaleIndex}
-                        handleCheckbox={handleCheckbox}
                     />
                 )
                 // }

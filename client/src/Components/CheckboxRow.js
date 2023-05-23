@@ -7,7 +7,6 @@ const CheckboxRow = ({
     // makeXNotesState,
     areXBeatsChecked,
     setAreXBeatsChecked,
-    handleCheckbox,
     note,
     // row,
     index,
@@ -15,6 +14,8 @@ const CheckboxRow = ({
     scaleIndex,
     whichGrid,
     noteTitle,
+    notesToPlay,
+    setNotesToPlay,
 }) => {
     // todo dynamically bring in makeXstate and areXbeats
     const [checked, setChecked] = useState(
@@ -50,8 +51,9 @@ const CheckboxRow = ({
                                     setAreXBeatsChecked={setAreXBeatsChecked}
                                     beatIndex={index}
                                     scaleIndex={scaleIndex}
-                                    handleCheckbox={handleCheckbox}
                                     whichGrid={whichGrid}
+                                    notesToPlay={notesToPlay}
+                                    setNotesToPlay={setNotesToPlay}
                                 />
                             )
                         }
@@ -90,51 +92,4 @@ const NoteTitle = styled.span`
     display: inline-block;
     opacity: 75%;
     padding-right: 8px;
-`
-
-const CheckboxButton = styled.input`
-    position: absolute;
-    z-index: 1;
-    border: none;
-    // background-color: var(--lighter-color);
-    width: 4px;
-    opacity: 0%;
-    height: 10px;
-    width: 20px;
-    // padding: 5px 10px;
-    appearance: none;
-    margin: 0px;
-
-    :hover {
-        cursor: pointer;
-        border: none;
-        background-color: var(--lighter-color);
-        width: 4px;
-        opacity: 50%;
-        height: 4px;
-        padding: 5px 10px;
-        border-radius: 4px;
-    }
-    :checked {
-        border: none;
-        background-color: var(--lighter-color);
-        width: 4px;
-        opacity: 80%;
-        height: 4px;
-        padding: 5px 10px;
-        border-radius: 10px;
-    }
-    :checked && :hover {
-        background-color: white;
-    }
-`
-const SVGContainer = styled.div`
-    position: relative;
-    // border: 1px solid fuchsia;
-    margin: 0px 3.5px;
-    // background-color: var(--lighter-color);
-    overflow: hidden;
-    // ! might be useful to change the containing div height/width, no idea what im doin tho
-    height: 10px;
-    width: 20px;
 `

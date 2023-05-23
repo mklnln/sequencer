@@ -2,13 +2,15 @@ import { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
+import { handleCheckbox } from '../Helpers'
 const SingleCheckbox = ({
-    handleCheckbox,
     beatIndex,
     areXBeatsChecked,
     setAreXBeatsChecked,
     scaleIndex,
     whichGrid,
+    notesToPlay,
+    setNotesToPlay,
 }) => {
     const [checked, setChecked] = useState(
         // used for styling, see bottom :checked class
@@ -36,13 +38,14 @@ const SingleCheckbox = ({
                         type="checkbox"
                         checked={checked ? 'checked' : ''}
                         onChange={() => {
-                            console.log('check,', areXBeatsChecked)
                             handleCheckbox(
                                 scaleIndex,
                                 beatIndex,
                                 areXBeatsChecked,
                                 setAreXBeatsChecked,
-                                'melody'
+                                'melody',
+                                notesToPlay,
+                                setNotesToPlay
                             )
                             setChecked(!checked)
                         }}
@@ -57,7 +60,9 @@ const SingleCheckbox = ({
                                 beatIndex,
                                 areXBeatsChecked,
                                 setAreXBeatsChecked,
-                                'chords'
+                                'chords',
+                                notesToPlay,
+                                setNotesToPlay
                             )
                             setChecked(!checked)
                         }}

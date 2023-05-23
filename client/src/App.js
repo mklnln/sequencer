@@ -1,4 +1,4 @@
-import { useState, createContext, useEffect } from 'react'
+import { useState, createContext, useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Sequencer from './Sequencer'
@@ -83,7 +83,12 @@ const App = () => {
         })
         return newState
     }
+    const appRendersRef = useRef(1)
 
+    useEffect(() => {
+        appRendersRef.current = appRendersRef.current + 1
+        console.log(appRendersRef.current, 'App renders')
+    })
     return (
         <BrowserRouter>
             <MusicParametersContext.Provider
