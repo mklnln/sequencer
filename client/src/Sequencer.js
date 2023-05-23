@@ -74,7 +74,7 @@ const Sequencer = () => {
 
     const [tempo, setTempo] = useState(60)
 
-    const notesToPlay = {}
+    const [notesToPlay, setNotesToPlay] = useState({})
     // let playing = false
     let currentBeat = 0
     let nextBeatTime = 0
@@ -82,7 +82,6 @@ const Sequencer = () => {
     // todo find out what these are used for
     // const playingRef = useRef(playing)
     const currentBeatRef = useRef(0)
-    console.log(currentBeatRef.current, 'is this a rerender thing???')
     const romanNumeralReference = {
         major: {
             1: 'I',
@@ -343,6 +342,8 @@ const Sequencer = () => {
                                 beatIndex={index}
                                 whichGrid="melody"
                                 noteTitle={note}
+                                notesToPlay={notesToPlay}
+                                setNotesToPlay={setNotesToPlay}
                             />
                         )
                     })}

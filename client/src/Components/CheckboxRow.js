@@ -14,6 +14,8 @@ const CheckboxRow = ({
     scaleIndex,
     whichGrid,
     noteTitle,
+    notesToPlay,
+    setNotesToPlay,
 }) => {
     // todo dynamically bring in makeXstate and areXbeats
     const [checked, setChecked] = useState(
@@ -50,6 +52,8 @@ const CheckboxRow = ({
                                     beatIndex={index}
                                     scaleIndex={scaleIndex}
                                     whichGrid={whichGrid}
+                                    notesToPlay={notesToPlay}
+                                    setNotesToPlay={setNotesToPlay}
                                 />
                             )
                         }

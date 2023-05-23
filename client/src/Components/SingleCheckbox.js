@@ -9,6 +9,8 @@ const SingleCheckbox = ({
     setAreXBeatsChecked,
     scaleIndex,
     whichGrid,
+    notesToPlay,
+    setNotesToPlay,
 }) => {
     const [checked, setChecked] = useState(
         // used for styling, see bottom :checked class
@@ -41,7 +43,9 @@ const SingleCheckbox = ({
                                 beatIndex,
                                 areXBeatsChecked,
                                 setAreXBeatsChecked,
-                                'melody'
+                                'melody',
+                                notesToPlay,
+                                setNotesToPlay
                             )
                             setChecked(!checked)
                         }}

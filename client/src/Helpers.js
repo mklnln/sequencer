@@ -156,17 +156,34 @@ export const handleCheckbox = (
     beatIndex,
     areXBeatsChecked,
     setAreXBeatsChecked,
-    type
+    type,
+    notesToPlay,
+    setNotesToPlay
 ) => {
-    console.log(areXBeatsChecked, 'before ANYTHING')
     const arrayKey = `note-${noteIndex}`
     // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
     const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)
 
-    checkboxObjCopy[arrayKey][beatIndex] = checkboxObjCopy[arrayKey][beatIndex] // toggle  the value
-        ? 0
-        : 1
+    let obj = { ...notesToPlay }
+    if (checkboxObjCopy[arrayKey][beatIndex]) {
+        checkboxObjCopy[arrayKey][beatIndex] = 0
+        delete obj[`beat-${beatIndex}`][arrayKey]
 
+        // ? couldn't figure out another way to validate obj[`beat-${beatIndex}`]. even if it was an empty object, i couldn't test its equivalency at all at all
+        if (Object.values(obj[`beat-${beatIndex}`]).length === 0) {
+            delete obj[`beat-${beatIndex}`]
+        }
+
+        setNotesToPlay(obj)
+    } else {
+        checkboxObjCopy[arrayKey][beatIndex] = 1
+        obj[`beat-${beatIndex}`] = {
+            [arrayKey]: 1,
+            ...obj[`beat-${beatIndex}`],
+        }
+        // ? hopefully does something idfk
+        setNotesToPlay(obj)
+    }
     setAreXBeatsChecked(checkboxObjCopy)
     // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
     // i suppose that a copy is being made of the original and now the new one points to it

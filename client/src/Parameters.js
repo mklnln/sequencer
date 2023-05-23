@@ -68,7 +68,17 @@ const Parameters = ({
     // -> otherwise have to ask each note upon currentBeat, which seems tedious AF to do that constantly everytime
     // -> just put it in an object called notesToPlay
 
-    // * atm i do seem to need intervalRunningRef in order to not send a million instances of playSynth
+    // * gets called every tick of setInterval when playing
+    // wont make sound unless playing
+
+    const playFxn = () => {
+        // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
+        //     scheduleNote( current16thNote, nextNoteTime );
+        //     nextNote();
+        //   }
+        // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
+    }
+
     const sendToPlayFxns = () => {
         // ? getting called, areMelodyBeatsChecked is normal
         makeMelodyNotesState.forEach((noteRow, index) => {
@@ -178,7 +188,6 @@ const Parameters = ({
                     advanceCurrentBeat()
                     // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
                 } else {
-                    console.log('yoyoyoyo!!!!!!!!!!!')
                     currentBeat.current = 1 // this resets the playback to the beginning. remove to just make it a pause button.
                 }
 
@@ -187,7 +196,7 @@ const Parameters = ({
 
             intervalIDRef.current = id
         } else if (playing && intervalRunningRef.current) {
-            // ! without this, the other setInterval will play newly added notes, but wont update parameters
+            // ! without intervalRunningRef, the other setInterval will play newly added notes, but wont update parameters
             clearInterval(intervalIDRef.current)
             id = setInterval(() => {
                 if (playing) {
@@ -310,7 +319,6 @@ const Parameters = ({
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {
         const detectKeyDown = (e) => {
-            console.log('key pressed')
             if (e.key === 's' && e.target.type !== 'text') {
                 // intervalRunningRef.current = !intervalRunningRef.current
                 // setPlaying(intervalRunningRef.current)
