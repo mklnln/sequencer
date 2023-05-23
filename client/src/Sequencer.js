@@ -81,8 +81,8 @@ const Sequencer = () => {
 
     // todo find out what these are used for
     // const playingRef = useRef(playing)
-    const currentBeatRef = useRef(currentBeat)
-
+    const currentBeatRef = useRef(0)
+    console.log(currentBeatRef.current, 'is this a rerender thing???')
     const romanNumeralReference = {
         major: {
             1: 'I',
@@ -178,7 +178,6 @@ const Sequencer = () => {
     }
 
     useEffect(() => {
-        console.log(process.env.REACT_APP_HOOK_THEORY_BEARER, 'token?!?!')
         fetch('https://api.hooktheory.com/v1/trends/nodes', {
             method: 'GET',
             headers: {
@@ -207,7 +206,7 @@ const Sequencer = () => {
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        Authorization: process.env.HOOK_THEORY_BEARER,
+                        Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
                     },
                 }
             )
@@ -237,7 +236,7 @@ const Sequencer = () => {
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        Authorization: process.env.HOOK_THEORY_BEARER,
+                        Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
                     },
                 }
             )
@@ -322,6 +321,7 @@ const Sequencer = () => {
             </span>
             <Parameters
                 currentBeat={currentBeat}
+                currentBeatRef={currentBeatRef}
                 makeChordNotesState={makeChordNotesState}
                 makeMelodyNotesState={makeMelodyNotesState}
                 areMelodyBeatsChecked={areMelodyBeatsChecked}

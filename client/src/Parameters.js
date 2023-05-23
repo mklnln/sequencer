@@ -15,6 +15,7 @@ import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
 const Parameters = ({
     currentBeat,
+    currentBeatRef,
     areMelodyBeatsChecked,
     areChordBeatsChecked,
     makeMelodyNotesState,
@@ -26,7 +27,7 @@ const Parameters = ({
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
     const intervalIDRef = useRef('')
-    const currentBeatRef = useRef(currentBeat)
+    // const currentBeatRef = useRef(currentBeat)
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
@@ -69,15 +70,16 @@ const Parameters = ({
 
     // * atm i do seem to need intervalRunningRef in order to not send a million instances of playSynth
     const sendToPlayFxns = () => {
+        // ? getting called, areMelodyBeatsChecked is normal
         makeMelodyNotesState.forEach((noteRow, index) => {
             if (
-                areMelodyBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
-                    1 &&
+                areMelodyBeatsChecked[`note-${noteRow}`][
+                    currentBeatRef.current - 1
+                ] === 1 &&
                 playing
             ) {
                 if (!sound.includes('sample')) {
-                    console.log('play melody!!!!!!!!')
-                    console.log(currentBeat, 'beat')
+                    // console.log(currentBeat, 'beat')
                     console.log(audioTime())
                     playSynth(
                         // audioCtx,
@@ -110,8 +112,9 @@ const Parameters = ({
 
         makeChordNotesState.forEach((noteRow, index) => {
             if (
-                areChordBeatsChecked[`note-${noteRow}`][currentBeat - 1] ===
-                    1 &&
+                areChordBeatsChecked[`note-${noteRow}`][
+                    currentBeat.current - 1
+                ] === 1 &&
                 playing
             ) {
                 if (!sound.includes('sample')) {
@@ -147,11 +150,14 @@ const Parameters = ({
     }
 
     const advanceCurrentBeat = () => {
-        // console.log(audioCtx.currentTime, 'time')
-        console.log(currentBeat)
-        currentBeat <= 0 || currentBeat >= stepCount
-            ? (currentBeat = 1)
-            : currentBeat++
+        if (
+            currentBeatRef.current <= 0 ||
+            currentBeatRef.current >= stepCount
+        ) {
+            currentBeatRef.current = 1
+        } else {
+            currentBeatRef.current = currentBeatRef.current + 1
+        }
     }
 
     const stopIntervalAndFalsifyRef = () => {
@@ -173,7 +179,7 @@ const Parameters = ({
                     // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
                 } else {
                     console.log('yoyoyoyo!!!!!!!!!!!')
-                    currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+                    currentBeat.current = 1 // this resets the playback to the beginning. remove to just make it a pause button.
                 }
 
                 sendToPlayFxns()
@@ -188,7 +194,7 @@ const Parameters = ({
                     advanceCurrentBeat()
                     // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
                 } else {
-                    currentBeat = 1 // this resets the playback to the beginning. remove to just make it a pause button.
+                    currentBeat.current = 1 // this resets the playback to the beginning. remove to just make it a pause button.
                 }
                 sendToPlayFxns()
             }, interval)
@@ -304,6 +310,7 @@ const Parameters = ({
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {
         const detectKeyDown = (e) => {
+            console.log('key pressed')
             if (e.key === 's' && e.target.type !== 'text') {
                 // intervalRunningRef.current = !intervalRunningRef.current
                 // setPlaying(intervalRunningRef.current)
