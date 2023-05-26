@@ -63,34 +63,25 @@ const Parameters = ({
     // 1 second / 2
 
     const tempoToMilliseconds = (tempo) => {
-        let ms = tempo / 6000 // convert from BPM to beats per millisecond
-        console.log(ms, 'bpMS')
-        ms = ms / 2 // half the time because we are sending 8th notes, i.e. 2 notes per beat4
-        // i have tempo in beats / minute
-        // i want milliseconds / beat
-        // if i wanna turn a minute into milliseconds, how do?
-        // what is beats per second? / 60
-        // divide by 60bpm / 6000 you get 0.005 beats per ms, which is true
-        // except i want to send 1 beat. 0.005 * x = 1
-        ms = 1 / ms
-        ms = ms * 2.5 // idk where this comes from but its needed apparently
-        console.log(ms, 'ms')
-        return ms
+        // calculate: how many milliseconds does a beat take?
+        return 60000 / (tempo * 2)
     }
 
+    // ! this is technically an 8th note's duration in ms, not lookahead
+    // ? lookahead = intervalTime / 2.5?
     let intervalTime = tempoToMilliseconds(tempo) // in milliseconds
+    const scheduleAheadTime = intervalTime / 2
+    let nextNoteTime
 
     // * gets called every tick of setInterval when playing
     // wont make sound unless playing
     const playFxn = () => {
-        // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
-        //     scheduleNote( current16thNote, nextNoteTime );
-        //     nextNote();
-        //   }
+        while (nextNoteTime < audioTime() + scheduleAheadTime) {
+            // scheduleNote(currentBeatRef.current, nextNoteTime)
+            // nextNote()
+        }
         // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
     }
-
-    console.log(notesToPlay, 'notes')
 
     const sendToPlayFxns = () => {
         console.log(audioTime(), 'time')
@@ -169,7 +160,7 @@ const Parameters = ({
             }
         })
     }
-
+    console.log(notesToPlay, 'toplay')
     const advanceCurrentBeat = () => {
         if (
             currentBeatRef.current <= 0 ||
@@ -179,6 +170,8 @@ const Parameters = ({
         } else {
             currentBeatRef.current = currentBeatRef.current + 1
         }
+
+        // nextNoteTime
     }
 
     const stopIntervalAndFalsifyRef = () => {
@@ -229,8 +222,6 @@ const Parameters = ({
         //     console.log('not sure i need this, but both are false')
         // }
     })
-
-    const scheduleAheadTime = 100 // i think it's seconds
 
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {

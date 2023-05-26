@@ -1,3 +1,4 @@
+import React from 'react'
 import styled from 'styled-components'
 
 const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
@@ -8,7 +9,7 @@ const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
                 // every 2 beats make a div
                 if ((index + 1) % 2 === 0) {
                     return (
-                        <>
+                        <React.Fragment key={num}>
                             <BeatMarker
                                 key={num}
                                 className={
@@ -32,7 +33,7 @@ const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
                                     {num / 2}
                                 </BeatSpan>
                             </BeatMarker>
-                        </>
+                        </React.Fragment>
                     )
                 }
             })}
