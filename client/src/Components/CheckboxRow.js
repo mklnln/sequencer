@@ -1,16 +1,13 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 import MelodyCheckbox from './SingleCheckbox'
 import SingleCheckbox from './SingleCheckbox'
 const CheckboxRow = ({
-    // makeXNotesState,
     areXBeatsChecked,
     setAreXBeatsChecked,
     note,
-    // row,
-    index,
-    beatIndex,
+    // beatIndex,
     scaleIndex,
     whichGrid,
     noteTitle,
@@ -18,38 +15,40 @@ const CheckboxRow = ({
     setNotesToPlay,
 }) => {
     // todo dynamically bring in makeXstate and areXbeats
-    const [checked, setChecked] = useState(
-        // used for styling, see bottom :checked class
-        areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
-    )
-    useEffect(() => {
-        setChecked(
-            areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
-        )
-        // console.log(areXBeatsChecked, beatIndex, scaleIndex, 'usefx')
-        // ! holy fuck this is causing a lot of console logs!! worth figurin this the fuck out, goddamn
-        // *its caused by there being acouple hundred checkboxes, lol
-        // it is indeed necessary. without it, clicking 'reset melodies' keeps the checkboxes highlighted as if they were checked
-        // however, these checked boxes are not reflected in areBeatsChecked states
-        // todo see if theres a way to make each checked state keep up to date with a global change like reset melodies.
-        // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
-    }, [areXBeatsChecked])
-
+    // const [checked, setChecked] = useState(
+    //     // used for styling, see bottom :checked class
+    //     areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
+    // )
+    // useEffect(() => {
+    //     setChecked(
+    //         areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
+    //     )
+    //     // console.log(areXBeatsChecked, beatIndex, scaleIndex, 'usefx')
+    //     // ! holy fuck this is causing a lot of console logs!! worth figurin this the fuck out, goddamn
+    //     // *its caused by there being acouple hundred checkboxes, lol
+    //     // it is indeed necessary. without it, clicking 'reset melodies' keeps the checkboxes highlighted as if they were checked
+    //     // however, these checked boxes are not reflected in areBeatsChecked states
+    //     // todo see if theres a way to make each checked state keep up to date with a global change like reset melodies.
+    //     // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
+    // }, [areXBeatsChecked])
+    console.log(`${whichGrid}-chkrow-note-${scaleIndex}-beat-} KEYYYYYYYYYYYY`)
     return (
-        <>
-            <TitleAndBoxesDiv key={scaleIndex}>
+        <React.Fragment
+        // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatIndex}}`}
+        >
+            <TitleAndBoxesDiv>
                 <TitleSpanDiv>
                     <NoteTitle>{noteTitle}</NoteTitle>
                 </TitleSpanDiv>
-                <ChordDiv key={`row-${scaleIndex}-beat-${index}`}>
+                <ChordDiv>
                     {areXBeatsChecked[`note-${scaleIndex}`].map(
                         (check, index) => {
                             return (
                                 <SingleCheckbox
-                                    key={`row-${scaleIndex}-beat-${index}`}
+                                    // key={`sglchk${whichGrid}-row-${scaleIndex}-beat`}
                                     areXBeatsChecked={areXBeatsChecked}
                                     setAreXBeatsChecked={setAreXBeatsChecked}
-                                    beatIndex={index}
+                                    beatIndex={index + 1}
                                     scaleIndex={scaleIndex}
                                     whichGrid={whichGrid}
                                     notesToPlay={notesToPlay}
@@ -60,7 +59,7 @@ const CheckboxRow = ({
                     )}
                 </ChordDiv>
             </TitleAndBoxesDiv>
-        </>
+        </React.Fragment>
     )
 }
 
@@ -68,8 +67,8 @@ export default CheckboxRow
 const TitleAndBoxesDiv = styled.div`
     display: flex;
     justify-content: center;
+    border: 1px solid fuchsia;
     align-items: center;
-    // border: 1px solid fuchsia;
 `
 const TitleSpanDiv = styled.div`
     width: 20px;

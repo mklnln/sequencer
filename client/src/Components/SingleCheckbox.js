@@ -30,48 +30,50 @@ const SingleCheckbox = ({
         // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
     }, [areXBeatsChecked])
 
+    // console.log(beatIndex, 'beatindex', scaleIndex, 'sacleindex')
     return (
-        <>
-            <SVGContainer className={whichGrid}>
-                {whichGrid === 'melody' ? (
-                    <MelodyCheckboxButton
-                        type="checkbox"
-                        checked={checked ? 'checked' : ''}
-                        onChange={() => {
-                            handleCheckbox(
-                                scaleIndex,
-                                beatIndex,
-                                areXBeatsChecked,
-                                setAreXBeatsChecked,
-                                'melody',
-                                notesToPlay,
-                                setNotesToPlay
-                            )
-                            setChecked(!checked)
-                        }}
-                    />
-                ) : (
-                    <ChordCheckboxButton
-                        type="checkbox"
-                        checked={checked ? 'checked' : ''}
-                        onChange={() => {
-                            handleCheckbox(
-                                scaleIndex,
-                                beatIndex,
-                                areXBeatsChecked,
-                                setAreXBeatsChecked,
-                                'chords',
-                                notesToPlay,
-                                setNotesToPlay
-                            )
-                            setChecked(!checked)
-                        }}
-                        className={whichGrid}
-                    />
-                )}
-                <CheckboxNoiseSVG />
-            </SVGContainer>
-        </>
+        <SVGContainer
+            className={whichGrid}
+            key={`svg-note${scaleIndex}-beat-${beatIndex}`}
+        >
+            {whichGrid === 'melody' ? (
+                <MelodyCheckboxButton
+                    type="checkbox"
+                    checked={checked ? 'checked' : ''}
+                    onChange={() => {
+                        handleCheckbox(
+                            scaleIndex,
+                            beatIndex,
+                            areXBeatsChecked,
+                            setAreXBeatsChecked,
+                            'melody',
+                            notesToPlay,
+                            setNotesToPlay
+                        )
+                        setChecked(!checked)
+                    }}
+                />
+            ) : (
+                <ChordCheckboxButton
+                    type="checkbox"
+                    checked={checked ? 'checked' : ''}
+                    onChange={() => {
+                        handleCheckbox(
+                            scaleIndex,
+                            beatIndex,
+                            areXBeatsChecked,
+                            setAreXBeatsChecked,
+                            'chords',
+                            notesToPlay,
+                            setNotesToPlay
+                        )
+                        setChecked(!checked)
+                    }}
+                    className={whichGrid}
+                />
+            )}
+            <CheckboxNoiseSVG />
+        </SVGContainer>
     )
 }
 

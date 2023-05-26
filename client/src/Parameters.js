@@ -5,11 +5,7 @@ import { loadSample } from './AudioEngine'
 import { audioTime } from './AudioEngine'
 import Slider from './Components/Slider'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine'
-import {
-    slidersToShowObj,
-    rootNoteOptions,
-    stepCountOptions,
-} from './BigObjectsAndArrays'
+import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
@@ -59,19 +55,36 @@ const Parameters = ({
     // repeat process
 
     // todo interval may be calculated based off of tempo
-    let interval = 200 // in milliseconds
+    // ? how to get milliseconds out of bpm?
+    // 60bpm -> 120 8th notes per minute
+    // 120 notes / 60 seconds = 2 notes a second
+    // a note every 500 ms
+    // i skipped a step. how 2 notes a second into 500ms?
+    // 1 second / 2
+
+    const tempoToMilliseconds = (tempo) => {
+        // calculate: how many milliseconds does a beat take?
+        return 60000 / (tempo * 2)
+    }
+
+    // ! this is technically an 8th note's duration in ms, not lookahead
+    // ? lookahead = intervalTime / 2.5?
+    let intervalTime = tempoToMilliseconds(tempo) // in milliseconds
+    const scheduleAheadTime = intervalTime / 2
+    let nextNoteTime
 
     // * gets called every tick of setInterval when playing
     // wont make sound unless playing
     const playFxn = () => {
-        // while (nextNoteTime < audioContext.currentTime + scheduleAheadTime ) {
-        //     scheduleNote( current16thNote, nextNoteTime );
-        //     nextNote();
-        //   }
+        while (nextNoteTime < audioTime() + scheduleAheadTime) {
+            // scheduleNote(currentBeatRef.current, nextNoteTime)
+            // nextNote()
+        }
         // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
     }
 
     const sendToPlayFxns = () => {
+        console.log(audioTime(), 'time')
         makeMelodyNotesState.forEach((noteRow, index) => {
             if (
                 areMelodyBeatsChecked[`note-${noteRow}`][
@@ -80,7 +93,6 @@ const Parameters = ({
                 playing
             ) {
                 if (!sound.includes('sample')) {
-                    console.log(audioTime())
                     playSynth(
                         // audioCtx,
                         makeMelodyNotesState.length - index,
@@ -113,7 +125,7 @@ const Parameters = ({
         makeChordNotesState.forEach((noteRow, index) => {
             if (
                 areChordBeatsChecked[`note-${noteRow}`][
-                    currentBeat.current - 1
+                    currentBeatRef.current - 1
                 ] === 1 &&
                 playing
             ) {
@@ -148,7 +160,7 @@ const Parameters = ({
             }
         })
     }
-
+    console.log(notesToPlay, 'toplay')
     const advanceCurrentBeat = () => {
         if (
             currentBeatRef.current <= 0 ||
@@ -158,6 +170,8 @@ const Parameters = ({
         } else {
             currentBeatRef.current = currentBeatRef.current + 1
         }
+
+        // nextNoteTime
     }
 
     const stopIntervalAndFalsifyRef = () => {
@@ -182,7 +196,7 @@ const Parameters = ({
                 }
 
                 sendToPlayFxns()
-            }, interval)
+            }, intervalTime)
 
             intervalIDRef.current = id
         } else if (playing && intervalRunningRef.current) {
@@ -196,7 +210,7 @@ const Parameters = ({
                     currentBeat.current = 1 // this resets the playback to the beginning. remove to just make it a pause button.
                 }
                 sendToPlayFxns()
-            }, interval)
+            }, intervalTime)
 
             intervalIDRef.current = id
         } else if (!playing && intervalRunningRef.current) {
@@ -209,15 +223,18 @@ const Parameters = ({
         // }
     })
 
-    const scheduleAheadTime = 100 // i think it's seconds
-
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {
         const detectKeyDown = (e) => {
+            console.log(
+                playing,
+                intervalRunningRef,
+                'playin and intervalrunnin'
+            )
             if (e.key === 's' && e.target.type !== 'text') {
                 // intervalRunningRef.current = !intervalRunningRef.current
                 // setPlaying(intervalRunningRef.current)
-                setPlaying(!playing)
+                togglePlayback()
                 document.removeEventListener('keydown', detectKeyDown, true)
             }
         }
@@ -322,6 +339,10 @@ const Parameters = ({
         countReRenders.current = countReRenders.current + 1
     })
 
+    const togglePlayback = () => {
+        setPlaying(!playing)
+    }
+    console.log('render', playing, intervalRunningRef.current)
     return (
         <>
             <MainDiv>
@@ -330,20 +351,23 @@ const Parameters = ({
                         <span>Start/Stop</span> <span>Press S</span>
                     </StartStopTextDiv>
                     <StartStopButton
-                        onClick={() => {
-                            if (!playing) {
-                                setPlaying(true)
-                                intervalRunningRef.current =
-                                    !intervalRunningRef.current
-                                // playing = true
-                            } else {
-                                setPlaying(false)
-                                intervalRunningRef.current =
-                                    !intervalRunningRef.current
-                                // playing = false
-                            }
-                            console.log(playing, 'playing')
-                        }}
+                        onClick={
+                            togglePlayback
+                            // () => {
+                            //     if (!playing) {
+                            //         setPlaying(true)
+                            //         intervalRunningRef.current =
+                            //             !intervalRunningRef.current
+                            //         // playing = true
+                            //     } else {
+                            //         setPlaying(false)
+                            //         intervalRunningRef.current =
+                            //             !intervalRunningRef.current
+                            //         // playing = false
+                            //     }
+                            //     console.log(playing, 'playing')
+                            // }
+                        }
                     >
                         {playing ? <StopButton /> : <PlayButton />}
                         {/* <PlayingSpan> {playing ? 'stop' : 'start'}</PlayingSpan> */}
