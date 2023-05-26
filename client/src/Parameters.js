@@ -5,11 +5,7 @@ import { loadSample } from './AudioEngine'
 import { audioTime } from './AudioEngine'
 import Slider from './Components/Slider'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine'
-import {
-    slidersToShowObj,
-    rootNoteOptions,
-    stepCountOptions,
-} from './BigObjectsAndArrays'
+import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
@@ -59,7 +55,30 @@ const Parameters = ({
     // repeat process
 
     // todo interval may be calculated based off of tempo
-    let interval = 200 // in milliseconds
+    // ? how to get milliseconds out of bpm?
+    // 60bpm -> 120 8th notes per minute
+    // 120 notes / 60 seconds = 2 notes a second
+    // a note every 500 ms
+    // i skipped a step. how 2 notes a second into 500ms?
+    // 1 second / 2
+
+    const tempoToMilliseconds = (tempo) => {
+        let ms = tempo / 6000 // convert from BPM to beats per millisecond
+        console.log(ms, 'bpMS')
+        ms = ms / 2 // half the time because we are sending 8th notes, i.e. 2 notes per beat4
+        // i have tempo in beats / minute
+        // i want milliseconds / beat
+        // if i wanna turn a minute into milliseconds, how do?
+        // what is beats per second? / 60
+        // divide by 60bpm / 6000 you get 0.005 beats per ms, which is true
+        // except i want to send 1 beat. 0.005 * x = 1
+        ms = 1 / ms
+        ms = ms * 2.5 // idk where this comes from but its needed apparently
+        console.log(ms, 'ms')
+        return ms
+    }
+
+    let intervalTime = tempoToMilliseconds(tempo) // in milliseconds
 
     // * gets called every tick of setInterval when playing
     // wont make sound unless playing
@@ -71,7 +90,10 @@ const Parameters = ({
         // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
     }
 
+    console.log(notesToPlay, 'notes')
+
     const sendToPlayFxns = () => {
+        console.log(audioTime(), 'time')
         makeMelodyNotesState.forEach((noteRow, index) => {
             if (
                 areMelodyBeatsChecked[`note-${noteRow}`][
@@ -80,7 +102,6 @@ const Parameters = ({
                 playing
             ) {
                 if (!sound.includes('sample')) {
-                    console.log(audioTime())
                     playSynth(
                         // audioCtx,
                         makeMelodyNotesState.length - index,
@@ -113,7 +134,7 @@ const Parameters = ({
         makeChordNotesState.forEach((noteRow, index) => {
             if (
                 areChordBeatsChecked[`note-${noteRow}`][
-                    currentBeat.current - 1
+                    currentBeatRef.current - 1
                 ] === 1 &&
                 playing
             ) {
@@ -182,7 +203,7 @@ const Parameters = ({
                 }
 
                 sendToPlayFxns()
-            }, interval)
+            }, intervalTime)
 
             intervalIDRef.current = id
         } else if (playing && intervalRunningRef.current) {
@@ -196,7 +217,7 @@ const Parameters = ({
                     currentBeat.current = 1 // this resets the playback to the beginning. remove to just make it a pause button.
                 }
                 sendToPlayFxns()
-            }, interval)
+            }, intervalTime)
 
             intervalIDRef.current = id
         } else if (!playing && intervalRunningRef.current) {
@@ -214,10 +235,15 @@ const Parameters = ({
     // ! if i render the page based on playing, then i don't need a useEffect??
     useEffect(() => {
         const detectKeyDown = (e) => {
+            console.log(
+                playing,
+                intervalRunningRef,
+                'playin and intervalrunnin'
+            )
             if (e.key === 's' && e.target.type !== 'text') {
                 // intervalRunningRef.current = !intervalRunningRef.current
                 // setPlaying(intervalRunningRef.current)
-                setPlaying(!playing)
+                togglePlayback()
                 document.removeEventListener('keydown', detectKeyDown, true)
             }
         }
@@ -322,6 +348,10 @@ const Parameters = ({
         countReRenders.current = countReRenders.current + 1
     })
 
+    const togglePlayback = () => {
+        setPlaying(!playing)
+    }
+    console.log('render', playing, intervalRunningRef.current)
     return (
         <>
             <MainDiv>
@@ -330,20 +360,23 @@ const Parameters = ({
                         <span>Start/Stop</span> <span>Press S</span>
                     </StartStopTextDiv>
                     <StartStopButton
-                        onClick={() => {
-                            if (!playing) {
-                                setPlaying(true)
-                                intervalRunningRef.current =
-                                    !intervalRunningRef.current
-                                // playing = true
-                            } else {
-                                setPlaying(false)
-                                intervalRunningRef.current =
-                                    !intervalRunningRef.current
-                                // playing = false
-                            }
-                            console.log(playing, 'playing')
-                        }}
+                        onClick={
+                            togglePlayback
+                            // () => {
+                            //     if (!playing) {
+                            //         setPlaying(true)
+                            //         intervalRunningRef.current =
+                            //             !intervalRunningRef.current
+                            //         // playing = true
+                            //     } else {
+                            //         setPlaying(false)
+                            //         intervalRunningRef.current =
+                            //             !intervalRunningRef.current
+                            //         // playing = false
+                            //     }
+                            //     console.log(playing, 'playing')
+                            // }
+                        }
                     >
                         {playing ? <StopButton /> : <PlayButton />}
                         {/* <PlayingSpan> {playing ? 'stop' : 'start'}</PlayingSpan> */}

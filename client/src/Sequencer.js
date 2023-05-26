@@ -74,7 +74,7 @@ const Sequencer = () => {
 
     const [tempo, setTempo] = useState(60)
 
-    const [notesToPlay, setNotesToPlay] = useState({})
+    const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
     // let playing = false
     let currentBeat = 0
     let nextBeatTime = 0
@@ -409,6 +409,8 @@ const Sequencer = () => {
                                 beatIndex={index}
                                 whichGrid="chords"
                                 noteTitle={romanNumeralReference['major'][note]}
+                                notesToPlay={notesToPlay}
+                                setNotesToPlay={setNotesToPlay}
                             />
                         )
                     })}

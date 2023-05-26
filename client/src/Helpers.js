@@ -164,23 +164,22 @@ export const handleCheckbox = (
     const arrayKey = `note-${noteIndex}`
     // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
     const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)
-
     let obj = { ...notesToPlay }
     if (checkboxObjCopy[arrayKey][beatIndex]) {
         checkboxObjCopy[arrayKey][beatIndex] = 0
-        delete obj[`beat-${beatIndex}`][arrayKey]
+        delete obj[type][`beat-${beatIndex}`][arrayKey]
 
-        // ? couldn't figure out another way to validate obj[`beat-${beatIndex}`]. even if it was an empty object, i couldn't test its equivalency at all at all
-        if (Object.values(obj[`beat-${beatIndex}`]).length === 0) {
-            delete obj[`beat-${beatIndex}`]
+        // ? couldn't figure out another way to validate obj[type][`beat-${beatIndex}`]. even if it was an empty object, i couldn't test its equivalency at all at all
+        if (Object.values(obj[type][`beat-${beatIndex}`]).length === 0) {
+            delete obj[type][`beat-${beatIndex}`]
         }
 
         setNotesToPlay(obj)
     } else {
         checkboxObjCopy[arrayKey][beatIndex] = 1
-        obj[`beat-${beatIndex}`] = {
+        obj[type][`beat-${beatIndex}`] = {
             [arrayKey]: 1,
-            ...obj[`beat-${beatIndex}`],
+            ...obj[type][`beat-${beatIndex}`],
         }
         // ? hopefully does something idfk
         setNotesToPlay(obj)
