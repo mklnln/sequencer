@@ -76,12 +76,13 @@ const Sequencer = () => {
 
     const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
     // let playing = false
-    let currentBeat = 0
-    let nextBeatTime = 0
+
+    // ! can likely be replaced with good ol' Ref.
+    let currentBeat = 1
 
     // todo find out what these are used for
     // const playingRef = useRef(playing)
-    const currentBeatRef = useRef(0)
+    const currentBeatRef = useRef(1)
     const romanNumeralReference = {
         major: {
             1: 'I',
@@ -312,8 +313,9 @@ const Sequencer = () => {
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
     })
+    console.log('seq rendered, how many?')
+    const countCheckboxRenders = useRef(1)
 
-    console.log(areMelodyBeatsChecked, '???!?!')
     return (
         <>
             <span>
@@ -329,26 +331,23 @@ const Sequencer = () => {
                 notesToPlay={notesToPlay}
             />
             <MelodySequencerGrid>
+                {countCheckboxRenders.current}
                 <AllBoxesDiv>
                     {Object.keys(areMelodyBeatsChecked).map((note, index) => {
                         const scaleIndex = index + 1
-                        console.log(scaleIndex, 'scaleindx')
-                        let noteTitle = note.substring(5)
-                        let noteInOctave = giveOctaveNumber(note.substring(5)) // convert "note-5" to just "5"
                         return (
                             <CheckboxRow
+                                key={`${note}`}
+                                countCheckboxRenders={countCheckboxRenders}
                                 areXBeatsChecked={areMelodyBeatsChecked}
                                 setAreXBeatsChecked={setAreMelodyBeatsChecked}
-                                note={noteInOctave}
-                                index={index}
                                 scaleIndex={
                                     Object.keys(areMelodyBeatsChecked).length +
                                     1 -
                                     scaleIndex
                                 }
-                                // beatIndex={index + 1}
                                 whichGrid="melody"
-                                noteTitle={noteTitle}
+                                noteTitle={giveOctaveNumber(note.substring(5))} // convert "note-5" to just "5"
                                 notesToPlay={notesToPlay}
                                 setNotesToPlay={setNotesToPlay}
                             />
@@ -403,20 +402,19 @@ const Sequencer = () => {
             </MelodySequencerGrid>
             <ChordSequencerGrid>
                 <AllBoxesDiv>
-                    {makeChordNotesState.map((note, index) => {
-                        console.log(makeChordNotesState, 'chordnoteststae')
-                        console.log(note, index, 'note then index')
-                        const scaleIndex = note
+                    {Object.keys(areChordBeatsChecked).map((note, index) => {
+                        const scaleIndex = note.substring(5)
                         return (
                             <CheckboxRow
+                                key={`${note}`}
                                 areXBeatsChecked={areChordBeatsChecked}
                                 setAreXBeatsChecked={setAreChordBeatsChecked}
-                                note={note}
-                                index={index}
                                 scaleIndex={scaleIndex}
                                 beatIndex={index + 1}
                                 whichGrid="chords"
-                                noteTitle={romanNumeralReference['major'][note]}
+                                noteTitle={
+                                    romanNumeralReference['major'][scaleIndex]
+                                }
                                 notesToPlay={notesToPlay}
                                 setNotesToPlay={setNotesToPlay}
                             />

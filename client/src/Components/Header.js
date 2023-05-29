@@ -5,6 +5,7 @@ import LogoutButton from './LogoutButton'
 import { useAuth0 } from '@auth0/auth0-react'
 import { MusicParametersContext } from '../App'
 import LoadSaveTestButtons from './LoadSaveTestButtons'
+
 const Header = () => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
     const { setLoadUserSongs, songSaved, handleLoadSongsFetch } = useContext(
