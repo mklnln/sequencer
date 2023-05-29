@@ -1,20 +1,14 @@
-import { useContext } from 'react'
-import { MusicParametersContext } from './App.js'
-
 const samplePianoC2 = require('./assets/samples/c2.mp3')
 const sampleOohC2 = require('./assets/samples/oohc2.mp3')
 const sampleFeltPianoC3 = require('./assets/samples/feltPianoC3.mp3')
 const sampleRonyA2 = require('./assets/samples/RonyA2.mp3')
-
-// React Hook "useContext" cannot be called at the top level. React Hooks must be called in a React function component or a custom React Hook function
-// const {wonkFactor, attack, volume} = useContext(MusicParametersContext)
 
 // http://localhost:3000/assets/samples/c2.mp3
 let audioCtx = new AudioContext()
 // todo change this dumb name below
 let audio // !! needed for sample
 export const audioTime = () => {
-    return audioCtx.currentTime * 1000 // convert to ms
+    return audioCtx.currentTime // convert to ms
 }
 
 // code creative
@@ -131,7 +125,11 @@ export const playSynth = (
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
     // take index, voice chord based off the starting note of the scale
     // based off of index being a proper scale degree (1,2,3 etc), we need to minus one to
-
+    console.log(
+        nextNoteTime,
+        audioCtx.currentTime,
+        'nextnote, ctx time in ENGNE'
+    )
     // ! if melody, do monophony. if chords, do polyphony
     // const voicing = [scale[index - 1], , scale[index + 1], scale[index + 3]]
     const voicing = []

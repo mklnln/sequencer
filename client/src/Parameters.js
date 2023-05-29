@@ -62,41 +62,44 @@ const Parameters = ({
     // i skipped a step. how 2 notes a second into 500ms?
     // 1 second / 2
 
-    const tempoToMilliseconds = (tempo) => {
-        // calculate: how many milliseconds does a beat take?
-        return 60000 / (tempo * 2)
+    const tempoToSeconds = (tempo) => {
+        // calculate: how many seconds does a beat take?
+        return 60 / (tempo * 2)
     }
 
     // ! this is technically an 8th note's duration in ms, not lookahead
     // ? lookahead = beatDuration / 2.5?
-    let beatDuration = tempoToMilliseconds(tempo) // time of one eighth note in milliseconds
+    let beatDuration = tempoToSeconds(tempo) // time of one eighth note in seconds
     const scheduleAheadTime = beatDuration / 3
     let nextNoteTime = 0
 
     console.log(notesToPlay, 'toplay')
-    const advanceCurrentBeat = () => {
-        if (
-            currentBeatRef.current <= 0 ||
-            currentBeatRef.current >= stepCount
-        ) {
-            currentBeatRef.current = 1
-        } else {
-            currentBeatRef.current = currentBeatRef.current + 1
-        }
 
-        // nextNoteTime
-    }
-
-    const stopIntervalAndFalsifyRef = () => {
-        clearInterval(intervalIDRef.current)
-        intervalRunningRef.current = false
-        console.log('CLEAR INTERVAL cuz no longer playing')
+    const playEngine = (nextNoteTime, noteIndex) => {
+        console.log(noteIndex, 'playengine')
+        playSynth(
+            // audioCtx,
+            noteIndex,
+            playing,
+            root,
+            wonk,
+            melodyVolume,
+            chordsVolume,
+            sound,
+            filterCutoff,
+            attack,
+            decay,
+            sustain,
+            release,
+            'melody',
+            nextNoteTime
+        )
     }
 
     // ! DRY: playSynth and playSample could be joined
-    const sendToPlayFxns = () => {
-        console.log(audioTime(), 'time')
+    const sendToPlayFxns = (nextNoteTime) => {
         makeMelodyNotesState.forEach((noteRow, index) => {
+            console.log('send to play fxns')
             if (
                 areMelodyBeatsChecked[`note-${noteRow}`][
                     currentBeatRef.current - 1
@@ -172,12 +175,18 @@ const Parameters = ({
             }
         })
     }
+    const stopIntervalAndFalsifyRef = () => {
+        clearInterval(intervalIDRef.current)
+        intervalRunningRef.current = false
+        console.log('CLEAR INTERVAL cuz no longer playing')
+    }
 
     // todo ugly AF, refactor
 
     // playing?
     // yes, setInterval
     let id
+    console.log(scheduleAheadTime, 'timeitmeim')
     if (playing) {
         // intervalRunningRef tracks interval ID and resets it upon render to keep up to date synth params
         if (!intervalRunningRef.current) intervalRunningRef.current = true
@@ -186,7 +195,7 @@ const Parameters = ({
             scheduleBeat() // todo needed for visual
             // ~ advanceCurrentBeat()
             // ~ sendToPlayFxns()
-        }, scheduleAheadTime)
+        }, scheduleAheadTime * 1000)
 
         intervalIDRef.current = id
     } else if (!playing && intervalRunningRef.current) {
@@ -195,37 +204,72 @@ const Parameters = ({
     // playing? true -> setInterval which advancesCurrentBeat and sendsToPlayFxns
     //
 
-    const scheduleBeat = () => {
-        // todo determine next note time
-        // notes to play?
-        // if notesToPlay.forEach((grid)) object exists that equals currentBeat+1, then schedule
+    const advanceCurrentBeat = () => {
+        if (
+            currentBeatRef.current <= 0 ||
+            currentBeatRef.current >= stepCount
+        ) {
+            currentBeatRef.current = 1
+        } else {
+            currentBeatRef.current = currentBeatRef.current + 1
+        }
 
+        nextNoteTime += beatDuration
+        // nextNoteTime
+    }
+
+    const scheduleBeat = () => {
         Object.keys(notesToPlay).forEach((grid) => {
             if (notesToPlay[grid][`beat-${currentBeatRef.current}`]) {
                 console.log(
                     `beat-${currentBeatRef.current} exists, send sumthin`
                 )
-                // case for beat 1 having a note. 0
-                nextNoteTime = currentBeatRef.current * beatDuration
+
+                // ! lol im sending a huge amount for no reason. it should be DISTANCE from current beat
+                // ! not just current beat, but DISTANCE, else you add 2s for no good reason for beat 8 e.g.
+                // nextNoteTime =
+                //     (currentBeatRef.current - 1) * beatDuration + audioTime()
                 console.log(nextNoteTime, 'nextnote')
+                // done
+                // ! what about case of current beat being 16 and needing to schedule beat 1?
             }
         })
 
-        // code pauses here waiting for the while condition to be false, then continues
-        // ! not quite actually, it will assume nextNoteTime is advanced by nextNote()
+        // ! do a forEach on notestoplay[melody/chords][beat-currentbeat] to send all the notes
+        // if (nextNoteTime < audioTime() + scheduleAheadTime) {
+        //     console.log(
+        //         'while loop engaged',
+        //         nextNoteTime,
+        //         audioTime(),
+        //         'next note, ctx'
+        //     )
+        //     sendToPlayFxns() // ~
+        //     // scheduleNote(currentBeatRef.current, nextNoteTime)
+        //     // nextNote()
+        // } else
 
-        // ? if the note time to be scheduled is less than current time + lookahead
-        // ? i.e. in the window between now and the limit of our lookahead, if a note is to be played..
-        // ? send to play fxn, advance beat and find the next nextNoteTime to calculate
-        // ! good reason for while instead of if?
-
+        console.log(
+            currentBeatRef.current,
+            'currentbeat, next note',
+            nextNoteTime,
+            'audiotime and schedule',
+            audioTime(),
+            scheduleAheadTime
+        )
         if (nextNoteTime < audioTime() + scheduleAheadTime) {
-            console.log('while loop engaged')
-            sendToPlayFxns() // ~
-            // scheduleNote(currentBeatRef.current, nextNoteTime)
-            // nextNote()
-            advanceCurrentBeat() // ~
+            console.log('less than, send to engine')
+            if (notesToPlay['melody'][`beat-${currentBeatRef.current}`]) {
+                let noteIndex
+                Object.keys(
+                    notesToPlay['melody'][`beat-${currentBeatRef.current}`]
+                ).forEach((note) => {
+                    noteIndex = note.substring(5)
+                    playEngine(nextNoteTime, noteIndex)
+                })
+            }
         }
+
+        advanceCurrentBeat() // ~
 
         // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
     }
