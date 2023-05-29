@@ -14,7 +14,7 @@ let audioCtx = new AudioContext()
 // todo change this dumb name below
 let audio // !! needed for sample
 export const audioTime = () => {
-    return audioCtx.currentTime
+    return audioCtx.currentTime * 1000 // convert to ms
 }
 
 // code creative
@@ -125,7 +125,7 @@ export const playSynth = (
     sustain,
     release,
     polyphony,
-    currentNoteStartTime
+    nextNoteTime
 ) => {
     let rootFrequency = 220 * 2 ** (rootNote / 12) // instead of accessing a big object with note frequency values, we can just calculate them based off of A3 = 220Hz
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
@@ -201,7 +201,8 @@ export const playSynth = (
         if (playing) {
             // osc.start()
             setTimeout(() => {
-                osc.start()
+                osc.start(nextNoteTime)
+                console.log('osc started at ', nextNoteTime)
                 // }, Math.random() * wonkFactor)
             }, 1)
             setTimeout(() => {

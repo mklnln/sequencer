@@ -68,20 +68,10 @@ const Parameters = ({
     }
 
     // ! this is technically an 8th note's duration in ms, not lookahead
-    // ? lookahead = intervalTime / 2.5?
-    let intervalTime = tempoToMilliseconds(tempo) // in milliseconds
-    const scheduleAheadTime = intervalTime / 2
+    // ? lookahead = beatDuration / 2.5?
+    let beatDuration = tempoToMilliseconds(tempo) // time of one eighth note in milliseconds
+    const scheduleAheadTime = beatDuration / 3
     let nextNoteTime = 0
-
-    // * gets called every tick of setInterval when playing
-    // wont make sound unless playing
-    const playFxn = () => {
-        while (nextNoteTime < audioTime() + scheduleAheadTime) {
-            // scheduleNote(currentBeatRef.current, nextNoteTime)
-            // nextNote()
-        }
-        // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
-    }
 
     console.log(notesToPlay, 'toplay')
     const advanceCurrentBeat = () => {
@@ -128,7 +118,8 @@ const Parameters = ({
                         decay,
                         sustain,
                         release,
-                        'melody'
+                        'melody',
+                        nextNoteTime
                     )
                 } else {
                     playSample(
@@ -183,22 +174,60 @@ const Parameters = ({
     }
 
     // todo ugly AF, refactor
+
+    // playing?
+    // yes, setInterval
     let id
     if (playing) {
         // intervalRunningRef tracks interval ID and resets it upon render to keep up to date synth params
         if (!intervalRunningRef.current) intervalRunningRef.current = true
         else clearInterval(intervalIDRef.current)
         id = setInterval(() => {
-            if (playing) {
-                advanceCurrentBeat()
-                // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-            }
-            sendToPlayFxns()
-        }, intervalTime)
+            scheduleBeat() // todo needed for visual
+            // ~ advanceCurrentBeat()
+            // ~ sendToPlayFxns()
+        }, scheduleAheadTime)
 
         intervalIDRef.current = id
     } else if (!playing && intervalRunningRef.current) {
         stopIntervalAndFalsifyRef()
+    }
+    // playing? true -> setInterval which advancesCurrentBeat and sendsToPlayFxns
+    //
+
+    const scheduleBeat = () => {
+        // todo determine next note time
+        // notes to play?
+        // if notesToPlay.forEach((grid)) object exists that equals currentBeat+1, then schedule
+
+        Object.keys(notesToPlay).forEach((grid) => {
+            if (notesToPlay[grid][`beat-${currentBeatRef.current}`]) {
+                console.log(
+                    `beat-${currentBeatRef.current} exists, send sumthin`
+                )
+                // case for beat 1 having a note. 0
+                nextNoteTime = currentBeatRef.current * beatDuration
+                console.log(nextNoteTime, 'nextnote')
+            }
+        })
+
+        // code pauses here waiting for the while condition to be false, then continues
+        // ! not quite actually, it will assume nextNoteTime is advanced by nextNote()
+
+        // ? if the note time to be scheduled is less than current time + lookahead
+        // ? i.e. in the window between now and the limit of our lookahead, if a note is to be played..
+        // ? send to play fxn, advance beat and find the next nextNoteTime to calculate
+        // ! good reason for while instead of if?
+
+        if (nextNoteTime < audioTime() + scheduleAheadTime) {
+            console.log('while loop engaged')
+            sendToPlayFxns() // ~
+            // scheduleNote(currentBeatRef.current, nextNoteTime)
+            // nextNote()
+            advanceCurrentBeat() // ~
+        }
+
+        // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
     }
 
     // * this useEffect is necessary to make sure theres only ever one event listener

@@ -72,7 +72,6 @@ export default CheckboxRow
 const TitleAndBoxesDiv = styled.div`
     display: flex;
     justify-content: center;
-    border: 1px solid fuchsia;
     align-items: center;
 `
 const TitleSpanDiv = styled.div`
