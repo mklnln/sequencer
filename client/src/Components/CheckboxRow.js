@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 import MelodyCheckbox from './SingleCheckbox'
 import SingleCheckbox from './SingleCheckbox'
 const CheckboxRow = ({
+    countCheckboxRenders,
     areXBeatsChecked,
     setAreXBeatsChecked,
-    note,
-    // beatIndex,
     scaleIndex,
     whichGrid,
     noteTitle,
@@ -31,7 +30,12 @@ const CheckboxRow = ({
     //     // todo see if theres a way to make each checked state keep up to date with a global change like reset melodies.
     //     // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
     // }, [areXBeatsChecked])
-    console.log(`${whichGrid}-chkrow-note-${scaleIndex}-beat-} KEYYYYYYYYYYYY`)
+
+    useEffect(() => {
+        if (countCheckboxRenders) {
+            countCheckboxRenders.current = countCheckboxRenders.current + 1
+        }
+    })
     return (
         <React.Fragment
         // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatIndex}}`}
@@ -43,12 +47,13 @@ const CheckboxRow = ({
                 <ChordDiv>
                     {areXBeatsChecked[`note-${scaleIndex}`].map(
                         (check, index) => {
+                            const beatIndex = index + 1
                             return (
                                 <SingleCheckbox
-                                    // key={`sglchk${whichGrid}-row-${scaleIndex}-beat`}
+                                    key={`sglchk${whichGrid}-row-${scaleIndex}-beat-${beatIndex}`}
                                     areXBeatsChecked={areXBeatsChecked}
                                     setAreXBeatsChecked={setAreXBeatsChecked}
-                                    beatIndex={index + 1}
+                                    beatIndex={beatIndex}
                                     scaleIndex={scaleIndex}
                                     whichGrid={whichGrid}
                                     notesToPlay={notesToPlay}

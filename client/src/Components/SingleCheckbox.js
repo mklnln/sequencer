@@ -34,7 +34,7 @@ const SingleCheckbox = ({
     return (
         <SVGContainer
             className={whichGrid}
-            key={`svg-note${scaleIndex}-beat-${beatIndex}`}
+            key={`svg-note${scaleIndex}-beat-${beatIndex}-${whichGrid}`}
         >
             {whichGrid === 'melody' ? (
                 <MelodyCheckboxButton

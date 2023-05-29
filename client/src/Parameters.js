@@ -31,7 +31,7 @@ const Parameters = ({
     // ! can some of these parameters be regular const so that i dont lag with the drag??
 
     let root = 1
-    const [tempo, setTempo] = useState(60)
+    const [tempo, setTempo] = useState(120)
     const [wonk, setWonk] = useState(0)
     const [melodyVolume, setMelodyVolume] = useState(100)
     const [chordsVolume, setChordsVolume] = useState(100)
@@ -71,7 +71,7 @@ const Parameters = ({
     // ? lookahead = intervalTime / 2.5?
     let intervalTime = tempoToMilliseconds(tempo) // in milliseconds
     const scheduleAheadTime = intervalTime / 2
-    let nextNoteTime
+    let nextNoteTime = 0
 
     // * gets called every tick of setInterval when playing
     // wont make sound unless playing
@@ -83,6 +83,27 @@ const Parameters = ({
         // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
     }
 
+    console.log(notesToPlay, 'toplay')
+    const advanceCurrentBeat = () => {
+        if (
+            currentBeatRef.current <= 0 ||
+            currentBeatRef.current >= stepCount
+        ) {
+            currentBeatRef.current = 1
+        } else {
+            currentBeatRef.current = currentBeatRef.current + 1
+        }
+
+        // nextNoteTime
+    }
+
+    const stopIntervalAndFalsifyRef = () => {
+        clearInterval(intervalIDRef.current)
+        intervalRunningRef.current = false
+        console.log('CLEAR INTERVAL cuz no longer playing')
+    }
+
+    // ! DRY: playSynth and playSample could be joined
     const sendToPlayFxns = () => {
         console.log(audioTime(), 'time')
         makeMelodyNotesState.forEach((noteRow, index) => {
@@ -160,80 +181,30 @@ const Parameters = ({
             }
         })
     }
-    console.log(notesToPlay, 'toplay')
-    const advanceCurrentBeat = () => {
-        if (
-            currentBeatRef.current <= 0 ||
-            currentBeatRef.current >= stepCount
-        ) {
-            currentBeatRef.current = 1
-        } else {
-            currentBeatRef.current = currentBeatRef.current + 1
-        }
-
-        // nextNoteTime
-    }
-
-    const stopIntervalAndFalsifyRef = () => {
-        console.log('made intervalRunningRef false')
-        clearInterval(intervalIDRef.current)
-        intervalRunningRef.current = false
-        console.log('CLEAR INTERVAL cuz no longer playing')
-    }
 
     // todo ugly AF, refactor
-    useEffect(() => {
-        let id
-        if (playing && !intervalRunningRef.current) {
-            intervalRunningRef.current = true
-            console.log(currentBeatRef.current, 'currentbeatref')
-            id = setInterval(() => {
-                if (playing) {
-                    advanceCurrentBeat()
-                    // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-                } else {
-                    currentBeat.current = 1 // this resets the playback to the beginning. remove to just make it a pause button.
-                }
+    let id
+    if (playing) {
+        // intervalRunningRef tracks interval ID and resets it upon render to keep up to date synth params
+        if (!intervalRunningRef.current) intervalRunningRef.current = true
+        else clearInterval(intervalIDRef.current)
+        id = setInterval(() => {
+            if (playing) {
+                advanceCurrentBeat()
+                // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
+            }
+            sendToPlayFxns()
+        }, intervalTime)
 
-                sendToPlayFxns()
-            }, intervalTime)
+        intervalIDRef.current = id
+    } else if (!playing && intervalRunningRef.current) {
+        stopIntervalAndFalsifyRef()
+    }
 
-            intervalIDRef.current = id
-        } else if (playing && intervalRunningRef.current) {
-            // ! without intervalRunningRef, the other setInterval will play newly added notes, but wont update parameters
-            clearInterval(intervalIDRef.current)
-            id = setInterval(() => {
-                if (playing) {
-                    advanceCurrentBeat()
-                    // scheduleBeat(currentBeat, nextBeatTime) // todo needed for visual
-                } else {
-                    currentBeat.current = 1 // this resets the playback to the beginning. remove to just make it a pause button.
-                }
-                sendToPlayFxns()
-            }, intervalTime)
-
-            intervalIDRef.current = id
-        } else if (!playing && intervalRunningRef.current) {
-            stopIntervalAndFalsifyRef()
-        }
-        // else if (!playing && !intervalRunningRef.current) {
-        //     clearInterval(intervalIDRef.current)
-        //     intervalRunningRef.current = false
-        //     console.log('not sure i need this, but both are false')
-        // }
-    })
-
-    // ! if i render the page based on playing, then i don't need a useEffect??
+    // * this useEffect is necessary to make sure theres only ever one event listener
     useEffect(() => {
         const detectKeyDown = (e) => {
-            console.log(
-                playing,
-                intervalRunningRef,
-                'playin and intervalrunnin'
-            )
             if (e.key === 's' && e.target.type !== 'text') {
-                // intervalRunningRef.current = !intervalRunningRef.current
-                // setPlaying(intervalRunningRef.current)
                 togglePlayback()
                 document.removeEventListener('keydown', detectKeyDown, true)
             }
@@ -340,9 +311,12 @@ const Parameters = ({
     })
 
     const togglePlayback = () => {
+        if (!playing) {
+            currentBeat = 1
+            currentBeatRef.current = 1
+        }
         setPlaying(!playing)
     }
-    console.log('render', playing, intervalRunningRef.current)
     return (
         <>
             <MainDiv>
