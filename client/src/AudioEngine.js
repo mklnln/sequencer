@@ -125,11 +125,7 @@ export const playSynth = (
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
     // take index, voice chord based off the starting note of the scale
     // based off of index being a proper scale degree (1,2,3 etc), we need to minus one to
-    console.log(
-        nextNoteTime,
-        audioCtx.currentTime,
-        'nextnote, ctx time in ENGNE'
-    )
+
     // ! if melody, do monophony. if chords, do polyphony
     // const voicing = [scale[index - 1], , scale[index + 1], scale[index + 3]]
     const voicing = []
@@ -200,7 +196,6 @@ export const playSynth = (
             // osc.start()
             setTimeout(() => {
                 osc.start(nextNoteTime)
-                console.log('osc started at ', nextNoteTime)
                 // }, Math.random() * wonkFactor)
             }, 1)
             setTimeout(() => {
