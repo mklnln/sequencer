@@ -73,10 +73,7 @@ const Parameters = ({
     const scheduleAheadTime = beatDuration / 3
     let nextNoteTime = 0
 
-    console.log(notesToPlay, 'toplay')
-
     const playEngine = (nextNoteTime, noteIndex) => {
-        console.log(noteIndex, 'playengine')
         playSynth(
             // audioCtx,
             noteIndex,
@@ -186,16 +183,97 @@ const Parameters = ({
     // playing?
     // yes, setInterval
     let id
-    console.log(scheduleAheadTime, 'timeitmeim')
+    let timeFromStart = 0
+    let eighthNoteTicks = 0
+    let intervalTicks = 0
     if (playing) {
+        console.log(audioTime(), 'right after if playing')
+        timeFromStart = audioTime()
+        nextNoteTime = timeFromStart
         // intervalRunningRef tracks interval ID and resets it upon render to keep up to date synth params
         if (!intervalRunningRef.current) intervalRunningRef.current = true
         else clearInterval(intervalIDRef.current)
         id = setInterval(() => {
-            scheduleBeat() // todo needed for visual
-            // ~ advanceCurrentBeat()
             // ~ sendToPlayFxns()
-        }, scheduleAheadTime * 1000)
+            console.log((intervalTicks / 3) * beatDuration, 'other bit')
+            console.log(timeFromStart, 'timefromstart')
+            console.log(audioTime(), 'time in interval')
+            if (intervalTicks % 3 === 0) {
+                console.log(audioTime(), 'after if')
+                nextNoteTime =
+                    (intervalTicks / 3) * beatDuration + timeFromStart
+                console.log(
+                    nextNoteTime,
+                    'new time from % 3',
+                    audioTime(),
+                    'autiodiim'
+                )
+            }
+            // ! have this first, THEN change to a new note time
+            console.log(
+                nextNoteTime.toFixed(3),
+                '< ?',
+                (audioTime() + scheduleAheadTime).toFixed(3)
+            )
+            // ? need a way to make this within the window, not below it
+            if (
+                nextNoteTime < audioTime() + scheduleAheadTime &&
+                notesToPlay['melody'][`beat-${currentBeatRef.current}`]
+            ) {
+                let noteIndex
+                Object.keys(
+                    notesToPlay['melody'][`beat-${currentBeatRef.current}`]
+                ).forEach((note) => {
+                    noteIndex = note.substring(5)
+                    playEngine(nextNoteTime, noteIndex)
+                })
+                // scheduleBeat
+                nextNoteTime += beatDuration
+                console.log(nextNoteTime, 'new nextnotetime')
+                // }
+            }
+            // Object.keys(notesToPlay).forEach((grid) => {
+            //     if (notesToPlay[grid][`beat-${currentBeatRef.current}`]) {
+            //         console.log(
+            //             `beat-${currentBeatRef.current} exists, send sumthin`
+            //         )
+            //         console.log(nextNoteTime, 'nextnote before')
+
+            //         console.log(nextNoteTime, 'nextnote after')
+            //     }
+            // })
+            console.log(
+                nextNoteTime.toFixed(3),
+                '< ?',
+                (audioTime() + scheduleAheadTime).toFixed(3)
+            )
+            console.log('one interval')
+
+            // if (
+            //     nextNoteTime < audioTime() + scheduleAheadTime &&
+            //     notesToPlay['melody'][`beat-${currentBeatRef.current}`]
+            // ) {
+            //     console.log('less than, send to engine')
+            //     // if (notesToPlay['melody'][`beat-${currentBeatRef.current}`]) {
+            //     let noteIndex
+            //     Object.keys(
+            //         notesToPlay['melody'][`beat-${currentBeatRef.current}`]
+            //     ).forEach((note) => {
+            //         console.log(note, 'how many notes sent?')
+            //         noteIndex = note.substring(5)
+            //         playEngine(nextNoteTime, noteIndex)
+
+            //     })
+            // ! need to nullify nextNoteTime being < once we send it to the engine
+            // }
+            intervalTicks++
+            if (intervalTicks % 3 === 0) {
+                eighthNoteTicks++
+                advanceCurrentBeat()
+
+                console.log('every 3rd tick')
+            }
+        }, scheduleAheadTime * 1000) // maybe 250? so 1000 divided by 4, so there are 4 calls in the window for insurance
 
         intervalIDRef.current = id
     } else if (!playing && intervalRunningRef.current) {
@@ -213,66 +291,19 @@ const Parameters = ({
         } else {
             currentBeatRef.current = currentBeatRef.current + 1
         }
-
-        nextNoteTime += beatDuration
-        // nextNoteTime
+        // ! in the event of no note being scheduled, we advance its clock
+        // ! this should be calculated based off of notesToPlay
+        // ! i should only increase nextNoteTime when i find the next note to play.
+        // ! this is advancing it every tick, but advancing more than the tick so it eventually doesnt play
+        // todo calculate based off of distance to the played beat, from current beat
+        // nextNoteTime += beatDuration
     }
 
-    const scheduleBeat = () => {
-        Object.keys(notesToPlay).forEach((grid) => {
-            if (notesToPlay[grid][`beat-${currentBeatRef.current}`]) {
-                console.log(
-                    `beat-${currentBeatRef.current} exists, send sumthin`
-                )
+    // const scheduleBeat = (startTime) => {
+    //     advanceCurrentBeat() // ~
 
-                // ! lol im sending a huge amount for no reason. it should be DISTANCE from current beat
-                // ! not just current beat, but DISTANCE, else you add 2s for no good reason for beat 8 e.g.
-                // nextNoteTime =
-                //     (currentBeatRef.current - 1) * beatDuration + audioTime()
-                console.log(nextNoteTime, 'nextnote')
-                // done
-                // ! what about case of current beat being 16 and needing to schedule beat 1?
-            }
-        })
-
-        // ! do a forEach on notestoplay[melody/chords][beat-currentbeat] to send all the notes
-        // if (nextNoteTime < audioTime() + scheduleAheadTime) {
-        //     console.log(
-        //         'while loop engaged',
-        //         nextNoteTime,
-        //         audioTime(),
-        //         'next note, ctx'
-        //     )
-        //     sendToPlayFxns() // ~
-        //     // scheduleNote(currentBeatRef.current, nextNoteTime)
-        //     // nextNote()
-        // } else
-
-        console.log(
-            currentBeatRef.current,
-            'currentbeat, next note',
-            nextNoteTime,
-            'audiotime and schedule',
-            audioTime(),
-            scheduleAheadTime
-        )
-        if (nextNoteTime < audioTime() + scheduleAheadTime) {
-            console.log('less than, send to engine')
-            if (notesToPlay['melody'][`beat-${currentBeatRef.current}`]) {
-                let noteIndex
-                Object.keys(
-                    notesToPlay['melody'][`beat-${currentBeatRef.current}`]
-                ).forEach((note) => {
-                    noteIndex = note.substring(5)
-                    playEngine(nextNoteTime, noteIndex)
-                })
-            }
-        }
-
-        advanceCurrentBeat() // ~
-
-        // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
-    }
+    //     // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
+    // }
 
     // * this useEffect is necessary to make sure theres only ever one event listener
     useEffect(() => {
@@ -377,7 +408,6 @@ const Parameters = ({
             setParameterState: setFilterCutoff,
         },
     }
-
     const countReRenders = useRef(1)
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
