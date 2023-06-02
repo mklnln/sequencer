@@ -121,6 +121,7 @@ export const playSynth = (
     polyphony,
     nextNoteTime
 ) => {
+    console.log(index, 'engnin')
     let rootFrequency = 220 * 2 ** (rootNote / 12) // instead of accessing a big object with note frequency values, we can just calculate them based off of A3 = 220Hz
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
     // take index, voice chord based off the starting note of the scale
@@ -139,15 +140,17 @@ export const playSynth = (
         voicing.push(scale[index - 1])
         voicing.push(scale[index + 1])
         voicing.push(scale[index + 3])
+        console.log(voicing, 'HEYEYEYEY')
     }
     // we want index, index+2, index+4 notes played.
     // ? this could be a state KEY as in major, minor, harmonic minor
     voicing.forEach((monophone) => {
+        console.log(monophone, 'mononono')
         const note = rootFrequency * 2 ** (monophone / 12)
         // 2^(12/12)
         // 0 = 1
         // 1/12, 1.0075
-
+        console.log(note, polyphony)
         const osc = audioCtx.createOscillator()
         osc.frequency.value = note // (1.1/12) 1.075*
         osc.type = sound

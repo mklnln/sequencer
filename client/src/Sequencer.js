@@ -6,6 +6,7 @@ import {
     makeNewMelodyMaster,
     loadChangedSongList,
     giveOctaveNumber,
+    makeNotesToPlayMaster,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
@@ -74,7 +75,10 @@ const Sequencer = () => {
 
     const [tempo, setTempo] = useState(60)
 
-    const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
+    // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
+    const [notesToPlay, setNotesToPlay] = useState(
+        makeNotesToPlayMaster(stepCount)
+    )
     // let playing = false
 
     // ! can likely be replaced with good ol' Ref.
