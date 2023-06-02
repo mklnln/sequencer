@@ -144,7 +144,7 @@ const makeDeepCopy = (areXBeatsChecked) => {
     const obj = {}
     Object.keys(areXBeatsChecked).forEach((note) => {
         const arr = []
-        areXBeatsChecked[note].forEach((beat) => {
+        areXBeatsChecked[note].forEach((beat, index) => {
             arr.push(beat)
         })
         obj[note] = arr
@@ -153,7 +153,7 @@ const makeDeepCopy = (areXBeatsChecked) => {
 }
 export const handleCheckbox = (
     scaleIndex,
-    beatIndex,
+    beatNum,
     areXBeatsChecked,
     setAreXBeatsChecked,
     type,
@@ -164,30 +164,39 @@ export const handleCheckbox = (
     const arrayKey = `note-${scaleIndex}`
     // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
     const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)
+    console.log(checkboxObjCopy, 'after deep copy, happens right away?')
     let obj = { ...notesToPlay }
-    if (checkboxObjCopy[arrayKey][beatIndex]) {
-        checkboxObjCopy[arrayKey][beatIndex] = 0
-        delete obj[`beat-${beatIndex}`][arrayKey][type]
+    if (checkboxObjCopy[arrayKey][beatNum]) {
+        console.log(checkboxObjCopy[arrayKey])
+        checkboxObjCopy[arrayKey][beatNum] = 0
+        console.log(checkboxObjCopy[arrayKey])
+        delete obj[`beat-${beatNum + 1}`][arrayKey][type]
 
-        // ? couldn't figure out another way to validate obj[type][`beat-${beatIndex}`]. even if it was an empty object, i couldn't test its equivalency at all at all
-        if (Object.values(obj[`beat-${beatIndex}`][arrayKey]).length === 0) {
-            delete obj[`beat-${beatIndex}`][arrayKey]
+        // ? couldn't figure out another way to validate obj[type][`beat-${beatNum+1}`]. even if it was an empty object, i couldn't test its equivalency at all at all
+        if (Object.values(obj[`beat-${beatNum + 1}`][arrayKey]).length === 0) {
+            delete obj[`beat-${beatNum + 1}`][arrayKey]
         }
 
         setNotesToPlay(obj)
     } else {
-        console.log('else!!!')
-        checkboxObjCopy[arrayKey][beatIndex] = 1
-        // obj[`beat-${beatIndex}`] = {
+        console.log(checkboxObjCopy[arrayKey])
+        checkboxObjCopy[arrayKey][beatNum] = 1
+        console.log(checkboxObjCopy[arrayKey])
+        // obj[`beat-${beatNum}`] = {
         //     [arrayKey]: {
         //         [type]: 1,
-        //         ...obj[`beat-${beatIndex}`][arrayKey],
+        //         ...obj[`beat-${beatNum}`][arrayKey],
         //     },
-        //     ...obj[`beat-${beatIndex}`],
+        //     ...obj[`beat-${beatNum}`],
         // }
-        obj[`beat-${beatIndex}`][arrayKey] = {
-            [type]: 1,
-            ...obj[`beat-${beatIndex}`][arrayKey],
+        console.log(beatNum, 'beatindx')
+        console.log(obj[`beat-${beatNum + 1}`], 'yo does this exist', arrayKey)
+        obj[`beat-${beatNum + 1}`] = {
+            [arrayKey]: {
+                [type]: 1,
+                ...obj[`beat-${beatNum + 1}`][arrayKey],
+            },
+            ...obj[`beat-${beatNum + 1}`],
         }
         // ? hopefully does something idfk
         setNotesToPlay(obj)
@@ -199,7 +208,6 @@ export const handleCheckbox = (
 }
 
 export const makeNotesToPlayMaster = (stepCount) => {
-    console.log(stepCount, 'helper')
     const obj = {}
     for (let i = 1; i <= stepCount; i++) {
         obj[`beat-${i}`] = {}

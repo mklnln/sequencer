@@ -16,13 +16,13 @@ const CheckboxRow = ({
     // todo dynamically bring in makeXstate and areXbeats
     // const [checked, setChecked] = useState(
     //     // used for styling, see bottom :checked class
-    //     areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
+    //     areXBeatsChecked[`note-${scaleIndex}`][beatNum] ? 'checked' : ''
     // )
     // useEffect(() => {
     //     setChecked(
-    //         areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
+    //         areXBeatsChecked[`note-${scaleIndex}`][beatNum] ? 'checked' : ''
     //     )
-    //     // console.log(areXBeatsChecked, beatIndex, scaleIndex, 'usefx')
+    //     // console.log(areXBeatsChecked, beatNum, scaleIndex, 'usefx')
     //     // ! holy fuck this is causing a lot of console logs!! worth figurin this the fuck out, goddamn
     //     // *its caused by there being acouple hundred checkboxes, lol
     //     // it is indeed necessary. without it, clicking 'reset melodies' keeps the checkboxes highlighted as if they were checked
@@ -36,9 +36,10 @@ const CheckboxRow = ({
             countCheckboxRenders.current = countCheckboxRenders.current + 1
         }
     })
+
     return (
         <React.Fragment
-        // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatIndex}}`}
+        // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatNum}}`}
         >
             <TitleAndBoxesDiv>
                 <TitleSpanDiv>
@@ -47,13 +48,13 @@ const CheckboxRow = ({
                 <ChordDiv>
                     {areXBeatsChecked[`note-${scaleIndex}`].map(
                         (check, index) => {
-                            const beatIndex = index + 1
+                            const beatNum = index
                             return (
                                 <SingleCheckbox
-                                    key={`sglchk${whichGrid}-row-${scaleIndex}-beat-${beatIndex}`}
+                                    key={`sglchk${whichGrid}-row-${scaleIndex}-beat-${beatNum}`}
                                     areXBeatsChecked={areXBeatsChecked}
                                     setAreXBeatsChecked={setAreXBeatsChecked}
-                                    beatIndex={beatIndex}
+                                    beatNum={beatNum}
                                     scaleIndex={scaleIndex}
                                     whichGrid={whichGrid}
                                     notesToPlay={notesToPlay}

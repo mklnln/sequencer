@@ -320,6 +320,8 @@ const Sequencer = () => {
     console.log('seq rendered, how many?')
     const countCheckboxRenders = useRef(1)
 
+    console.log(areMelodyBeatsChecked)
+
     return (
         <>
             <span>
@@ -414,7 +416,7 @@ const Sequencer = () => {
                                 areXBeatsChecked={areChordBeatsChecked}
                                 setAreXBeatsChecked={setAreChordBeatsChecked}
                                 scaleIndex={scaleIndex}
-                                beatIndex={index + 1}
+                                beatNum={index + 1}
                                 whichGrid="chords"
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]

@@ -4,7 +4,7 @@ import { MusicParametersContext } from '../App'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 import { handleCheckbox } from '../Helpers'
 const SingleCheckbox = ({
-    beatIndex,
+    beatNum,
     areXBeatsChecked,
     setAreXBeatsChecked,
     scaleIndex,
@@ -14,14 +14,14 @@ const SingleCheckbox = ({
 }) => {
     const [checked, setChecked] = useState(
         // used for styling, see bottom :checked class
-        areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
+        areXBeatsChecked[`note-${scaleIndex}`][beatNum] ? 'checked' : ''
     )
 
     useEffect(() => {
         setChecked(
-            areXBeatsChecked[`note-${scaleIndex}`][beatIndex] ? 'checked' : ''
+            areXBeatsChecked[`note-${scaleIndex}`][beatNum] ? 'checked' : ''
         )
-        // console.log(areXBeatsChecked, beatIndex, scaleIndex, 'usefx')
+        // console.log(areXBeatsChecked, beatNum, scaleIndex, 'usefx')
         // ! holy fuck this is causing a lot of console logs!! worth figurin this the fuck out, goddamn
         // *its caused by there being acouple hundred checkboxes, lol
         // it is indeed necessary. without it, clicking 'reset melodies' keeps the checkboxes highlighted as if they were checked
@@ -30,11 +30,11 @@ const SingleCheckbox = ({
         // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
     }, [areXBeatsChecked])
 
-    // console.log(beatIndex, 'beatindex', scaleIndex, 'sacleindex')
+    // console.log(beatNum, 'beatNum', scaleIndex, 'sacleindex')
     return (
         <SVGContainer
             className={whichGrid}
-            key={`svg-note${scaleIndex}-beat-${beatIndex}-${whichGrid}`}
+            key={`svg-note${scaleIndex}-beat-${beatNum}-${whichGrid}`}
         >
             {whichGrid === 'melody' ? (
                 <MelodyCheckboxButton
@@ -43,7 +43,7 @@ const SingleCheckbox = ({
                     onChange={() => {
                         handleCheckbox(
                             scaleIndex,
-                            beatIndex,
+                            beatNum,
                             areXBeatsChecked,
                             setAreXBeatsChecked,
                             'melody',
@@ -60,7 +60,7 @@ const SingleCheckbox = ({
                     onChange={() => {
                         handleCheckbox(
                             scaleIndex,
-                            beatIndex,
+                            beatNum,
                             areXBeatsChecked,
                             setAreXBeatsChecked,
                             'chords',
