@@ -164,12 +164,9 @@ export const handleCheckbox = (
     const arrayKey = `note-${scaleIndex}`
     // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
     const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)
-    console.log(checkboxObjCopy, 'after deep copy, happens right away?')
     let obj = { ...notesToPlay }
     if (checkboxObjCopy[arrayKey][beatNum]) {
-        console.log(checkboxObjCopy[arrayKey])
         checkboxObjCopy[arrayKey][beatNum] = 0
-        console.log(checkboxObjCopy[arrayKey])
         delete obj[`beat-${beatNum + 1}`][arrayKey][type]
 
         // ? couldn't figure out another way to validate obj[type][`beat-${beatNum+1}`]. even if it was an empty object, i couldn't test its equivalency at all at all
@@ -179,9 +176,7 @@ export const handleCheckbox = (
 
         setNotesToPlay(obj)
     } else {
-        console.log(checkboxObjCopy[arrayKey])
         checkboxObjCopy[arrayKey][beatNum] = 1
-        console.log(checkboxObjCopy[arrayKey])
         // obj[`beat-${beatNum}`] = {
         //     [arrayKey]: {
         //         [type]: 1,
@@ -189,8 +184,6 @@ export const handleCheckbox = (
         //     },
         //     ...obj[`beat-${beatNum}`],
         // }
-        console.log(beatNum, 'beatindx')
-        console.log(obj[`beat-${beatNum + 1}`], 'yo does this exist', arrayKey)
         obj[`beat-${beatNum + 1}`] = {
             [arrayKey]: {
                 [type]: 1,
@@ -209,8 +202,11 @@ export const handleCheckbox = (
 
 export const makeNotesToPlayMaster = (stepCount) => {
     const obj = {}
+    console.log('makeNotesToPlayMaster')
+    console.log(stepCount, typeof stepCount)
     for (let i = 1; i <= stepCount; i++) {
         obj[`beat-${i}`] = {}
     }
+    console.log(obj, 'newnotetoplaymaster')
     return obj
 }

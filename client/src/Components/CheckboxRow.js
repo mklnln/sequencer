@@ -36,7 +36,6 @@ const CheckboxRow = ({
             countCheckboxRenders.current = countCheckboxRenders.current + 1
         }
     })
-
     return (
         <React.Fragment
         // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatNum}}`}

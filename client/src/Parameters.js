@@ -29,7 +29,6 @@ const Parameters = ({
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
     // ! can some of these parameters be regular const so that i dont lag with the drag??
-    console.log(notesToPlay)
     let root = 1
     const [tempo, setTempo] = useState(120)
     const [wonk, setWonk] = useState(0)
