@@ -144,7 +144,7 @@ const makeDeepCopy = (areXBeatsChecked) => {
     const obj = {}
     Object.keys(areXBeatsChecked).forEach((note) => {
         const arr = []
-        areXBeatsChecked[note].forEach((beat) => {
+        areXBeatsChecked[note].forEach((beat, index) => {
             arr.push(beat)
         })
         obj[note] = arr
@@ -153,7 +153,7 @@ const makeDeepCopy = (areXBeatsChecked) => {
 }
 export const handleCheckbox = (
     scaleIndex,
-    beatIndex,
+    beatNum,
     areXBeatsChecked,
     setAreXBeatsChecked,
     type,
@@ -165,21 +165,31 @@ export const handleCheckbox = (
     // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
     const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)
     let obj = { ...notesToPlay }
-    if (checkboxObjCopy[arrayKey][beatIndex]) {
-        checkboxObjCopy[arrayKey][beatIndex] = 0
-        delete obj[type][`beat-${beatIndex}`][arrayKey]
+    if (checkboxObjCopy[arrayKey][beatNum]) {
+        checkboxObjCopy[arrayKey][beatNum] = 0
+        delete obj[`beat-${beatNum + 1}`][arrayKey][type]
 
-        // ? couldn't figure out another way to validate obj[type][`beat-${beatIndex}`]. even if it was an empty object, i couldn't test its equivalency at all at all
-        if (Object.values(obj[type][`beat-${beatIndex}`]).length === 0) {
-            delete obj[type][`beat-${beatIndex}`]
+        // ? couldn't figure out another way to validate obj[type][`beat-${beatNum+1}`]. even if it was an empty object, i couldn't test its equivalency at all at all
+        if (Object.values(obj[`beat-${beatNum + 1}`][arrayKey]).length === 0) {
+            delete obj[`beat-${beatNum + 1}`][arrayKey]
         }
 
         setNotesToPlay(obj)
     } else {
-        checkboxObjCopy[arrayKey][beatIndex] = 1
-        obj[type][`beat-${beatIndex}`] = {
-            [arrayKey]: 1,
-            ...obj[type][`beat-${beatIndex}`],
+        checkboxObjCopy[arrayKey][beatNum] = 1
+        // obj[`beat-${beatNum}`] = {
+        //     [arrayKey]: {
+        //         [type]: 1,
+        //         ...obj[`beat-${beatNum}`][arrayKey],
+        //     },
+        //     ...obj[`beat-${beatNum}`],
+        // }
+        obj[`beat-${beatNum + 1}`] = {
+            [arrayKey]: {
+                [type]: 1,
+                ...obj[`beat-${beatNum + 1}`][arrayKey],
+            },
+            ...obj[`beat-${beatNum + 1}`],
         }
         // ? hopefully does something idfk
         setNotesToPlay(obj)
@@ -188,4 +198,15 @@ export const handleCheckbox = (
     // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
     // i suppose that a copy is being made of the original and now the new one points to it
     // toggling the value to a string 'hi' will make that string show up in the console.logs before it should..
+}
+
+export const makeNotesToPlayMaster = (stepCount) => {
+    const obj = {}
+    console.log('makeNotesToPlayMaster')
+    console.log(stepCount, typeof stepCount)
+    for (let i = 1; i <= stepCount; i++) {
+        obj[`beat-${i}`] = {}
+    }
+    console.log(obj, 'newnotetoplaymaster')
+    return obj
 }

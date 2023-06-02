@@ -8,6 +8,8 @@ export const MusicParametersContext = createContext()
 const App = () => {
     const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
     const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
+    
+    
     const makeMelodyNotesState = []
     // [8,7,6,5,4,3,2,1] where amtofnotes = 8
     for (let i = amtOfNotes * 2 - 1; i > 0; i--) {

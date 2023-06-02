@@ -6,6 +6,7 @@ import {
     makeNewMelodyMaster,
     loadChangedSongList,
     giveOctaveNumber,
+    makeNotesToPlayMaster,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
@@ -73,8 +74,11 @@ const Sequencer = () => {
     const { isAuthenticated, user } = useAuth0()
 
     const [tempo, setTempo] = useState(60)
-
-    const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
+    console.log(stepCount, 'sequencer reander')
+    // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
+    const [notesToPlay, setNotesToPlay] = useState(
+        makeNotesToPlayMaster(stepCount)
+    )
     // let playing = false
 
     // ! can likely be replaced with good ol' Ref.
@@ -272,8 +276,9 @@ const Sequencer = () => {
             blankStepCountArray
         )
         setAreMelodyBeatsChecked(newMelodyMaster)
+        setNotesToPlay(makeNotesToPlayMaster(stepCount))
     }, [stepCount])
-
+    console.log(notesToPlay)
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
     useEffect(() => {
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
@@ -313,9 +318,8 @@ const Sequencer = () => {
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
     })
-    console.log('seq rendered, how many?')
     const countCheckboxRenders = useRef(1)
-
+    console.log(notesToPlay)
     return (
         <>
             <span>
@@ -410,7 +414,7 @@ const Sequencer = () => {
                                 areXBeatsChecked={areChordBeatsChecked}
                                 setAreXBeatsChecked={setAreChordBeatsChecked}
                                 scaleIndex={scaleIndex}
-                                beatIndex={index + 1}
+                                beatNum={index + 1}
                                 whichGrid="chords"
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]

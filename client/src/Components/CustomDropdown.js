@@ -14,7 +14,10 @@ const CustomDropdown = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     const handleOptionClick = (option, index) => {
-        setState(option)
+        let set = option
+        console.log(typeof parseInt(option))
+        if (title === 'Steps') set = parseInt(option)
+        setState(set)
         setIsDropdownOpen(false)
         console.log('option thereby click`d')
         // console.log(rootNoteOptions.indexOf(option), 'bybybyb')
