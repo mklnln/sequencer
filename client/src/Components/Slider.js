@@ -19,11 +19,13 @@ const Slider = ({
         if (dragging) {
             const deltaY = dragStartY - e.clientY
             const newValue = Math.max(
+                // math.max chooses higher value, ensuring the value doesn't drop below minValue
                 minValue,
+                // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
                 Math.min(maxValue, stateValue + deltaY * valuePerPixel)
             )
             console.log(newValue, 'newval')
-            setParameterState(Math.round(newValue), stateValue)
+            setParameterState(Math.round(newValue))
             console.log(stateValue, newValue)
             setDragStartY(e.clientY)
         }
@@ -47,6 +49,24 @@ const Slider = ({
     }
 
     const gap = calculateTop()
+
+    // const debounce = (func, timeout = 300) => {
+    //     let timer
+    //     return (...args) => {
+    //         clearTimeout(timer)
+    //         timer = setTimeout(() => {
+    //             console.log('debeouncing!')
+    //             func.apply(this, args)
+    //         }, timeout)
+    //     }
+    // }
+    // function saveInput() {
+    //     console.log('Saving data')
+    // }
+    // const debounceMouseMove = (e) => {
+    //     console.log('devouncemosuemove!')
+    //     debounce(() => handleMouseMove(e))
+    // }
     let hover = false
     const [hoverState, setHoverState] = useState(false)
     return (
@@ -62,12 +82,10 @@ const Slider = ({
                     onMouseEnter={() => {
                         hover = true
                         setHoverState(true)
-                        console.log(hover)
                     }}
                     onMouseLeave={() => {
                         hover = false
                         setHoverState(false)
-                        console.log(hover)
                     }}
                     style={
                         {

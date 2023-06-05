@@ -214,7 +214,7 @@ const Parameters = ({
                     console.log(futureBeatTarget, note)
                     const scaleIndex = note.substring(5)
                     Object.keys(futureBeatTarget[note]).forEach((type) => {
-                        console.log(type)
+                        console.log(type, 'WE SENDINNNNNNNNNNN')
                         playEngine(nextNoteTime, parseInt(scaleIndex), type)
                     })
                 })

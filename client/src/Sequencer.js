@@ -7,6 +7,7 @@ import {
     loadChangedSongList,
     giveOctaveNumber,
     makeNotesToPlayMaster,
+    handleCheckbox,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
@@ -60,7 +61,7 @@ const Sequencer = () => {
         areChordBeatsChecked,
         setAreChordBeatsChecked,
         areMelodyBeatsChecked,
-        setAreMelodyBeatsChecked,
+        // setAreMelodyBeatsChecked,
         makeChordNotesState,
         makeMelodyNotesState,
         blankStepCountArray,
@@ -76,6 +77,7 @@ const Sequencer = () => {
     const [tempo, setTempo] = useState(60)
     console.log(stepCount, 'sequencer reander')
     // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
+
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
@@ -275,7 +277,7 @@ const Sequencer = () => {
             areMelodyBeatsChecked,
             blankStepCountArray
         )
-        setAreMelodyBeatsChecked(newMelodyMaster)
+        // setAreMelodyBeatsChecked(newMelodyMaster)
         setNotesToPlay(makeNotesToPlayMaster(stepCount))
     }, [stepCount])
     console.log(notesToPlay)
@@ -297,7 +299,7 @@ const Sequencer = () => {
             setSustain(song['sustain'])
             setRelease(song['release'])
             setAreChordBeatsChecked(song['areChordBeatsChecked'])
-            setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
+            // setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
             console.log('load song?!?!?!?')
         }
     }, [loadSong])
@@ -318,8 +320,19 @@ const Sequencer = () => {
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
     })
+
     const countCheckboxRenders = useRef(1)
-    console.log(notesToPlay)
+    const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
+        handleCheckbox(
+            beatNum,
+            scaleIndex,
+            whichGrid,
+            // ! gotta adapt away from areXChecked stuff
+            notesToPlay,
+            setNotesToPlay
+        )
+    }
+
     return (
         <>
             <span>
@@ -337,14 +350,16 @@ const Sequencer = () => {
             <MelodySequencerGrid>
                 {countCheckboxRenders.current}
                 <AllBoxesDiv>
-                    {Object.keys(areMelodyBeatsChecked).map((note, index) => {
+                    {makeMelodyNotesState.map((note, index) => {
                         const scaleIndex = index + 1
                         return (
                             <CheckboxRow
                                 key={`${note}`}
                                 countCheckboxRenders={countCheckboxRenders}
                                 areXBeatsChecked={areMelodyBeatsChecked}
-                                setAreXBeatsChecked={setAreMelodyBeatsChecked}
+                                blankStepCountArray={blankStepCountArray}
+                                makeMelodyNotesState={makeMelodyNotesState}
+                                // setAreXBeatsChecked={setAreMelodyBeatsChecked}
                                 scaleIndex={
                                     Object.keys(areMelodyBeatsChecked).length +
                                     1 -
@@ -352,8 +367,9 @@ const Sequencer = () => {
                                 }
                                 whichGrid="melody"
                                 noteTitle={giveOctaveNumber(note.substring(5))} // convert "note-5" to just "5"
-                                notesToPlay={notesToPlay}
-                                setNotesToPlay={setNotesToPlay}
+                                // notesToPlay={notesToPlay}
+                                // setNotesToPlay={setNotesToPlay}
+                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
                             />
                         )
                     })}
@@ -411,16 +427,17 @@ const Sequencer = () => {
                         return (
                             <CheckboxRow
                                 key={`${note}`}
-                                areXBeatsChecked={areChordBeatsChecked}
-                                setAreXBeatsChecked={setAreChordBeatsChecked}
+                                // areXBeatsChecked={areChordBeatsChecked}
+                                // setAreXBeatsChecked={setAreChordBeatsChecked}
+                                blankStepCountArray={blankStepCountArray}
                                 scaleIndex={scaleIndex}
                                 beatNum={index + 1}
                                 whichGrid="chords"
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]
                                 }
-                                notesToPlay={notesToPlay}
-                                setNotesToPlay={setNotesToPlay}
+                                // notesToPlay={notesToPlay}
+                                // setNotesToPlay={setNotesToPlay}
                             />
                         )
                     })}
