@@ -5,14 +5,15 @@ import SingleCheckbox from './SingleCheckbox'
 const CheckboxRow = ({
     makeMelodyNotesState,
     countCheckboxRenders,
-    areXBeatsChecked,
-    setAreXBeatsChecked,
+    // areXBeatsChecked,
+    // setAreXBeatsChecked,
     scaleIndex,
     whichGrid,
     noteTitle,
     bubbleUpCheckboxInfo,
-    notesToPlay,
-    setNotesToPlay,
+    // notesToPlay,
+    // setNotesToPlay,
+    blankStepCountArray,
 }) => {
     // todo dynamically bring in makeXstate and areXbeats
     // const [checked, setChecked] = useState(
@@ -46,31 +47,29 @@ const CheckboxRow = ({
                     <NoteTitle>{noteTitle}</NoteTitle>
                 </TitleSpanDiv>
                 <ChordDiv>
-                    {areXBeatsChecked[`note-${scaleIndex}`].map(
-                        (check, index) => {
-                            const beatNum = index
-                            return (
-                                <SingleCheckbox
-                                    key={`sglchk${whichGrid}-row-${scaleIndex}-beat-${beatNum}`}
-                                    areXBeatsChecked={areXBeatsChecked}
-                                    setAreXBeatsChecked={setAreXBeatsChecked}
-                                    beatNum={beatNum}
-                                    scaleIndex={scaleIndex}
-                                    whichGrid={whichGrid}
-                                    // notesToPlay={notesToPlay}
-                                    // setNotesToPlay={setNotesToPlay}
-                                    bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
-                                />
-                            )
-                        }
-                    )}
+                    {blankStepCountArray.map((check, index) => {
+                        const beatNum = index
+                        return (
+                            <SingleCheckbox
+                                key={`sglchk${whichGrid}-row-${scaleIndex}-beat-${beatNum}`}
+                                // areXBeatsChecked={areXBeatsChecked}
+                                // setAreXBeatsChecked={setAreXBeatsChecked}
+                                beatNum={beatNum}
+                                scaleIndex={scaleIndex}
+                                whichGrid={whichGrid}
+                                // notesToPlay={notesToPlay}
+                                // setNotesToPlay={setNotesToPlay}
+                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
+                            />
+                        )
+                    })}
                 </ChordDiv>
             </TitleAndBoxesDiv>
         </React.Fragment>
     )
 }
 
-export default CheckboxRow
+export default React.memo(CheckboxRow)
 const TitleAndBoxesDiv = styled.div`
     display: flex;
     justify-content: center;

@@ -12,18 +12,19 @@ const App = () => {
     const makeMelodyNotesState = []
     // [8,7,6,5,4,3,2,1] where amtofnotes = 8
     for (let i = amtOfNotes * 2 - 1; i > 0; i--) {
-        makeMelodyNotesState.push(i)
+        makeMelodyNotesState.push(`note-${i}`)
     }
 
     const makeChordNotesState = []
     // [8,7,6,5,4,3,2,1] where amtofnotes = 8
     for (let i = amtOfNotes; i > 0; i--) {
-        makeChordNotesState.push(i)
+        makeChordNotesState.push(`note-${i}`)
     }
     const blankStepCountArray = []
     // [0,0,0,0,0,0,0,0] where stepCount = 8
     for (let i = stepCount; i > 0; i--) {
         blankStepCountArray.push(0)
+        console.log('blankstepcount gen')
     }
     const [areChordBeatsChecked, setAreChordBeatsChecked] = useState(
         generateAreXBeatsCheckedInitialState(

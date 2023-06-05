@@ -15,17 +15,14 @@ export const generateAreXBeatsCheckedInitialState = (
     whichGrid === 'chords'
         ? (amtOfArraysToMake = makeChordNotesState)
         : (amtOfArraysToMake = makeMelodyNotesState)
-    // if (whichGrid === 'chords') {
-    //     amtOfArraysToMake = makeChordNotesState
-    // } else {
-    //     amtOfArraysToMake = makeMelodyNotesState
-    // }
+
     amtOfArraysToMake.forEach((num) => {
-        makeAreXBeatsChecked[`note-${num}`] = []
+        makeAreXBeatsChecked[`${num}`] = []
         blankStepCountArray.forEach((step) => {
-            makeAreXBeatsChecked[`note-${num}`].push(0)
+            makeAreXBeatsChecked[`${num}`].push(0)
         })
     })
+    console.log(makeAreXBeatsChecked, 'areXXXXXXXXXXXXXXX')
     return makeAreXBeatsChecked
 }
 
@@ -66,15 +63,15 @@ export const makeNewChordMaster = (
 ) => {
     const newMaster = {}
     makeChordNotesState.forEach((note) => {
-        newMaster[`note-${note}`] = areChordBeatsChecked[`note-${note}`]
+        newMaster[`${note}`] = areChordBeatsChecked[`${note}`]
         // this takes away if the new length is smaller
-        while (newMaster[`note-${note}`].length > blankStepCountArray.length) {
-            newMaster[`note-${note}`].pop()
+        while (newMaster[`${note}`].length > blankStepCountArray.length) {
+            newMaster[`${note}`].pop()
         }
 
         // this puts more in if the new length is greater
-        while (newMaster[`note-${note}`].length < blankStepCountArray.length) {
-            newMaster[`note-${note}`].push(0)
+        while (newMaster[`${note}`].length < blankStepCountArray.length) {
+            newMaster[`${note}`].push(0)
         }
     })
     return newMaster
@@ -87,19 +84,15 @@ export const makeNewMelodyMaster = (
 ) => {
     const newMelodyMaster = {}
     makeMelodyNotesState.forEach((note) => {
-        newMelodyMaster[`note-${note}`] = areMelodyBeatsChecked[`note-${note}`]
+        newMelodyMaster[`${note}`] = areMelodyBeatsChecked[`${note}`]
         // this takes away if the new length is smaller
-        while (
-            newMelodyMaster[`note-${note}`].length > blankStepCountArray.length
-        ) {
-            newMelodyMaster[`note-${note}`].pop()
+        while (newMelodyMaster[`${note}`].length > blankStepCountArray.length) {
+            newMelodyMaster[`${note}`].pop()
         }
 
         // this puts more in if the new length is greater
-        while (
-            newMelodyMaster[`note-${note}`].length < blankStepCountArray.length
-        ) {
-            newMelodyMaster[`note-${note}`].push(0)
+        while (newMelodyMaster[`${note}`].length < blankStepCountArray.length) {
+            newMelodyMaster[`${note}`].push(0)
         }
     })
     return newMelodyMaster
@@ -155,18 +148,14 @@ export const handleCheckbox = (
     beatNum,
     scaleIndex,
     whichGrid,
-    areXBeatsChecked,
-    // setAreXBeatsChecked,
     notesToPlay,
     setNotesToPlay
 ) => {
     // todo dont forget about chords!!
     const arrayKey = `note-${scaleIndex}`
-    // const checkboxObjCopy = { ...areXBeatsChecked } // ! makes a shallow copy
-    const checkboxObjCopy = makeDeepCopy(areXBeatsChecked)
+    console.log(notesToPlay)
     let obj = { ...notesToPlay }
-    if (checkboxObjCopy[arrayKey][beatNum]) {
-        checkboxObjCopy[arrayKey][beatNum] = 0
+    if (obj[`beat-${beatNum + 1}`][arrayKey]) {
         delete obj[`beat-${beatNum + 1}`][arrayKey][whichGrid]
 
         // ? couldn't figure out another way to validate obj[whichGrid][`beat-${beatNum+1}`]. even if it was an empty object, i couldn't test its equivalency at all at all
@@ -176,7 +165,6 @@ export const handleCheckbox = (
 
         setNotesToPlay(obj)
     } else {
-        checkboxObjCopy[arrayKey][beatNum] = 1
         // obj[`beat-${beatNum}`] = {
         //     [arrayKey]: {
         //         [whichGrid]: 1,
@@ -195,13 +183,7 @@ export const handleCheckbox = (
         setNotesToPlay(obj)
     }
 
-    // areXBeatsChecked = checkboxObjCopy // deep or not?
-    console.log(notesToPlay, 'HELLLLLLLL')
     return notesToPlay
-    // setAreXBeatsChecked(checkboxObjCopy)
-    // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
-    // i suppose that a copy is being made of the original and now the new one points to it
-    // toggling the value to a string 'hi' will make that string show up in the console.logs before it should..
 }
 
 export const makeNotesToPlayMaster = (stepCount) => {

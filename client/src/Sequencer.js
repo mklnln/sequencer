@@ -78,7 +78,6 @@ const Sequencer = () => {
     console.log(stepCount, 'sequencer reander')
     // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
 
-    // const notesToPlay = makeNotesToPlayMaster(stepCount)
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
@@ -279,7 +278,7 @@ const Sequencer = () => {
             blankStepCountArray
         )
         // setAreMelodyBeatsChecked(newMelodyMaster)
-        // setNotesToPlay(makeNotesToPlayMaster(stepCount))
+        setNotesToPlay(makeNotesToPlayMaster(stepCount))
     }, [stepCount])
     console.log(notesToPlay)
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
@@ -321,16 +320,14 @@ const Sequencer = () => {
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
     })
-    const countCheckboxRenders = useRef(1)
 
+    const countCheckboxRenders = useRef(1)
     const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
         handleCheckbox(
             beatNum,
             scaleIndex,
             whichGrid,
             // ! gotta adapt away from areXChecked stuff
-            areMelodyBeatsChecked,
-            // setAreXBeatsChecked,
             notesToPlay,
             setNotesToPlay
         )
@@ -353,13 +350,14 @@ const Sequencer = () => {
             <MelodySequencerGrid>
                 {countCheckboxRenders.current}
                 <AllBoxesDiv>
-                    {Object.keys(areMelodyBeatsChecked).map((note, index) => {
+                    {makeMelodyNotesState.map((note, index) => {
                         const scaleIndex = index + 1
                         return (
                             <CheckboxRow
                                 key={`${note}`}
                                 countCheckboxRenders={countCheckboxRenders}
                                 areXBeatsChecked={areMelodyBeatsChecked}
+                                blankStepCountArray={blankStepCountArray}
                                 makeMelodyNotesState={makeMelodyNotesState}
                                 // setAreXBeatsChecked={setAreMelodyBeatsChecked}
                                 scaleIndex={
@@ -429,16 +427,17 @@ const Sequencer = () => {
                         return (
                             <CheckboxRow
                                 key={`${note}`}
-                                areXBeatsChecked={areChordBeatsChecked}
-                                setAreXBeatsChecked={setAreChordBeatsChecked}
+                                // areXBeatsChecked={areChordBeatsChecked}
+                                // setAreXBeatsChecked={setAreChordBeatsChecked}
+                                blankStepCountArray={blankStepCountArray}
                                 scaleIndex={scaleIndex}
                                 beatNum={index + 1}
                                 whichGrid="chords"
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]
                                 }
-                                notesToPlay={notesToPlay}
-                                setNotesToPlay={setNotesToPlay}
+                                // notesToPlay={notesToPlay}
+                                // setNotesToPlay={setNotesToPlay}
                             />
                         )
                     })}
