@@ -1,15 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
-import MelodyCheckbox from './SingleCheckbox'
 import SingleCheckbox from './SingleCheckbox'
 const CheckboxRow = ({
+    makeMelodyNotesState,
     countCheckboxRenders,
     areXBeatsChecked,
     setAreXBeatsChecked,
     scaleIndex,
     whichGrid,
     noteTitle,
+    bubbleUpCheckboxInfo,
     notesToPlay,
     setNotesToPlay,
 }) => {
@@ -56,8 +57,9 @@ const CheckboxRow = ({
                                     beatNum={beatNum}
                                     scaleIndex={scaleIndex}
                                     whichGrid={whichGrid}
-                                    notesToPlay={notesToPlay}
-                                    setNotesToPlay={setNotesToPlay}
+                                    // notesToPlay={notesToPlay}
+                                    // setNotesToPlay={setNotesToPlay}
+                                    bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
                                 />
                             )
                         }

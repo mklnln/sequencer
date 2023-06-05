@@ -7,6 +7,7 @@ import {
     loadChangedSongList,
     giveOctaveNumber,
     makeNotesToPlayMaster,
+    handleCheckbox,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
@@ -60,7 +61,7 @@ const Sequencer = () => {
         areChordBeatsChecked,
         setAreChordBeatsChecked,
         areMelodyBeatsChecked,
-        setAreMelodyBeatsChecked,
+        // setAreMelodyBeatsChecked,
         makeChordNotesState,
         makeMelodyNotesState,
         blankStepCountArray,
@@ -76,6 +77,8 @@ const Sequencer = () => {
     const [tempo, setTempo] = useState(60)
     console.log(stepCount, 'sequencer reander')
     // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
+
+    // const notesToPlay = makeNotesToPlayMaster(stepCount)
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
@@ -275,8 +278,8 @@ const Sequencer = () => {
             areMelodyBeatsChecked,
             blankStepCountArray
         )
-        setAreMelodyBeatsChecked(newMelodyMaster)
-        setNotesToPlay(makeNotesToPlayMaster(stepCount))
+        // setAreMelodyBeatsChecked(newMelodyMaster)
+        // setNotesToPlay(makeNotesToPlayMaster(stepCount))
     }, [stepCount])
     console.log(notesToPlay)
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
@@ -297,7 +300,7 @@ const Sequencer = () => {
             setSustain(song['sustain'])
             setRelease(song['release'])
             setAreChordBeatsChecked(song['areChordBeatsChecked'])
-            setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
+            // setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
             console.log('load song?!?!?!?')
         }
     }, [loadSong])
@@ -319,7 +322,20 @@ const Sequencer = () => {
         countReRenders.current = countReRenders.current + 1
     })
     const countCheckboxRenders = useRef(1)
-    console.log(notesToPlay)
+
+    const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
+        handleCheckbox(
+            beatNum,
+            scaleIndex,
+            whichGrid,
+            // ! gotta adapt away from areXChecked stuff
+            areMelodyBeatsChecked,
+            // setAreXBeatsChecked,
+            notesToPlay,
+            setNotesToPlay
+        )
+    }
+
     return (
         <>
             <span>
@@ -344,7 +360,8 @@ const Sequencer = () => {
                                 key={`${note}`}
                                 countCheckboxRenders={countCheckboxRenders}
                                 areXBeatsChecked={areMelodyBeatsChecked}
-                                setAreXBeatsChecked={setAreMelodyBeatsChecked}
+                                makeMelodyNotesState={makeMelodyNotesState}
+                                // setAreXBeatsChecked={setAreMelodyBeatsChecked}
                                 scaleIndex={
                                     Object.keys(areMelodyBeatsChecked).length +
                                     1 -
@@ -352,8 +369,9 @@ const Sequencer = () => {
                                 }
                                 whichGrid="melody"
                                 noteTitle={giveOctaveNumber(note.substring(5))} // convert "note-5" to just "5"
-                                notesToPlay={notesToPlay}
-                                setNotesToPlay={setNotesToPlay}
+                                // notesToPlay={notesToPlay}
+                                // setNotesToPlay={setNotesToPlay}
+                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
                             />
                         )
                     })}

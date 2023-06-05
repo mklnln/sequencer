@@ -1,15 +1,15 @@
 // ? trying to use useContext, i can only import those things inside of a custom hook or a react function component. otherwise, it may need to be tons of arguments passed to JS functions.
 
-export const generateAreChordBeatsCheckedInitialState = (
+export const generateAreXBeatsCheckedInitialState = (
     makeChordNotesState,
     makeMelodyNotesState,
     blankStepCountArray,
     whichGrid
 ) => {
-    const makeAreChordBeatsChecked = {}
+    const makeAreXBeatsChecked = {}
     // DRYDRYDRY
     // TODO refactor and only pass in one of the makeXNotesState, no need to check chords/melody
-    // ! did        makeAreChordBeatsChecked[`note-${num}`].push(0) because using blankstepcountarray caused problems with spread operator down the road, each array used the same reference and so a change to one lead to a change to all
+    // ! did        makeAreXBeatsChecked[`note-${num}`].push(0) because using blankstepcountarray caused problems with spread operator down the road, each array used the same reference and so a change to one lead to a change to all
     let amtOfArraysToMake
 
     whichGrid === 'chords'
@@ -21,12 +21,12 @@ export const generateAreChordBeatsCheckedInitialState = (
     //     amtOfArraysToMake = makeMelodyNotesState
     // }
     amtOfArraysToMake.forEach((num) => {
-        makeAreChordBeatsChecked[`note-${num}`] = []
+        makeAreXBeatsChecked[`note-${num}`] = []
         blankStepCountArray.forEach((step) => {
-            makeAreChordBeatsChecked[`note-${num}`].push(0)
+            makeAreXBeatsChecked[`note-${num}`].push(0)
         })
     })
-    return makeAreChordBeatsChecked
+    return makeAreXBeatsChecked
 }
 
 export const clearAreChordBeatsChecked = (
@@ -152,11 +152,11 @@ const makeDeepCopy = (areXBeatsChecked) => {
     return obj
 }
 export const handleCheckbox = (
-    scaleIndex,
     beatNum,
+    scaleIndex,
+    whichGrid,
     areXBeatsChecked,
-    setAreXBeatsChecked,
-    type,
+    // setAreXBeatsChecked,
     notesToPlay,
     setNotesToPlay
 ) => {
@@ -167,9 +167,9 @@ export const handleCheckbox = (
     let obj = { ...notesToPlay }
     if (checkboxObjCopy[arrayKey][beatNum]) {
         checkboxObjCopy[arrayKey][beatNum] = 0
-        delete obj[`beat-${beatNum + 1}`][arrayKey][type]
+        delete obj[`beat-${beatNum + 1}`][arrayKey][whichGrid]
 
-        // ? couldn't figure out another way to validate obj[type][`beat-${beatNum+1}`]. even if it was an empty object, i couldn't test its equivalency at all at all
+        // ? couldn't figure out another way to validate obj[whichGrid][`beat-${beatNum+1}`]. even if it was an empty object, i couldn't test its equivalency at all at all
         if (Object.values(obj[`beat-${beatNum + 1}`][arrayKey]).length === 0) {
             delete obj[`beat-${beatNum + 1}`][arrayKey]
         }
@@ -179,14 +179,14 @@ export const handleCheckbox = (
         checkboxObjCopy[arrayKey][beatNum] = 1
         // obj[`beat-${beatNum}`] = {
         //     [arrayKey]: {
-        //         [type]: 1,
+        //         [whichGrid]: 1,
         //         ...obj[`beat-${beatNum}`][arrayKey],
         //     },
         //     ...obj[`beat-${beatNum}`],
         // }
         obj[`beat-${beatNum + 1}`] = {
             [arrayKey]: {
-                [type]: 1,
+                [whichGrid]: 1,
                 ...obj[`beat-${beatNum + 1}`][arrayKey],
             },
             ...obj[`beat-${beatNum + 1}`],
@@ -194,7 +194,11 @@ export const handleCheckbox = (
         // ? hopefully does something idfk
         setNotesToPlay(obj)
     }
-    setAreXBeatsChecked(checkboxObjCopy)
+
+    // areXBeatsChecked = checkboxObjCopy // deep or not?
+    console.log(notesToPlay, 'HELLLLLLLL')
+    return notesToPlay
+    // setAreXBeatsChecked(checkboxObjCopy)
     // ! how tf does this work?? it doesnt return anything! it just makes a copy of an object
     // i suppose that a copy is being made of the original and now the new one points to it
     // toggling the value to a string 'hi' will make that string show up in the console.logs before it should..

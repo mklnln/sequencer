@@ -9,14 +9,14 @@ const SingleCheckbox = ({
     setAreXBeatsChecked,
     scaleIndex,
     whichGrid,
-    notesToPlay,
-    setNotesToPlay,
+    bubbleUpCheckboxInfo,
+    // notesToPlay,
+    // setNotesToPlay,
 }) => {
     const [checked, setChecked] = useState(
         // used for styling, see bottom :checked class
         areXBeatsChecked[`note-${scaleIndex}`][beatNum] ? 'checked' : ''
     )
-
     useEffect(() => {
         setChecked(
             areXBeatsChecked[`note-${scaleIndex}`][beatNum] ? 'checked' : ''
@@ -30,7 +30,11 @@ const SingleCheckbox = ({
         // ---------> this is a band-aid fix. i could potentially only call this when the global changes happen. // ! usefx only on a global change!
     }, [areXBeatsChecked])
 
-    // console.log(beatNum, 'beatNum', scaleIndex, 'sacleindex')
+    const handleChange = () => {
+        bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
+        setChecked(!checked)
+    }
+
     return (
         <SVGContainer
             className={whichGrid}
@@ -40,35 +44,13 @@ const SingleCheckbox = ({
                 <MelodyCheckboxButton
                     type="checkbox"
                     checked={checked ? 'checked' : ''}
-                    onChange={() => {
-                        handleCheckbox(
-                            scaleIndex,
-                            beatNum,
-                            areXBeatsChecked,
-                            setAreXBeatsChecked,
-                            'melody',
-                            notesToPlay,
-                            setNotesToPlay
-                        )
-                        setChecked(!checked)
-                    }}
+                    onChange={handleChange}
                 />
             ) : (
                 <ChordCheckboxButton
                     type="checkbox"
                     checked={checked ? 'checked' : ''}
-                    onChange={() => {
-                        handleCheckbox(
-                            scaleIndex,
-                            beatNum,
-                            areXBeatsChecked,
-                            setAreXBeatsChecked,
-                            'chords',
-                            notesToPlay,
-                            setNotesToPlay
-                        )
-                        setChecked(!checked)
-                    }}
+                    onChange={handleChange}
                     className={whichGrid}
                 />
             )}

@@ -3,13 +3,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Sequencer from './Sequencer'
 import GlobalStyle from './globalStyles'
-import { generateAreChordBeatsCheckedInitialState } from './Helpers'
+import { generateAreXBeatsCheckedInitialState } from './Helpers'
 export const MusicParametersContext = createContext()
 const App = () => {
     const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
     const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
-    
-    
+
     const makeMelodyNotesState = []
     // [8,7,6,5,4,3,2,1] where amtofnotes = 8
     for (let i = amtOfNotes * 2 - 1; i > 0; i--) {
@@ -27,7 +26,7 @@ const App = () => {
         blankStepCountArray.push(0)
     }
     const [areChordBeatsChecked, setAreChordBeatsChecked] = useState(
-        generateAreChordBeatsCheckedInitialState(
+        generateAreXBeatsCheckedInitialState(
             makeChordNotesState,
             makeMelodyNotesState,
             blankStepCountArray,
@@ -45,14 +44,22 @@ const App = () => {
     // chord-2: [0, 0, 0, 0, 0, 0, 0, 0],
     // chord-1: [0, 0, 0, 1, 0, 0, 0, 0],
     // }
-    const [areMelodyBeatsChecked, setAreMelodyBeatsChecked] = useState(
-        generateAreChordBeatsCheckedInitialState(
-            makeChordNotesState,
-            makeMelodyNotesState,
-            blankStepCountArray,
-            'melody'
-        )
+    // const [areMelodyBeatsChecked, setAreMelodyBeatsChecked] = useState(
+    //     generateAreXBeatsCheckedInitialState(
+    //         makeChordNotesState,
+    //         makeMelodyNotesState,
+    //         blankStepCountArray,
+    //         'melody'
+    //     )
+    // )
+
+    const areMelodyBeatsChecked = generateAreXBeatsCheckedInitialState(
+        makeChordNotesState,
+        makeMelodyNotesState,
+        blankStepCountArray,
+        'melody'
     )
+
     // // const [tempo, setTempo] = useState(60)
     // const [rootNote, setRootNote] = useState(0)
     // const [wonkFactor, setWonkFactor] = useState(1)
@@ -138,7 +145,7 @@ const App = () => {
                     areMelodyBeatsChecked,
                     amtOfNotes,
                     setAmtOfNotes,
-                    setAreMelodyBeatsChecked,
+                    // setAreMelodyBeatsChecked,
                     makeChordNotesState,
                     makeMelodyNotesState,
                     blankStepCountArray,
