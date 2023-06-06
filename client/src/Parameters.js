@@ -1,75 +1,47 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, {
+    useCallback,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from './App'
 import { loadSample } from './AudioEngine'
 import { audioTime } from './AudioEngine'
 import Slider from './Components/Slider'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine'
+import { slidersToShowObj } from './BigObjectsAndArrays'
 import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
-const Parameters = ({
-    currentBeat,
-    currentBeatRef,
-    areMelodyBeatsChecked,
-    areChordBeatsChecked,
-    makeMelodyNotesState,
-    makeChordNotesState,
-    notesToPlay,
-}) => {
-    //   const [tempo, setTempo] = useState(150)
-    // const audioCtx = new AudioContext() // restarts upon every re-render due to playing changing state
-    const [dragging, setDragging] = useState(false)
+const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
     const intervalIDRef = useRef('')
-    // const currentBeatRef = useRef(currentBeat)
-    // ! can some of these parameters be regular const so that i dont lag with the drag??
-    // ! can some of these parameters be regular const so that i dont lag with the drag??
-    // ! can some of these parameters be regular const so that i dont lag with the drag??
-    // ! can some of these parameters be regular const so that i dont lag with the drag??
     let root = 1
     const [tempo, setTempo] = useState(120)
     const [wonk, setWonk] = useState(0)
     const [melodyVolume, setMelodyVolume] = useState(100)
     const [chordsVolume, setChordsVolume] = useState(100)
-    const [attack, setAttack] = useState(1)
-    const [decay, setDecay] = useState(15)
-    const [sustain, setSustain] = useState(60)
-    const [release, setRelease] = useState(5)
+    // const [attack, setAttack] = useState(1)
+    // const [decay, setDecay] = useState(15)
+    // const [sustain, setSustain] = useState(60)
+    // const [release, setRelease] = useState(5)
     const [rootNote, setRootNote] = useState('A')
     const [filterCutoff, setFilterCutoff] = useState(7500)
     const [sound, setSound] = useState('sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const { stepCount, setStepCount } = useContext(MusicParametersContext)
 
-    // * Chris Wilson:::
-    // if playing
-    // first note should be sent to audioEngine ASAP if its on beat 1
-    // calculate second note time, store in nextNoteTime
-    // ask while loop, is this time less than currentTime + lookahead
-    // schedule note if so
-    // move to next note
-    // repeat process
-
-    // todo interval may be calculated based off of tempo
-    // ? how to get milliseconds out of bpm?
-    // 60bpm -> 120 8th notes per minute
-    // 120 notes / 60 seconds = 2 notes a second
-    // a note every 500 ms
-    // i skipped a step. how 2 notes a second into 500ms?
-    // 1 second / 2
-
     const tempoToSeconds = (tempo) => {
         // calculate: how many seconds does a beat take?
         return 60 / (tempo * 2)
     }
 
-    // ! this is technically an 8th note's duration in ms, not lookahead
-    // ? lookahead = beatDuration / 2.5?
     let beatDuration = tempoToSeconds(tempo) // time of one eighth note in seconds
-    const scheduleAheadTime = beatDuration / 3
+    const scheduleAheadTime = beatDuration / 3 // for setInterval, check ahead to see if a note is to be played
     let nextNoteTime = 0
 
     const playEngine = (nextNoteTime, scaleIndex, type) => {
@@ -83,94 +55,94 @@ const Parameters = ({
             chordsVolume,
             sound,
             filterCutoff,
-            attack,
-            decay,
-            sustain,
-            release,
+            parameterValuesObj['attack'],
+            parameterValuesObj['decay'],
+            parameterValuesObj['sustain'],
+            parameterValuesObj['release'],
             type,
             nextNoteTime
         )
     }
 
     // ! DRY: playSynth and playSample could be joined
-    const sendToPlayFxns = (nextNoteTime) => {
-        makeMelodyNotesState.forEach((noteRow, index) => {
-            console.log('send to play fxns')
-            if (
-                areMelodyBeatsChecked[`note-${noteRow}`][
-                    currentBeatRef.current - 1
-                ] === 1 &&
-                playing
-            ) {
-                if (!sound.includes('sample')) {
-                    playSynth(
-                        // audioCtx,
-                        makeMelodyNotesState.length - index,
-                        playing,
-                        root,
-                        wonk,
-                        melodyVolume,
-                        chordsVolume,
-                        sound,
-                        filterCutoff,
-                        attack,
-                        decay,
-                        sustain,
-                        release,
-                        'melody',
-                        nextNoteTime
-                    )
-                } else {
-                    playSample(
-                        // audioCtx,
-                        makeMelodyNotesState.length - index,
-                        playing,
-                        root,
-                        wonk,
-                        'melody'
-                    )
-                }
-            }
-        })
+    // const sendToPlayFxns = (nextNoteTime) => {
+    //     makeMelodyNotesState.forEach((noteRow, index) => {
+    //         console.log('send to play fxns')
+    //         if (
+    //             areMelodyBeatsChecked[`note-${noteRow}`][
+    //                 currentBeatRef.current - 1
+    //             ] === 1 &&
+    //             playing
+    //         ) {
+    //             if (!sound.includes('sample')) {
+    //                 playSynth(
+    //                     // audioCtx,
+    //                     makeMelodyNotesState.length - index,
+    //                     playing,
+    //                     root,
+    //                     wonk,
+    //                     melodyVolume,
+    //                     chordsVolume,
+    //                     sound,
+    //                     filterCutoff,
+    //                     attack,
+    //                     decay,
+    //                     sustain,
+    //                     release,
+    //                     'melody',
+    //                     nextNoteTime
+    //                 )
+    //             } else {
+    //                 playSample(
+    //                     // audioCtx,
+    //                     makeMelodyNotesState.length - index,
+    //                     playing,
+    //                     root,
+    //                     wonk,
+    //                     'melody'
+    //                 )
+    //             }
+    //         }
+    //     })
 
-        makeChordNotesState.forEach((noteRow, index) => {
-            if (
-                areChordBeatsChecked[`note-${noteRow}`][
-                    currentBeatRef.current - 1
-                ] === 1 &&
-                playing
-            ) {
-                if (!sound.includes('sample')) {
-                    console.log('play chords!!!!!!!!!!!!')
-                    playSynth(
-                        // audioCtx,
-                        makeChordNotesState.length - index,
-                        playing,
-                        root,
-                        wonk,
-                        melodyVolume,
-                        chordsVolume,
-                        sound,
-                        filterCutoff,
-                        attack,
-                        decay,
-                        sustain,
-                        release,
-                        'chords'
-                    )
-                } else {
-                    playSample(
-                        // audioCtx,
-                        makeChordNotesState.length - index,
-                        playing,
-                        root,
-                        wonk,
-                        'chords'
-                    )
-                }
-            }
-        })
-    }
+    //     makeChordNotesState.forEach((noteRow, index) => {
+    //         if (
+    //             areChordBeatsChecked[`note-${noteRow}`][
+    //                 currentBeatRef.current - 1
+    //             ] === 1 &&
+    //             playing
+    //         ) {
+    //             if (!sound.includes('sample')) {
+    //                 console.log('play chords!!!!!!!!!!!!')
+    //                 playSynth(
+    //                     // audioCtx,
+    //                     makeChordNotesState.length - index,
+    //                     playing,
+    //                     root,
+    //                     wonk,
+    //                     melodyVolume,
+    //                     chordsVolume,
+    //                     sound,
+    //                     filterCutoff,
+    //                     attack,
+    //                     decay,
+    //                     sustain,
+    //                     release,
+    //                     'chords'
+    //                 )
+    //             } else {
+    //                 playSample(
+    //                     // audioCtx,
+    //                     makeChordNotesState.length - index,
+    //                     playing,
+    //                     root,
+    //                     wonk,
+    //                     'chords'
+    //                 )
+    //             }
+    //         }
+    //     })
+    // }
     const stopIntervalAndFalsifyRef = () => {
         clearInterval(intervalIDRef.current)
         intervalRunningRef.current = false
@@ -198,9 +170,6 @@ const Parameters = ({
 
             const futureBeatNotesArray = Object.keys(futureBeatTarget)
             const elapsedPlayTime = eighthNoteTicks * beatDuration
-            // ! should i just use areXChecked instead??
-            // ! should i just use areXChecked instead??
-            // ! should i just use areXChecked instead??
             if (
                 futureBeatNotesArray.length !== 0 // notes exist, play them
             ) {
@@ -282,81 +251,6 @@ const Parameters = ({
         }
     }
 
-    // ! will there be problems with an object pointing to state? when will the object update??
-    const slidersToShowObj = {
-        tempo: {
-            id: 0,
-            minValue: 30,
-            maxValue: 240,
-            title: 'Tempo',
-            stateValue: tempo,
-            setParameterState: setTempo,
-        },
-        wonk: {
-            id: 1,
-            minValue: 0,
-            maxValue: 100,
-            title: 'Wonk',
-            stateValue: wonk,
-            setParameterState: setWonk,
-        },
-        melodyVolume: {
-            id: 2,
-            minValue: 0,
-            maxValue: 100,
-            title: 'Melody',
-            stateValue: melodyVolume,
-            setParameterState: setMelodyVolume,
-        },
-        chordsVolume: {
-            id: 3,
-            minValue: 0,
-            maxValue: 100,
-            title: 'Chords',
-            stateValue: chordsVolume,
-            setParameterState: setChordsVolume,
-        },
-        attack: {
-            id: 4,
-            minValue: 0,
-            maxValue: 100,
-            title: 'Attack',
-            stateValue: attack,
-            setParameterState: setAttack,
-        },
-        sustain: {
-            id: 5,
-            minValue: 0,
-            maxValue: 100,
-            title: 'Sustain',
-            stateValue: sustain,
-            setParameterState: setSustain,
-        },
-        decay: {
-            id: 6,
-            minValue: 0,
-            maxValue: 100,
-            title: 'Decay',
-            stateValue: decay,
-            setParameterState: setDecay,
-        },
-        release: {
-            id: 7,
-            minValue: 0,
-            maxValue: 100,
-            title: 'Release',
-            stateValue: release,
-            setParameterState: setRelease,
-        },
-        filter: {
-            id: 7,
-            minValue: 100,
-            maxValue: 10000,
-            title: 'Filter',
-            stateValue: filterCutoff,
-            setParameterState: setFilterCutoff,
-        },
-    }
     const countReRenders = useRef(1)
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
@@ -369,6 +263,57 @@ const Parameters = ({
         }
         setPlaying(!playing)
     }
+
+    const [parameterValuesObj, setParameterValuesObj] = useState({
+        tempo: 120,
+        wonk: 0,
+        melodyVolume: 100,
+        chordsVolume: 100,
+        attack: 1,
+        decay: 15,
+        sustain: 60,
+        release: 5,
+        filter: 7500,
+    })
+
+    const [changedParameter, setChangedParameter] = useState({
+        title: '',
+        value: null,
+    })
+
+    const bubbleUpSliderInfo = useCallback(
+        (
+            value,
+            title
+            // todo put in necessary args from Slider
+        ) => {
+            // todo change parameterValuesObj
+            console.log(value, title)
+            setChangedParameter({
+                title: title.toLowerCase(),
+                value: value,
+            })
+        },
+        []
+    )
+
+    if (changedParameter) {
+        let obj = { ...parameterValuesObj }
+        obj[changedParameter.title] = changedParameter.value
+        setParameterValuesObj(obj)
+        setChangedParameter(null)
+    }
+    // useEffect(() => {
+    //     console.log(changedParameter)
+    //     if (changedParameter.value) {
+    //         let obj = { ...parameterValuesObj }
+    //         obj[changedParameter.title] = changedParameter.value
+    //         setParameterValuesObj(obj)
+    //         setChangedParameter(null)
+    //     }
+    // }, [changedParameter])
+
+    console.log(parameterValuesObj, 'param values before rturn')
     return (
         <>
             <MainDiv>
@@ -401,12 +346,15 @@ const Parameters = ({
                 </StartButtonDiv>
 
                 {Object.keys(slidersToShowObj).map((slider, index) => {
+                    const sliderStaticInfo = slidersToShowObj[slider]
                     return (
                         <Slider
                             key={`${index}`}
                             slider={slidersToShowObj[slider]}
-                            dragging={dragging}
-                            setDragging={setDragging}
+                            // dragging={dragging}
+                            // setDragging={setDragging}
+                            sliderStaticInfo={sliderStaticInfo}
+                            bubbleUpSliderInfo={bubbleUpSliderInfo}
                         />
                     )
                 })}
@@ -486,9 +434,11 @@ const MainDiv = styled.div`
     display: flex;
     justify-content: space-around;
     align-items: center;
+    margin: auto;
     margin-bottom: 40px;
     height: 128px;
     position: relative;
+    max-width: 900px;
 `
 
 const StartButtonDiv = styled.div`

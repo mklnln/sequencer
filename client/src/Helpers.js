@@ -22,7 +22,6 @@ export const generateAreXBeatsCheckedInitialState = (
             makeAreXBeatsChecked[`${num}`].push(0)
         })
     })
-    console.log(makeAreXBeatsChecked, 'areXXXXXXXXXXXXXXX')
     return makeAreXBeatsChecked
 }
 
@@ -144,16 +143,15 @@ const makeDeepCopy = (areXBeatsChecked) => {
     })
     return obj
 }
-export const handleCheckbox = (
-    beatNum,
-    scaleIndex,
-    whichGrid,
+export const handleNoteClick = (
     notesToPlay,
-    setNotesToPlay
+    setNotesToPlay,
+    { beatNum, scaleIndex, whichGrid },
+    setClickedNote
 ) => {
-    // todo dont forget about chords!!
+    console.log(beatNum, 'clicked note?E')
     const arrayKey = `note-${scaleIndex}`
-    console.log(notesToPlay)
+    console.log(whichGrid, 'whichgrid')
     let obj = { ...notesToPlay }
     if (obj[`beat-${beatNum + 1}`][arrayKey]) {
         delete obj[`beat-${beatNum + 1}`][arrayKey][whichGrid]
@@ -163,7 +161,9 @@ export const handleCheckbox = (
             delete obj[`beat-${beatNum + 1}`][arrayKey]
         }
 
+        console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
+        setClickedNote(null)
     } else {
         // obj[`beat-${beatNum}`] = {
         //     [arrayKey]: {
@@ -180,19 +180,28 @@ export const handleCheckbox = (
             ...obj[`beat-${beatNum + 1}`],
         }
         // ? hopefully does something idfk
+        console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
+        setClickedNote(null)
     }
-
-    return notesToPlay
 }
 
 export const makeNotesToPlayMaster = (stepCount) => {
     const obj = {}
     console.log('makeNotesToPlayMaster')
-    console.log(stepCount, typeof stepCount)
     for (let i = 1; i <= stepCount; i++) {
         obj[`beat-${i}`] = {}
     }
-    console.log(obj, 'newnotetoplaymaster')
     return obj
 }
+
+// export const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
+//     handleNoteClick(
+//         beatNum,
+//         scaleIndex,
+//         whichGrid,
+//         // ! gotta adapt away from areXChecked stuff
+//         notesToPlay,
+//         setNotesToPlay
+//     )
+// }

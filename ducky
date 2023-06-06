@@ -129,13 +129,13 @@ NOW IMA TRY TO REMOVE ARExBEATS FROM STATE AND JUST DEPEND ON CHECKED IN THE FUR
 
 > doenst work cuz state is king
 	> REMEMBER to revisit the functionality of all the setAreMelody and setAreChords and setNotesToPlay you commented out
-	> since im not returning anything from handleCheckbox, areXBeats and notesToPlay do not persist in their changes in the rest of the app, thus nothing plays.
+	> since im not returning anything from handleNoteClick, areXBeats and notesToPlay do not persist in their changes in the rest of the app, thus nothing plays.
 		> at this point, i should decide which to keep. it seems more elegant to keep notesToPlay as it is one fine object, doesn't have tons of zero fluff. it also is already integrated with nextNoteTime.
 		> can i actually get rid of both areMelodyBeats and areChordBeats?? wow! they've been with me since the beginning.. i cant throw away old friends like that!
 > can i avoid sending notesToPlay state down to SingleCheckbox while still having it use the helper to update it?
-	> prop drill handleCheckbox, remove it from Helpers so we can access notesToPlay directly without having to pass it from SingleCheckbox
+	> prop drill handleNoteClick, remove it from Helpers so we can access notesToPlay directly without having to pass it from SingleCheckbox
 	> what will this achieve? we update notesToPlay state, meaning we can play notes, but it isnt a dependency for the children (not passed as a prop) and thus doesn't trigger a re-render of the entire grid. 
-	> ok, so remove handleCheckbox from SingleCheck
+	> ok, so remove handleNoteClick from SingleCheck
 	> take out of Helpers.js
 		> actually, you can keep it there, just call it from Sequencer and pass it notesToPlay
 	> integrate into Sequencer.js
@@ -150,6 +150,42 @@ NOW IMA TRY TO REMOVE ARExBEATS FROM STATE AND JUST DEPEND ON CHECKED IN THE FUR
 				> remove from CheckboxRow requires changing initialization of makeMelodyNotesState
 		>v refactor makeNewXMaster
 		> its possible that memo isn't working because blankStepCountArray gets redone every time. mb make it state so it doesnt change every render?
+
+INTERESTING, INTERESTING!!
+	> by re-rendering and thus re-defining my function, bubbleUpCheckBoxInfo technically gets viewed as a changing prop, thus triggering re-renders. in order to fix this, we can store the function in between renders using the useCallback react hook. 
+	> we fix the useCallback issue, but we have to update useCallback by having a dependency array containing notesToPlay or else it doesn't keep an up to date version of notesToPlay :<
+		> imagine the state initialization as its own closure. once init'd, it keeps a snapshot of the state as it was then and will not change unless included in the dependency array, thus causing a re-render
+	> maybe i could just send back the beatNum, scaleIndex, whichGrid and set them in state in Sequencer so that i can handle checkbox willynilly
+		> this still requires useCallback since we're init'ing bubbleUp.. in Sequencer.js
+		> should i make another piece of state, put a useEffect on it, that useEffect updates notesToPlay? this is a lot of workaround, but it might be worth it for performance reasons...
+
+for bubblin:
+	> either some convoluted thing sending beatNum scaleIndex to the handleNoteClick helper, or set state and a useEffect watching for that state
+		> recursive useCallbacks is dumb. just do one useCallback for bubbleUp, set state in sequencer, then call helper based off that state change
+	> SUCCESS! what did i do?
+		> bubbleUp useCallback: receive important info from SingleCheckbox, set this info in state called clickedNote
+		> use this new state and send it to handleNoteClick helper which updates notesToPlay
+			> put this in a useEffect so that it only sends when clickedNote state changes
+				> had to add an if (clickedNote.whichGrid) because it was sending an empty note click upon render
+
+now to fix parameters re-rendering:
+	> slidersToShowObj needs to be in state because react thinks its changing every time
+		> changing it to state, we can see render time from clicking one checkbox go from 12-13ms to about 6-8ms, i.e. 33% improvement in render time. This was in an enormous, crappy copy pasted slidersToShowObj into a big ugly state and call it a day
+	> mb deconstruct slidersToShowObj, make the static parameters an import
+		> this must fix the problem of re-rendering thinking something is new. its not. if it fails, its gotta be state
+		> if i have my big slidersState, are stateValue and setParameterState pointing to memory or taking a snapshot?
+		> i know that react doesn't like big crazy nested state
+	> ALT: possible to make a generic slider state within the slider itself and bubble it back, sending it to the engine
+		> make a parameters object that we then send to the engine, clean++
+			> TODO:
+				> test to see if importing static info from ext file causes a re-render
+				> make dynamic the state changing in Slider.js, bubble it back to parameter
+				> make Slider access stateValue from const obj
+				> put dragging state into Slider? why, why not?
+					> why: passing it as a prop to all of them will re render all of them
+				> try sending new parameterValuesObj into engine ADSR
+				> done? remove extra lines at end of BigObjectsand..
+
 
 
 > A POSSIBLE ALTERNATIVE is simply making a state for each horizontal note row. alreday, that would be 1/16th the work. very worth it

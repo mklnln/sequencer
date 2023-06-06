@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { MusicParametersContext } from './App.js'
 import {
     generateAreChordBeatsCheckedInitialState,
@@ -7,7 +7,7 @@ import {
     loadChangedSongList,
     giveOctaveNumber,
     makeNotesToPlayMaster,
-    handleCheckbox,
+    handleNoteClick,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
@@ -75,12 +75,16 @@ const Sequencer = () => {
     const { isAuthenticated, user } = useAuth0()
 
     const [tempo, setTempo] = useState(60)
-    console.log(stepCount, 'sequencer reander')
     // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
 
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
+    const [clickedNote, setClickedNote] = useState({
+        beatNum: null,
+        scaleIndex: null,
+        whichGrid: null,
+    })
     // let playing = false
 
     // ! can likely be replaced with good ol' Ref.
@@ -280,7 +284,6 @@ const Sequencer = () => {
         // setAreMelodyBeatsChecked(newMelodyMaster)
         setNotesToPlay(makeNotesToPlayMaster(stepCount))
     }, [stepCount])
-    console.log(notesToPlay)
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
     useEffect(() => {
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
@@ -322,14 +325,26 @@ const Sequencer = () => {
     })
 
     const countCheckboxRenders = useRef(1)
-    const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
-        handleCheckbox(
-            beatNum,
-            scaleIndex,
-            whichGrid,
-            // ! gotta adapt away from areXChecked stuff
+
+    // ! this function changes each render if we pass it notesToPlay, thus we prevent extra renders by removing it as a dependency
+    // this requires the if (clickedNote) seen below to watch for changes. according to dev tools, 1/10th the render time without notesToPlay in useCallback!!
+    const bubbleUpCheckboxInfo = useCallback(
+        (beatNum, scaleIndex, whichGrid) => {
+            console.log('bubble up callback, set clicked note')
+            setClickedNote({
+                beatNum: beatNum,
+                scaleIndex: scaleIndex,
+                whichGrid: whichGrid,
+            })
+        },
+        []
+    )
+    if (clickedNote) {
+        handleNoteClick(
             notesToPlay,
-            setNotesToPlay
+            setNotesToPlay,
+            clickedNote,
+            setClickedNote
         )
     }
 
@@ -359,7 +374,6 @@ const Sequencer = () => {
                                 areXBeatsChecked={areMelodyBeatsChecked}
                                 blankStepCountArray={blankStepCountArray}
                                 makeMelodyNotesState={makeMelodyNotesState}
-                                // setAreXBeatsChecked={setAreMelodyBeatsChecked}
                                 scaleIndex={
                                     Object.keys(areMelodyBeatsChecked).length +
                                     1 -
@@ -367,8 +381,6 @@ const Sequencer = () => {
                                 }
                                 whichGrid="melody"
                                 noteTitle={giveOctaveNumber(note.substring(5))} // convert "note-5" to just "5"
-                                // notesToPlay={notesToPlay}
-                                // setNotesToPlay={setNotesToPlay}
                                 bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
                             />
                         )
@@ -427,8 +439,6 @@ const Sequencer = () => {
                         return (
                             <CheckboxRow
                                 key={`${note}`}
-                                // areXBeatsChecked={areChordBeatsChecked}
-                                // setAreXBeatsChecked={setAreChordBeatsChecked}
                                 blankStepCountArray={blankStepCountArray}
                                 scaleIndex={scaleIndex}
                                 beatNum={index + 1}
@@ -436,8 +446,6 @@ const Sequencer = () => {
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]
                                 }
-                                // notesToPlay={notesToPlay}
-                                // setNotesToPlay={setNotesToPlay}
                             />
                         )
                     })}
