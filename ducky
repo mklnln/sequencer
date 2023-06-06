@@ -151,6 +151,11 @@ NOW IMA TRY TO REMOVE ARExBEATS FROM STATE AND JUST DEPEND ON CHECKED IN THE FUR
 		>v refactor makeNewXMaster
 		> its possible that memo isn't working because blankStepCountArray gets redone every time. mb make it state so it doesnt change every render?
 
+INTERESTING, INTERESTING!!
+	> by re-rendering and thus re-defining my function, bubbleUpCheckBoxInfo technically gets viewed as a changing prop, thus triggering re-renders. in order to fix this, we can store the function in between renders using the useCallback react hook. 
+	> we fix the useCallback issue, but we have to update useCallback by having a dependency array containing notesToPlay or else it doesn't keep an up to date version of notesToPlay :<
+	> maybe i could just send back the beatNum, scaleIndex, whichGrid and set them in state in Sequencer so that i can handle checkbox willynilly
+
 
 > A POSSIBLE ALTERNATIVE is simply making a state for each horizontal note row. alreday, that would be 1/16th the work. very worth it
 

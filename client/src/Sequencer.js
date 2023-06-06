@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { MusicParametersContext } from './App.js'
 import {
     generateAreChordBeatsCheckedInitialState,
@@ -7,7 +7,7 @@ import {
     loadChangedSongList,
     giveOctaveNumber,
     makeNotesToPlayMaster,
-    handleCheckbox,
+    handleNoteClick,
 } from './Helpers'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
@@ -322,16 +322,30 @@ const Sequencer = () => {
     })
 
     const countCheckboxRenders = useRef(1)
-    const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
-        handleCheckbox(
-            beatNum,
-            scaleIndex,
-            whichGrid,
-            // ! gotta adapt away from areXChecked stuff
-            notesToPlay,
-            setNotesToPlay
-        )
-    }
+    const bubbleUpCheckboxInfo = useCallback(
+        (beatNum, scaleIndex, whichGrid) => {
+            handleBubble(beatNum, scaleIndex, whichGrid)
+            // handleNoteClick(
+            //     beatNum,
+            //     scaleIndex,
+            //     whichGrid,
+            //     // ! gotta adapt away from areXChecked stuff
+            //     notesToPlay,
+            //     setNotesToPlay
+            // )
+        },
+        []
+    )
+
+    const handleBubble = useCallback(
+        (...args) => {
+            handleNoteClick(notesToPlay, setNotesToPlay, ...args)
+        },
+        [notesToPlay]
+    )
+
+    // todo take bubble up info, send it to handleNoteClick
+    // ? do i have to
 
     return (
         <>

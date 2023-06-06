@@ -144,14 +144,14 @@ const makeDeepCopy = (areXBeatsChecked) => {
     })
     return obj
 }
-export const handleCheckbox = (
+export const handleNoteClick = (
+    notesToPlay,
+    setNotesToPlay,
     beatNum,
     scaleIndex,
-    whichGrid,
-    notesToPlay,
-    setNotesToPlay
+    whichGrid
 ) => {
-    // todo dont forget about chords!!
+    console.log('hiiiiiiiii halper')
     const arrayKey = `note-${scaleIndex}`
     console.log(notesToPlay)
     let obj = { ...notesToPlay }
@@ -163,6 +163,7 @@ export const handleCheckbox = (
             delete obj[`beat-${beatNum + 1}`][arrayKey]
         }
 
+        console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
     } else {
         // obj[`beat-${beatNum}`] = {
@@ -180,10 +181,9 @@ export const handleCheckbox = (
             ...obj[`beat-${beatNum + 1}`],
         }
         // ? hopefully does something idfk
+        console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
     }
-
-    return notesToPlay
 }
 
 export const makeNotesToPlayMaster = (stepCount) => {
@@ -196,3 +196,14 @@ export const makeNotesToPlayMaster = (stepCount) => {
     console.log(obj, 'newnotetoplaymaster')
     return obj
 }
+
+// export const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
+//     handleNoteClick(
+//         beatNum,
+//         scaleIndex,
+//         whichGrid,
+//         // ! gotta adapt away from areXChecked stuff
+//         notesToPlay,
+//         setNotesToPlay
+//     )
+// }
