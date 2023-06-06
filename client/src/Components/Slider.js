@@ -6,18 +6,19 @@ import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG.js'
 const Slider = memo(
     ({
         parameterName,
-        dragging,
-        setDragging,
+        // dragging,
+        // setDragging,
         // dragStartY,
         // setDragStartY,
-        slider,
+        // slider,
         sliderStaticInfo,
+        bubbleUpSliderInfo,
     }) => {
         const [dragStartY, setDragStartY] = useState(null)
-        console.log(sliderStaticInfo, 'static info!!')
-        console.log(slider, 'slider in state')
-        const { minValue, maxValue, title, stateValue, setParameterState } =
-            slider
+        const [dragging, setDragging] = useState(false)
+        // const { stateValue, setParameterState } = slider
+        const { minValue, maxValue, title, defaultValue } = sliderStaticInfo
+        const [sliderValue, setSliderValue] = useState(defaultValue)
         const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
         const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
         const handleMouseMove = (e) => {
@@ -27,11 +28,10 @@ const Slider = memo(
                     // math.max chooses higher value, ensuring the value doesn't drop below minValue
                     minValue,
                     // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
-                    Math.min(maxValue, stateValue + deltaY * valuePerPixel)
+                    Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
                 )
-                console.log(newValue, 'newval')
-                setParameterState(Math.round(newValue))
-                console.log(stateValue, newValue)
+                bubbleUpSliderInfo(Math.round(newValue), title)
+                setSliderValue(Math.round(newValue))
                 setDragStartY(e.clientY)
             }
         }
@@ -48,32 +48,13 @@ const Slider = memo(
         }
 
         const calculateTop = () => {
-            const valueWithinRange = stateValue - minValue
+            const valueWithinRange = sliderValue - minValue
             const percentDisplacementFromTop = (valueWithinRange / range) * 100
             return 100 - percentDisplacementFromTop
         }
 
         const gap = calculateTop()
 
-        // const debounce = (func, timeout = 300) => {
-        //     let timer
-        //     return (...args) => {
-        //         clearTimeout(timer)
-        //         timer = setTimeout(() => {
-        //             console.log('debeouncing!')
-        //             func.apply(this, args)
-        //         }, timeout)
-        //     }
-        // }
-        // function saveInput() {
-        //     console.log('Saving data')
-        // }
-        // const debounceMouseMove = (e) => {
-        //     console.log('devouncemosuemove!')
-        //     debounce(() => handleMouseMove(e))
-        // }
-        let hover = false
-        const [hoverState, setHoverState] = useState(false)
         return (
             <SliderContainer>
                 <span>{title}</span>
@@ -83,30 +64,12 @@ const Slider = memo(
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseLeave}
                 >
-                    <SliderRange
-                        onMouseEnter={() => {
-                            hover = true
-                            setHoverState(true)
-                        }}
-                        onMouseLeave={() => {
-                            hover = false
-                            setHoverState(false)
-                        }}
-                        style={
-                            {
-                                // borderBottomColor: 'fuchsia',
-                                // borderBottom: ` solid #ff00000`,
-                            }
-                        }
-                    >
-                        {/* <NoiseFill>wwwwwwwwwwwwwwwwwww</NoiseFill> */}
+                    <SliderRange>
                         <NoiseSVG />
-                        {/* <CheckboxNoiseSVG /> */}
                         <SliderThumb
                             style={{
                                 borderBottomWidth: `${(100 - gap) / 2}px`,
                                 top: `${gap}%`, // required variables are out of scope if called below
-                                // backgroundColor: hoverState ? '#444444' : '#111111',
                             }}
                         />
                     </SliderRange>
@@ -138,20 +101,12 @@ const SliderBackground = styled.div`
 `
 
 const SliderRange = styled.div`
-    // overflow: hidden;
-    // display: flex;
-    // justify-content: center;
     position: relative;
-    // left: 5%;
-    // z-index: 1;
     padding: 10px 0px;
     margin: 0px;
     width: 20px;
     height: 50px;
-    // background-color: var(--secondary-color);
     cursor: pointer;
-    // border-bottom: 10px solid white;
-    userselect: none;
     :hover {
         background-color: var(--secondary-color);
         opacity: 60%;
@@ -184,7 +139,4 @@ const SliderThumb = styled.div`
 
     width: 10px;
     height: 10px;
-    :hover {
-        // opacity: 85%;
-    }
 `

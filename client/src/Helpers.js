@@ -146,8 +146,10 @@ const makeDeepCopy = (areXBeatsChecked) => {
 export const handleNoteClick = (
     notesToPlay,
     setNotesToPlay,
-    { beatNum, scaleIndex, whichGrid }
+    { beatNum, scaleIndex, whichGrid },
+    setClickedNote
 ) => {
+    console.log(beatNum, 'clicked note?E')
     const arrayKey = `note-${scaleIndex}`
     console.log(whichGrid, 'whichgrid')
     let obj = { ...notesToPlay }
@@ -161,6 +163,7 @@ export const handleNoteClick = (
 
         console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
+        setClickedNote(null)
     } else {
         // obj[`beat-${beatNum}`] = {
         //     [arrayKey]: {
@@ -179,6 +182,7 @@ export const handleNoteClick = (
         // ? hopefully does something idfk
         console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
+        setClickedNote(null)
     }
 }
 

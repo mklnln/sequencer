@@ -284,7 +284,6 @@ const Sequencer = () => {
         // setAreMelodyBeatsChecked(newMelodyMaster)
         setNotesToPlay(makeNotesToPlayMaster(stepCount))
     }, [stepCount])
-    console.log(notesToPlay)
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
     useEffect(() => {
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
@@ -327,6 +326,8 @@ const Sequencer = () => {
 
     const countCheckboxRenders = useRef(1)
 
+    // ! this function changes each render if we pass it notesToPlay, thus we prevent extra renders by removing it as a dependency
+    // this requires the if (clickedNote) seen below to watch for changes. according to dev tools, 1/10th the render time without notesToPlay in useCallback!!
     const bubbleUpCheckboxInfo = useCallback(
         (beatNum, scaleIndex, whichGrid) => {
             console.log('bubble up callback, set clicked note')
@@ -338,16 +339,14 @@ const Sequencer = () => {
         },
         []
     )
-
-    useEffect(() => {
-        console.log(clickedNote.whichGrid)
-        if (clickedNote.whichGrid) {
-            handleNoteClick(notesToPlay, setNotesToPlay, clickedNote)
-        }
-    }, [clickedNote])
-
-    // todo take bubble up info, send it to handleNoteClick
-    // ? do i have to
+    if (clickedNote) {
+        handleNoteClick(
+            notesToPlay,
+            setNotesToPlay,
+            clickedNote,
+            setClickedNote
+        )
+    }
 
     return (
         <>
@@ -375,7 +374,6 @@ const Sequencer = () => {
                                 areXBeatsChecked={areMelodyBeatsChecked}
                                 blankStepCountArray={blankStepCountArray}
                                 makeMelodyNotesState={makeMelodyNotesState}
-                                // setAreXBeatsChecked={setAreMelodyBeatsChecked}
                                 scaleIndex={
                                     Object.keys(areMelodyBeatsChecked).length +
                                     1 -
@@ -383,8 +381,6 @@ const Sequencer = () => {
                                 }
                                 whichGrid="melody"
                                 noteTitle={giveOctaveNumber(note.substring(5))} // convert "note-5" to just "5"
-                                // notesToPlay={notesToPlay}
-                                // setNotesToPlay={setNotesToPlay}
                                 bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
                             />
                         )
@@ -443,8 +439,6 @@ const Sequencer = () => {
                         return (
                             <CheckboxRow
                                 key={`${note}`}
-                                // areXBeatsChecked={areChordBeatsChecked}
-                                // setAreXBeatsChecked={setAreChordBeatsChecked}
                                 blankStepCountArray={blankStepCountArray}
                                 scaleIndex={scaleIndex}
                                 beatNum={index + 1}
@@ -452,8 +446,6 @@ const Sequencer = () => {
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]
                                 }
-                                // notesToPlay={notesToPlay}
-                                // setNotesToPlay={setNotesToPlay}
                             />
                         )
                     })}
