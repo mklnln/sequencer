@@ -16,7 +16,7 @@ import Parameters from './Parameters'
 import { useAuth0 } from '@auth0/auth0-react'
 import RowOfNotes from './Components/RowOfNotes'
 import BeatMarkers from './Components/BeatMarkers'
-import { MemoCheckboxRow } from './Components/CheckboxRow'
+import CheckboxRow from './Components/CheckboxRow'
 const Sequencer = () => {
     // const [tempo, setTempo] = useState(150)
     // todo make this context one object?
@@ -75,12 +75,16 @@ const Sequencer = () => {
     const { isAuthenticated, user } = useAuth0()
 
     const [tempo, setTempo] = useState(60)
-    console.log(stepCount, 'sequencer reander')
     // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
 
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
+    const [clickedNote, setClickedNote] = useState({
+        beatNum: null,
+        scaleIndex: null,
+        whichGrid: null,
+    })
     // let playing = false
 
     // ! can likely be replaced with good ol' Ref.
@@ -322,27 +326,25 @@ const Sequencer = () => {
     })
 
     const countCheckboxRenders = useRef(1)
+
     const bubbleUpCheckboxInfo = useCallback(
         (beatNum, scaleIndex, whichGrid) => {
-            handleBubble(beatNum, scaleIndex, whichGrid)
-            // handleNoteClick(
-            //     beatNum,
-            //     scaleIndex,
-            //     whichGrid,
-            //     // ! gotta adapt away from areXChecked stuff
-            //     notesToPlay,
-            //     setNotesToPlay
-            // )
+            console.log('bubble up callback, set clicked note')
+            setClickedNote({
+                beatNum: beatNum,
+                scaleIndex: scaleIndex,
+                whichGrid: whichGrid,
+            })
         },
         []
     )
 
-    const handleBubble = useCallback(
-        (...args) => {
-            handleNoteClick(notesToPlay, setNotesToPlay, ...args)
-        },
-        [notesToPlay]
-    )
+    useEffect(() => {
+        console.log(clickedNote.whichGrid)
+        if (clickedNote.whichGrid) {
+            handleNoteClick(notesToPlay, setNotesToPlay, clickedNote)
+        }
+    }, [clickedNote])
 
     // todo take bubble up info, send it to handleNoteClick
     // ? do i have to
@@ -367,7 +369,7 @@ const Sequencer = () => {
                     {makeMelodyNotesState.map((note, index) => {
                         const scaleIndex = index + 1
                         return (
-                            <MemoCheckboxRow
+                            <CheckboxRow
                                 key={`${note}`}
                                 countCheckboxRenders={countCheckboxRenders}
                                 areXBeatsChecked={areMelodyBeatsChecked}
@@ -439,7 +441,7 @@ const Sequencer = () => {
                     {Object.keys(areChordBeatsChecked).map((note, index) => {
                         const scaleIndex = note.substring(5)
                         return (
-                            <MemoCheckboxRow
+                            <CheckboxRow
                                 key={`${note}`}
                                 // areXBeatsChecked={areChordBeatsChecked}
                                 // setAreXBeatsChecked={setAreChordBeatsChecked}

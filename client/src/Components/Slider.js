@@ -1,114 +1,120 @@
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 import styled from 'styled-components'
 import NoiseSVG from '../assets/SVGs/SliderNoiseSVG.js'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG.js'
 
-const Slider = ({
-    parameterName,
-    dragging,
-    setDragging,
-    // dragStartY,
-    // setDragStartY,
-    slider,
-}) => {
-    const [dragStartY, setDragStartY] = useState(null)
-    const { minValue, maxValue, title, stateValue, setParameterState } = slider
-    const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
-    const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
-    const handleMouseMove = (e) => {
-        if (dragging) {
-            const deltaY = dragStartY - e.clientY
-            const newValue = Math.max(
-                // math.max chooses higher value, ensuring the value doesn't drop below minValue
-                minValue,
-                // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
-                Math.min(maxValue, stateValue + deltaY * valuePerPixel)
-            )
-            console.log(newValue, 'newval')
-            setParameterState(Math.round(newValue))
-            console.log(stateValue, newValue)
+const Slider = memo(
+    ({
+        parameterName,
+        dragging,
+        setDragging,
+        // dragStartY,
+        // setDragStartY,
+        slider,
+        sliderStaticInfo,
+    }) => {
+        const [dragStartY, setDragStartY] = useState(null)
+        console.log(sliderStaticInfo, 'static info!!')
+        console.log(slider, 'slider in state')
+        const { minValue, maxValue, title, stateValue, setParameterState } =
+            slider
+        const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
+        const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
+        const handleMouseMove = (e) => {
+            if (dragging) {
+                const deltaY = dragStartY - e.clientY
+                const newValue = Math.max(
+                    // math.max chooses higher value, ensuring the value doesn't drop below minValue
+                    minValue,
+                    // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
+                    Math.min(maxValue, stateValue + deltaY * valuePerPixel)
+                )
+                console.log(newValue, 'newval')
+                setParameterState(Math.round(newValue))
+                console.log(stateValue, newValue)
+                setDragStartY(e.clientY)
+            }
+        }
+        const handleMouseUp = () => {
+            setDragging(false)
+        }
+        const handleMouseDown = (e) => {
+            setDragging(true)
             setDragStartY(e.clientY)
         }
-    }
-    const handleMouseUp = () => {
-        setDragging(false)
-    }
-    const handleMouseDown = (e) => {
-        setDragging(true)
-        setDragStartY(e.clientY)
-    }
 
-    const handleMouseLeave = () => {
-        setDragging(false)
-    }
+        const handleMouseLeave = () => {
+            setDragging(false)
+        }
 
-    const calculateTop = () => {
-        const valueWithinRange = stateValue - minValue
-        const percentDisplacementFromTop = (valueWithinRange / range) * 100
-        return 100 - percentDisplacementFromTop
-    }
+        const calculateTop = () => {
+            const valueWithinRange = stateValue - minValue
+            const percentDisplacementFromTop = (valueWithinRange / range) * 100
+            return 100 - percentDisplacementFromTop
+        }
 
-    const gap = calculateTop()
+        const gap = calculateTop()
 
-    // const debounce = (func, timeout = 300) => {
-    //     let timer
-    //     return (...args) => {
-    //         clearTimeout(timer)
-    //         timer = setTimeout(() => {
-    //             console.log('debeouncing!')
-    //             func.apply(this, args)
-    //         }, timeout)
-    //     }
-    // }
-    // function saveInput() {
-    //     console.log('Saving data')
-    // }
-    // const debounceMouseMove = (e) => {
-    //     console.log('devouncemosuemove!')
-    //     debounce(() => handleMouseMove(e))
-    // }
-    let hover = false
-    const [hoverState, setHoverState] = useState(false)
-    return (
-        <SliderContainer>
-            <span>{title}</span>
-            <SliderBackground
-                onMouseMove={handleMouseMove}
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
-            >
-                <SliderRange
-                    onMouseEnter={() => {
-                        hover = true
-                        setHoverState(true)
-                    }}
-                    onMouseLeave={() => {
-                        hover = false
-                        setHoverState(false)
-                    }}
-                    style={
-                        {
-                            // borderBottomColor: 'fuchsia',
-                            // borderBottom: ` solid #ff00000`,
-                        }
-                    }
+        // const debounce = (func, timeout = 300) => {
+        //     let timer
+        //     return (...args) => {
+        //         clearTimeout(timer)
+        //         timer = setTimeout(() => {
+        //             console.log('debeouncing!')
+        //             func.apply(this, args)
+        //         }, timeout)
+        //     }
+        // }
+        // function saveInput() {
+        //     console.log('Saving data')
+        // }
+        // const debounceMouseMove = (e) => {
+        //     console.log('devouncemosuemove!')
+        //     debounce(() => handleMouseMove(e))
+        // }
+        let hover = false
+        const [hoverState, setHoverState] = useState(false)
+        return (
+            <SliderContainer>
+                <span>{title}</span>
+                <SliderBackground
+                    onMouseMove={handleMouseMove}
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseLeave}
                 >
-                    {/* <NoiseFill>wwwwwwwwwwwwwwwwwww</NoiseFill> */}
-                    <NoiseSVG />
-                    {/* <CheckboxNoiseSVG /> */}
-                    <SliderThumb
-                        style={{
-                            borderBottomWidth: `${(100 - gap) / 2}px`,
-                            top: `${gap}%`, // required variables are out of scope if called below
-                            // backgroundColor: hoverState ? '#444444' : '#111111',
+                    <SliderRange
+                        onMouseEnter={() => {
+                            hover = true
+                            setHoverState(true)
                         }}
-                    />
-                </SliderRange>
-            </SliderBackground>
-        </SliderContainer>
-    )
-}
+                        onMouseLeave={() => {
+                            hover = false
+                            setHoverState(false)
+                        }}
+                        style={
+                            {
+                                // borderBottomColor: 'fuchsia',
+                                // borderBottom: ` solid #ff00000`,
+                            }
+                        }
+                    >
+                        {/* <NoiseFill>wwwwwwwwwwwwwwwwwww</NoiseFill> */}
+                        <NoiseSVG />
+                        {/* <CheckboxNoiseSVG /> */}
+                        <SliderThumb
+                            style={{
+                                borderBottomWidth: `${(100 - gap) / 2}px`,
+                                top: `${gap}%`, // required variables are out of scope if called below
+                                // backgroundColor: hoverState ? '#444444' : '#111111',
+                            }}
+                        />
+                    </SliderRange>
+                </SliderBackground>
+            </SliderContainer>
+        )
+    }
+)
 
 export default Slider
 

@@ -22,7 +22,6 @@ export const generateAreXBeatsCheckedInitialState = (
             makeAreXBeatsChecked[`${num}`].push(0)
         })
     })
-    console.log(makeAreXBeatsChecked, 'areXXXXXXXXXXXXXXX')
     return makeAreXBeatsChecked
 }
 
@@ -147,13 +146,10 @@ const makeDeepCopy = (areXBeatsChecked) => {
 export const handleNoteClick = (
     notesToPlay,
     setNotesToPlay,
-    beatNum,
-    scaleIndex,
-    whichGrid
+    { beatNum, scaleIndex, whichGrid }
 ) => {
-    console.log('hiiiiiiiii halper')
     const arrayKey = `note-${scaleIndex}`
-    console.log(notesToPlay)
+    console.log(whichGrid, 'whichgrid')
     let obj = { ...notesToPlay }
     if (obj[`beat-${beatNum + 1}`][arrayKey]) {
         delete obj[`beat-${beatNum + 1}`][arrayKey][whichGrid]
@@ -189,11 +185,9 @@ export const handleNoteClick = (
 export const makeNotesToPlayMaster = (stepCount) => {
     const obj = {}
     console.log('makeNotesToPlayMaster')
-    console.log(stepCount, typeof stepCount)
     for (let i = 1; i <= stepCount; i++) {
         obj[`beat-${i}`] = {}
     }
-    console.log(obj, 'newnotetoplaymaster')
     return obj
 }
 

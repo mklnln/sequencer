@@ -5,6 +5,7 @@ import { loadSample } from './AudioEngine'
 import { audioTime } from './AudioEngine'
 import Slider from './Components/Slider'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine'
+import { slidersToShowObj } from './BigObjectsAndArrays'
 import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
@@ -73,6 +74,7 @@ const Parameters = ({
     let nextNoteTime = 0
 
     const playEngine = (nextNoteTime, scaleIndex, type) => {
+        console.log(scaleIndex, 'engine')
         playSynth(
             // audioCtx,
             scaleIndex,
@@ -282,8 +284,7 @@ const Parameters = ({
         }
     }
 
-    // ! will there be problems with an object pointing to state? when will the object update??
-    const slidersToShowObj = {
+    const [slidersState, setSlidersState] = useState({
         tempo: {
             id: 0,
             minValue: 30,
@@ -349,14 +350,88 @@ const Parameters = ({
             setParameterState: setRelease,
         },
         filter: {
-            id: 7,
+            id: 8,
             minValue: 100,
             maxValue: 10000,
             title: 'Filter',
             stateValue: filterCutoff,
             setParameterState: setFilterCutoff,
         },
-    }
+    })
+    // const slidersToShowObj = {
+    //     tempo: {
+    //         id: 0,
+    //         minValue: 30,
+    //         maxValue: 240,
+    //         title: 'Tempo',
+    //         stateValue: tempo,
+    //         setParameterState: setTempo,
+    //     },
+    //     wonk: {
+    //         id: 1,
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         title: 'Wonk',
+    //         stateValue: wonk,
+    //         setParameterState: setWonk,
+    //     },
+    //     melodyVolume: {
+    //         id: 2,
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         title: 'Melody',
+    //         stateValue: melodyVolume,
+    //         setParameterState: setMelodyVolume,
+    //     },
+    //     chordsVolume: {
+    //         id: 3,
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         title: 'Chords',
+    //         stateValue: chordsVolume,
+    //         setParameterState: setChordsVolume,
+    //     },
+    //     attack: {
+    //         id: 4,
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         title: 'Attack',
+    //         stateValue: attack,
+    //         setParameterState: setAttack,
+    //     },
+    //     sustain: {
+    //         id: 5,
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         title: 'Sustain',
+    //         stateValue: sustain,
+    //         setParameterState: setSustain,
+    //     },
+    //     decay: {
+    //         id: 6,
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         title: 'Decay',
+    //         stateValue: decay,
+    //         setParameterState: setDecay,
+    //     },
+    //     release: {
+    //         id: 7,
+    //         minValue: 0,
+    //         maxValue: 100,
+    //         title: 'Release',
+    //         stateValue: release,
+    //         setParameterState: setRelease,
+    //     },
+    //     filter: {
+    //         id: 8,
+    //         minValue: 100,
+    //         maxValue: 10000,
+    //         title: 'Filter',
+    //         stateValue: filterCutoff,
+    //         setParameterState: setFilterCutoff,
+    //     },
+    // }
     const countReRenders = useRef(1)
     useEffect(() => {
         countReRenders.current = countReRenders.current + 1
@@ -400,13 +475,18 @@ const Parameters = ({
                     </StartStopButton>
                 </StartButtonDiv>
 
-                {Object.keys(slidersToShowObj).map((slider, index) => {
+                {Object.keys(slidersState).map((slider, index) => {
+                    console.log(slider)
+
+                    const sliderStaticInfo = slidersToShowObj[slider]
+                    console.log(sliderStaticInfo)
                     return (
                         <Slider
                             key={`${index}`}
-                            slider={slidersToShowObj[slider]}
+                            slider={slidersState[slider]}
                             dragging={dragging}
                             setDragging={setDragging}
+                            sliderStaticInfo={sliderStaticInfo}
                         />
                     )
                 })}
