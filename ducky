@@ -1,0 +1,157 @@
+	>>> nextNoteTime calculation
+need to calculate it based off of the notesToPlay
+!! currently just upping it every interval tick by an amount greater than the interval so that it eventually stops playback, lol
+
+what parameters do i need to calculate it?
+	> know when the next beat is to be played
+		> NEXT beat, i.e. gotta check currentBeat + 1 
+	> calculate that beat in time
+		> try ctxTime plus 
+
+how do i calculate nextNoteTime?
+	> at beat 1, i want nextNoteTime to be 0, play right away
+	> at beat 2, i want nextNoteTime to be audioTime plus beatDuration
+
+how should it work in theory?
+	> setTimeout call, ask if a note is to be played
+		> know when the note should be played
+			> this is really stumping me. know the difference between scheduleAhead, interval time, beatDuration, and nextNoteTime
+			> scheduleAhead: furthest window boundary
+			> interval: how often setTimeout is called
+			> beatDuration: time of one eighth note
+			> nextNoteTime: time a note should be played, sent to osc.start(nnt)
+	> if note falls within the window, schedule it
+	> if you find a note to be played, take current time
+	> mb need to keep track of audioTime once playing is true again, using this for a displacement of nextNoteTime.
+
+what is it currently doing?
+	> playing? setInterval ( scheduleBeat )
+		> scheduleBeat
+			> ask notesToPlay if it has an array at the currentbeat
+			> set note time if true
+		> timing is wack. im setting nextNoteTime to += beatDuration each interval. many intervals happen over one duration, so it quickly gets way higher number faster than audioTime
+		> ?!?!?! how do i keep track of the gap between startTime and nextNoteTime?
+
+advancing nextnote isnt enough to falsify the playEngine block:
+	> nextNoteTime < audioTime() + scheduleAheadTime 
+	> 58.741 < ? 58.913 
+	> one scheduleAheadTime later => (250ms/3) = 83ms
+	> nextNoteTime += beatDuration => 250ms
+	> 58.991 < ? 59.003
+	> here we see that 90ms later, i.e. 83 and change (7ms accounted for by slow JS thread), the next possible eighth note time is still <, so it plays twice
+
+	? my algorithm is wack. mb needs an overhaul
+		> CW's app was a metronome, assuming playback all the time
+		> only schedule nextNoteTime when a note is to be played
+			> make it null in between?
+			> how do we schedule the exact time of an upcoming note?
+				> timeFromStart + eighthNoteTicks * beatDuration + beatDuration ?
+ 		
+
+
+redo notesToPlay:
+	notesToPlay: {
+		beat-1 : {
+			note-1 : {
+				chords: 1,
+				melody: 1
+			}
+		}
+	}
+
+interval (unsure of order):
+	> nextNote null
+	> e.g. at currentBeat 4, ask if beat 5 has a note to be played
+		> if so, schedule the note. 
+			> calculate nextNoteTime, send it to playEngine
+		> upon subsequent lookahead intervals, how to not send repeats?
+			> keep a beat played boolean. if beat has been sent, 
+
+
+16th box click creates an invalid 17th:
+	> making deep copy seems to be the culrpit
+		> clg after, its present in the copy, not yet in state tho
+	> its an edge case issue, when index0 is valid, the 1st checkbox breaks and last one is ok. 
+		> mb due to inconsistent naming in my methods. make it consistent, it fixed?
+	> clicking on the right most, it adds one to the array
+	> clicking on the left most, it adds a toggle to the areXCheck but leaves the first one 0, only the second is at 1
+		> i.e. its toggling the wrong index
+		> change the index and it seems to visually enter it in the wrong spot, but the array is fine??
+
+
+
+
+TRY:
+	> schedule based on current + 1, what do we get?
+	> keep track of every tick of an eighth note as well as every tick of the interval. if its 3 intervals per eighth note, only tick eighth note time up after 3 are achieved. use the same variable, % 3 it to know when to tick eighth note count. 
+		> problem: need to advance nextNoteTime more to nullify the < condition
+			> theres a gap between audioTimea and timeFromStart, mb due to setTimeout lag
+		> currently hve nextNoteTime being < audioTime, when it should be IN the window, not super below it
+
+ctxTime + scheduleAheadTime create a window
+	> ctxTime->[         ]<-scheduleAheadTime
+	> they each define the boundaries of the window
+	> if nextNote falls within, schedule it
+
+chain of functions:
+	if playing
+		> setInterval() (scheduleBeat each interval)
+			> scheduleBeat() asks notesToPlay what's going on
+				> if nextNoteTime < audioTime() + scheduleAheadTime
+					> playEngine()
+				> then advanceCurrentBeat()
+					try to keep it just advancing, dassit
+
+edge case:
+	> on beat 1, nextNoteTime is 0. if it exists, it should play due to my if condition && checking if beat-1 exists one noteToPlay before passing to playEngine()
+	> on last beat (e.g. 16), ensure that beat 1 will be scheduled
+
+
+OK SO THAT WAS JUST FOR NEXTNOTETIME
+NOW I WANT TO TRY TO MAKE SLIDERS LESS PAINFUL FOR REACT
+	IDEAS: 
+		> DEBOUNCE (tried, idk if it really works especially w react)
+		> ONLY SET STATE UPON DRAGGING BECOMING FALSE
+		> MAKE JS UPDATE THE UI WITHOUT CHANGING STATE
+
+
+so if i wanna do the latter, how to?
+	> almost like making it no longer a react component tied to state cuz thats the whole thing about react.. you can update the UI very faithfully
+		> would i thus be unable to track the fill of the slider and update it ?
+
+maybe i can make parameters more efficient by putting dragging down further into child components??
+	> no. i mean, it wasnt the fix i wanted. all of the sliders rerender every move because just one of those state badboys exists in Parameters.js and if it changes then Parameters rerenders and thats that. its state changed
+		> mb the answer is figuring out a workaround to have these things in const, not state
+
+my main issue is that parameters.js contains the state that we then send down to the children. i wish there was a way only that child would update but im not sure thats possible. 
+
+NOW IMA TRY TO REMOVE ARExBEATS FROM STATE AND JUST DEPEND ON CHECKED IN THE FURTHEST CHILD
+
+> doenst work cuz state is king
+	> REMEMBER to revisit the functionality of all the setAreMelody and setAreChords and setNotesToPlay you commented out
+	> since im not returning anything from handleCheckbox, areXBeats and notesToPlay do not persist in their changes in the rest of the app, thus nothing plays.
+		> at this point, i should decide which to keep. it seems more elegant to keep notesToPlay as it is one fine object, doesn't have tons of zero fluff. it also is already integrated with nextNoteTime.
+		> can i actually get rid of both areMelodyBeats and areChordBeats?? wow! they've been with me since the beginning.. i cant throw away old friends like that!
+> can i avoid sending notesToPlay state down to SingleCheckbox while still having it use the helper to update it?
+	> prop drill handleCheckbox, remove it from Helpers so we can access notesToPlay directly without having to pass it from SingleCheckbox
+	> what will this achieve? we update notesToPlay state, meaning we can play notes, but it isnt a dependency for the children (not passed as a prop) and thus doesn't trigger a re-render of the entire grid. 
+	> ok, so remove handleCheckbox from SingleCheck
+	> take out of Helpers.js
+		> actually, you can keep it there, just call it from Sequencer and pass it notesToPlay
+	> integrate into Sequencer.js
+		> need 3 infos from SingleCheckbox: scaleIndex, beatNum, and type. i wont have these in Sequencer, so i must pass them back via a function
+
+		todo
+		>V send 3 infos to sequencer, toggle checked on checkbox
+		>V send these plus notesToPlay to Helper
+		>V update state via helper
+		>v prepare for the fact that since notesToPlay parent is rendering, the children might render. however, they mb shouldn't and we can use React.memo to compare and see if they need to
+			> areXBeats still changing and being used in children, thus everything still renders
+				> remove from CheckboxRow requires changing initialization of makeMelodyNotesState
+		>v refactor makeNewXMaster
+		> its possible that memo isn't working because blankStepCountArray gets redone every time. mb make it state so it doesnt change every render?
+
+
+> A POSSIBLE ALTERNATIVE is simply making a state for each horizontal note row. alreday, that would be 1/16th the work. very worth it
+
+//
