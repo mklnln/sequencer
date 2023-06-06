@@ -16,7 +16,7 @@ import Parameters from './Parameters'
 import { useAuth0 } from '@auth0/auth0-react'
 import RowOfNotes from './Components/RowOfNotes'
 import BeatMarkers from './Components/BeatMarkers'
-import CheckboxRow from './Components/CheckboxRow'
+import { MemoCheckboxRow } from './Components/CheckboxRow'
 const Sequencer = () => {
     // const [tempo, setTempo] = useState(150)
     // todo make this context one object?
@@ -353,7 +353,7 @@ const Sequencer = () => {
                     {makeMelodyNotesState.map((note, index) => {
                         const scaleIndex = index + 1
                         return (
-                            <CheckboxRow
+                            <MemoCheckboxRow
                                 key={`${note}`}
                                 countCheckboxRenders={countCheckboxRenders}
                                 areXBeatsChecked={areMelodyBeatsChecked}
@@ -425,7 +425,7 @@ const Sequencer = () => {
                     {Object.keys(areChordBeatsChecked).map((note, index) => {
                         const scaleIndex = note.substring(5)
                         return (
-                            <CheckboxRow
+                            <MemoCheckboxRow
                                 key={`${note}`}
                                 // areXBeatsChecked={areChordBeatsChecked}
                                 // setAreXBeatsChecked={setAreChordBeatsChecked}

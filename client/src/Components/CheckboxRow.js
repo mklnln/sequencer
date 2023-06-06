@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 import SingleCheckbox from './SingleCheckbox'
-const CheckboxRow = ({
+export const CheckboxRow = ({
     makeMelodyNotesState,
     countCheckboxRenders,
     // areXBeatsChecked,
@@ -69,7 +69,8 @@ const CheckboxRow = ({
     )
 }
 
-export default React.memo(CheckboxRow)
+export const MemoCheckboxRow = React.memo(CheckboxRow)
+
 const TitleAndBoxesDiv = styled.div`
     display: flex;
     justify-content: center;

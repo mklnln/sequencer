@@ -489,6 +489,7 @@ const MainDiv = styled.div`
     margin-bottom: 40px;
     height: 128px;
     position: relative;
+    max-width: 900px;
 `
 
 const StartButtonDiv = styled.div`
