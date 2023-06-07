@@ -1,3 +1,4 @@
+
 	>>> nextNoteTime calculation
 need to calculate it based off of the notesToPlay
 !! currently just upping it every interval tick by an amount greater than the interval so that it eventually stops playback, lol
@@ -178,16 +179,65 @@ now to fix parameters re-rendering:
 	> ALT: possible to make a generic slider state within the slider itself and bubble it back, sending it to the engine
 		> make a parameters object that we then send to the engine, clean++
 			> TODO:
-				> test to see if importing static info from ext file causes a re-render
-				> make dynamic the state changing in Slider.js, bubble it back to parameter
-				> make Slider access stateValue from const obj
-				> put dragging state into Slider? why, why not?
-					> why: passing it as a prop to all of them will re render all of them
+				>v test to see if importing static info from ext file causes a re-render. YES
+				>v make dynamic the state changing in Slider.js, bubble it back to parameter
+				
+				>v put dragging state into Slider? why, why not?
+					>v why: passing it as a prop to all of them will re render all of them
+						> it was a good idea
 				> try sending new parameterValuesObj into engine ADSR
-				> done? remove extra lines at end of BigObjectsand..
+					> getting confused by closure
+					> MB IT AINT CLOSURE?? FOLLOW THE LOGIC!!
+					> i need to fully know where and when my functions are getting closure started
+						> must be state or else when Parameters re-renders it reinitializes parameterValues to their default values
+				>v done? remove extra lines at end of BigObjectsand..
+
+
+todo june 7th:
+	>v pare down ducky
+		> i think its good to have a reference of my work and thoughts actually
+	> create and stick to todo items
+		> no random ici et la improvements
+	> remove useFX from Sequencer as much as possible
+		>v understand WHY they're not necessary and which rule to reference to justify the why
+			> changing state upon other state change is dumb AF
+			> generally the only reason to use one is to sync with external things like an API, then display the result
+			> consider things that need to be in App, mb its loadSong or other stuff? tryna fix useFX
+		>v get useFX out that don't even fetch
+		> ! get useFX that fetch API chords
+			> ? do i want hookTheoryChords in state? cant do const because of rerenders. mb ref, so it doesnt cause a rerender when it changes?
+			> 
+		> ! move loadSong useFX into parameters
+		> ! bring useFX logic out of Sequencer, if possible. make custom hooks????
+	> handleChordClick and handleChordRemove need updating desperately
+		> move to Helpers, update for notesToPlay
+	>v add chords to notesToPlay clicked from grid
+		> TYPE IS NULL for chords on futureBeatTarget
+	
+	> investigate, why makeNotesToPlayMaster trigger alla time?
+	> fully remove areXBeats in App
+	> remove makeXNotes state?
+		> or make them a helper
+	> review helper functions which use areXBeats, either delete or update them for notesToPlay
+	> troubleshoot sign in
+		> address undefined
+	> dropdown, remove behaviour of closing again when mouse away, add click dans le vide to close it
+	> UX UX UX!! where's the melody grid?? chords?? whats that?
+		> modal to explain what's going on
+	> rename folder on disk
+	> semantic meaning of sequencer and paramters
+		> is each file dedicated to a clear purpose, could another dev poke around and know where to fix, e.g. timing issues
+			> "why did you organize your files like this?"
+
+	?? handle
+
+
+general todo:
+	> render Parameters.js less upon Slider action
+		> either some memo thing or debounce. temp state variable to enable smooth slider action, but only actually setting state back up in parameters every 300ms or something
+			> https://blog.logrocket.com/how-and-when-to-debounce-or-throttle-in-react/
 
 
 
-> A POSSIBLE ALTERNATIVE is simply making a state for each horizontal note row. alreday, that would be 1/16th the work. very worth it
 
 //
