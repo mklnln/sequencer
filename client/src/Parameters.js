@@ -285,10 +285,7 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
         (
             value,
             title
-            // todo put in necessary args from Slider
         ) => {
-            // todo change parameterValuesObj
-            console.log(value, title)
             setChangedParameter({
                 title: title.toLowerCase(),
                 value: value,

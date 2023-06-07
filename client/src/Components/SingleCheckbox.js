@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
-import { handleNoteClick } from '../Helpers'
+import { handleNoteClick } from '../FrontEndHelpers'
 const SingleCheckbox = ({
     beatNum,
     // areXBeatsChecked,

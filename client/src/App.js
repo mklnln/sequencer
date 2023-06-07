@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Sequencer from './Sequencer'
 import GlobalStyle from './globalStyles'
-import { generateAreXBeatsCheckedInitialState } from './Helpers'
+import { generateAreXBeatsCheckedInitialState } from './FrontEndHelpers'
 export const MusicParametersContext = createContext()
 const App = () => {
     const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there

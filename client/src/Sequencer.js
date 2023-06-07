@@ -8,7 +8,8 @@ import {
     giveOctaveNumber,
     makeNotesToPlayMaster,
     handleNoteClick,
-} from './Helpers'
+} from './FrontEndHelpers.js'
+import { romanNumeralReference } from './BigObjectsAndArrays.js'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
 import HookTheoryChordButton from './Components/HookTheoryChordButton'
@@ -18,9 +19,6 @@ import RowOfNotes from './Components/RowOfNotes'
 import BeatMarkers from './Components/BeatMarkers'
 import CheckboxRow from './Components/CheckboxRow'
 const Sequencer = () => {
-    // const [tempo, setTempo] = useState(150)
-    // todo make this context one object?
-    // todo what gets used here in sequencer as opposed to elsewhere? mb i can skip bringing them into here
     const {
         // tempo,
         // setTempo,
@@ -93,25 +91,6 @@ const Sequencer = () => {
     // todo find out what these are used for
     // const playingRef = useRef(playing)
     const currentBeatRef = useRef(1)
-    const romanNumeralReference = {
-        major: {
-            1: 'I',
-            2: 'ii',
-            3: 'iii',
-            4: 'IV',
-            5: 'V',
-            6: 'vi',
-            7: 'vii',
-            8: 'I',
-        },
-    }
-
-    // * this array is for visual purposes. try state though?
-    const notesInQueue = []
-    const scheduleBeat = (beatNumber, time) => {
-        notesInQueue.push({ note: beatNumber, time })
-    }
-    const secondsPerBeat = tempo / 60
 
     // todo make helper
     const handleChordClick = (chordID, index) => {
@@ -186,18 +165,44 @@ const Sequencer = () => {
             })
         }
     }
+    // useEffect(() => {
+    //     const userAuth = {
+    //         username: process.env.REACT_APP_HOOK_THEORY_USER,
+    //         password: process.env.REACT_APP_HOOK_THEORY_PASS,
+    //     }
+    //     fetch('https://api.hooktheory.com/v1/users/auth', {
+    //         method: 'POST',
+    //         headers: {
+    //             Accept: 'application/json',
+    //             'Content-Type': 'application/json',
+    //             // Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
+    //         },
+    //         body: JSON.stringify({ ...userAuth }),
+    //     })
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             console.log(data)
+    //         })
+    //         .catch((error) => {
+    //             console.log(error)
+    //         })
+    // }, [])
 
+    // ! invalid JSON sent!
     useEffect(() => {
+        console.log(process.env.REACT_APP_HOOK_THEORY_BEARER, 'process ENV')
+        console.log('FETCHING HOOK THEORY CHORDS!!')
         fetch('https://api.hooktheory.com/v1/trends/nodes', {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
+                Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
             },
         })
             .then((res) => res.json())
             .then((data) => {
+                console.log(data, 'YOOOOOOOOOO THIS IS WHAT WE WANT')
                 setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
             })
             .catch((error) => {
@@ -208,6 +213,7 @@ const Sequencer = () => {
     // todo ? show songs with the given chord progression
     useEffect(() => {
         // todo fit chosen chords in format 1,4 in ${}
+
         if (chosenAPIChords.length > 0) {
             fetch(
                 `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
@@ -265,27 +271,20 @@ const Sequencer = () => {
 
     // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
     useEffect(() => {
+        console.log('chord input step', chordInputStep)
         if (chordInputStep > stepCount) setChordInputStep(1)
     }, [chordInputStep])
 
     // when the user selects a different amount of steps, change the notes arrays to accomodate that.
-    useEffect(() => {
-        const newMaster = makeNewChordMaster(
-            makeChordNotesState,
-            areChordBeatsChecked,
-            blankStepCountArray
-        )
-        setAreChordBeatsChecked(newMaster)
-        const newMelodyMaster = makeNewMelodyMaster(
-            makeMelodyNotesState,
-            areMelodyBeatsChecked,
-            blankStepCountArray
-        )
-        // setAreMelodyBeatsChecked(newMelodyMaster)
+
+    if (stepCount !== Object.keys(notesToPlay).length) {
         setNotesToPlay(makeNotesToPlayMaster(stepCount))
-    }, [stepCount])
+    }
+
+    // todo either set all these things wherever you change loadSong, or ask if song !== current song, if so, change these states. remove useFX
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
     useEffect(() => {
+        console.log('loadSong useFX')
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
             // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
             const song = loadUserSongs[loadSong]
