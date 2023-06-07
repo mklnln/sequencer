@@ -166,51 +166,27 @@ const Sequencer = () => {
             })
         }
     }
-    // useEffect(() => {
-    //     const userAuth = {
-    //         username: process.env.REACT_APP_HOOK_THEORY_USER,
-    //         password: process.env.REACT_APP_HOOK_THEORY_PASS,
-    //     }
-    //     fetch('https://api.hooktheory.com/v1/users/auth', {
-    //         method: 'POST',
-    //         headers: {
-    //             Accept: 'application/json',
-    //             'Content-Type': 'application/json',
-    //             // Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
-    //         },
-    //         body: JSON.stringify({ ...userAuth }),
-    //     })
-    //         .then((res) => res.json())
-    //         .then((data) => {
-    //             console.log(data)
-    //         })
-    //         .catch((error) => {
-    //             console.log(error)
-    //         })
-    // }, [])
 
-    // replaces useEffect call, ask if hookTheoryChords is in its initial state
-    if (hookTheoryChords.length === 0) {
-        fetch('https://api.hooktheory.com/v1/trends/nodes', {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
-            },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data)
-                setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
-
+    // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
-        if (chosenAPIChords.length > 0) {
+        if (hookTheoryChords.length === 0) {
+            fetch('https://api.hooktheory.com/v1/trends/nodes', {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
+                },
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data)
+                    setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        } else if (chosenAPIChords.length > 0) {
             fetch(
                 `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
                 {
@@ -267,9 +243,9 @@ const Sequencer = () => {
     }, [chosenAPIChords])
 
     // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
-    useEffect(() => {
-        if (chordInputStep > stepCount) setChordInputStep(1)
-    }, [chordInputStep])
+    // useEffect(() => {
+    //     if (chordInputStep > stepCount) setChordInputStep(1)
+    // }, [chordInputStep])
 
     // when the user selects a different amount of steps, change the notes arrays to accomodate that.
 
@@ -279,38 +255,38 @@ const Sequencer = () => {
 
     // todo either set all these things wherever you change loadSong, or ask if song !== current song, if so, change these states. remove useFX
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
-    useEffect(() => {
-        if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
-            // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
-            const song = loadUserSongs[loadSong]
-            setRootNote(song['rootNote'])
-            setStepCount(song['stepCount'])
-            setTempo(song['tempo'])
-            setWonkFactor(song['wonkFactor'])
-            setMelodyVolume(song['melodyVolume'])
-            setChordsVolume(song['chordsVolume'])
-            setSound(song['sound'])
-            setFilterCutoff(song['filterCutoff'])
-            setAttack(song['attack'])
-            setDecay(song['decay'])
-            setSustain(song['sustain'])
-            setRelease(song['release'])
-            setAreChordBeatsChecked(song['areChordBeatsChecked'])
-            // setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
-            console.log('load song?!?!?!?')
-        }
-    }, [loadSong])
+    // useEffect(() => {
+    //     if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
+    //         // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
+    //         const song = loadUserSongs[loadSong]
+    //         setRootNote(song['rootNote'])
+    //         setStepCount(song['stepCount'])
+    //         setTempo(song['tempo'])
+    //         setWonkFactor(song['wonkFactor'])
+    //         setMelodyVolume(song['melodyVolume'])
+    //         setChordsVolume(song['chordsVolume'])
+    //         setSound(song['sound'])
+    //         setFilterCutoff(song['filterCutoff'])
+    //         setAttack(song['attack'])
+    //         setDecay(song['decay'])
+    //         setSustain(song['sustain'])
+    //         setRelease(song['release'])
+    //         setAreChordBeatsChecked(song['areChordBeatsChecked'])
+    //         // setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
+    //         console.log('load song?!?!?!?')
+    //     }
+    // }, [loadSong])
 
-    // upon saving or deleting a song, update the song list.
-    useEffect(() => {
-        loadChangedSongList(
-            songSavedOrDeleted,
-            user,
-            setLoadUserSongs,
-            setSongSavedOrDeleted,
-            handleLoadSongsFetch
-        )
-    }, [songSavedOrDeleted])
+    // // upon saving or deleting a song, update the song list.
+    // useEffect(() => {
+    //     loadChangedSongList(
+    //         songSavedOrDeleted,
+    //         user,
+    //         setLoadUserSongs,
+    //         setSongSavedOrDeleted,
+    //         handleLoadSongsFetch
+    //     )
+    // }, [songSavedOrDeleted])
 
     const countReRenders = useRef(1)
 
