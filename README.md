@@ -29,9 +29,9 @@ Please note that this is an MVP and still contains bugs. I hope you'll find some
 - [x] Allow for manipulation of the Web Audio API synth engine (cutoff, attack, decay, etc)
 - [x] Select different sounds, some of which are sampled from a single mp3 and pitch-shifted to create different notes
 - [ ] Get back-end (BE) live
-- [ ] Integrate rock-solid timing by co-ordinating Web Audio's current time with a lookahead note scheduling algorithm
-- [ ] Get tempo to reflect real BPM values (currently just approximate)
+- [x] Integrate rock-solid timing by co-ordinating Web Audio's current time with a lookahead note scheduling algorithm
+- [x] Get tempo to reflect real BPM values (currently just approximate)
 - [ ] Fix bugs with parameter manipulation, especially when the values are set to extremes (ADSR, tempo, filter, etc)
-- [ ] Design UI with inspiration from real-world synth hardware using Figma
+- [ ] Make UI intuitive, aiming at optimizing a UX for someone without any sequencer experience. Label melody and chord grids, among other things
 - [ ] Create ? icons with corresponding modals to teach the user about both the sequencer and music theory
-- [ ] Finishing touches (tab icon, tab title, song pre-loaded, UX decisions, etc)
+- [ ] Finishing touches (tab icon, tab title, song pre-loaded, etc)
