@@ -24,7 +24,6 @@ const App = () => {
     // [0,0,0,0,0,0,0,0] where stepCount = 8
     for (let i = stepCount; i > 0; i--) {
         blankStepCountArray.push(0)
-        console.log('blankstepcount gen')
     }
     const [areChordBeatsChecked, setAreChordBeatsChecked] = useState(
         generateAreXBeatsCheckedInitialState(

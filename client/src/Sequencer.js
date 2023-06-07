@@ -78,6 +78,7 @@ const Sequencer = () => {
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
+
     const [clickedNote, setClickedNote] = useState({
         beatNum: null,
         scaleIndex: null,
@@ -188,10 +189,8 @@ const Sequencer = () => {
     //         })
     // }, [])
 
-    // ! invalid JSON sent!
-    useEffect(() => {
-        console.log(process.env.REACT_APP_HOOK_THEORY_BEARER, 'process ENV')
-        console.log('FETCHING HOOK THEORY CHORDS!!')
+    // replaces useEffect call, ask if hookTheoryChords is in its initial state
+    if (hookTheoryChords.length === 0) {
         fetch('https://api.hooktheory.com/v1/trends/nodes', {
             method: 'GET',
             headers: {
@@ -202,18 +201,15 @@ const Sequencer = () => {
         })
             .then((res) => res.json())
             .then((data) => {
-                console.log(data, 'YOOOOOOOOOO THIS IS WHAT WE WANT')
+                console.log(data)
                 setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
             })
             .catch((error) => {
                 console.log(error)
             })
-    }, [chosenAPIChords])
+    }
 
-    // todo ? show songs with the given chord progression
     useEffect(() => {
-        // todo fit chosen chords in format 1,4 in ${}
-
         if (chosenAPIChords.length > 0) {
             fetch(
                 `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
@@ -241,6 +237,7 @@ const Sequencer = () => {
         }
 
         // * the below is for getting songs with the specific chord progression.
+        // todo give back 3 random songs, provide link to hooktheory site?
         if (chosenAPIChords.length >= 4) {
             // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
             const APISongs = []
@@ -271,7 +268,6 @@ const Sequencer = () => {
 
     // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
     useEffect(() => {
-        console.log('chord input step', chordInputStep)
         if (chordInputStep > stepCount) setChordInputStep(1)
     }, [chordInputStep])
 
@@ -284,7 +280,6 @@ const Sequencer = () => {
     // todo either set all these things wherever you change loadSong, or ask if song !== current song, if so, change these states. remove useFX
     // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
     useEffect(() => {
-        console.log('loadSong useFX')
         if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
             // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
             const song = loadUserSongs[loadSong]
@@ -329,16 +324,18 @@ const Sequencer = () => {
     // this requires the if (clickedNote) seen below to watch for changes. according to dev tools, 1/10th the render time without notesToPlay in useCallback!!
     const bubbleUpCheckboxInfo = useCallback(
         (beatNum, scaleIndex, whichGrid) => {
-            console.log('bubble up callback, set clicked note')
             setClickedNote({
                 beatNum: beatNum,
                 scaleIndex: scaleIndex,
                 whichGrid: whichGrid,
             })
+            console.log('useCallback only gets called ONCE')
         },
         []
     )
-    if (clickedNote) {
+    // ? without both if conditions, problems. only 1st, we add note-null to beat-1. only 2nd, 'cannot read properties of null'
+    if (clickedNote && clickedNote.scaleIndex !== null) {
+        console.log('handleNoteClick gets called A BUNCH OF TIMES')
         handleNoteClick(
             notesToPlay,
             setNotesToPlay,
@@ -445,6 +442,7 @@ const Sequencer = () => {
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]
                                 }
+                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
                             />
                         )
                     })}
