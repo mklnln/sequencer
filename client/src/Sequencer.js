@@ -8,7 +8,8 @@ import {
     giveOctaveNumber,
     makeNotesToPlayMaster,
     handleNoteClick,
-} from './Helpers'
+} from './FrontEndHelpers.js'
+import { romanNumeralReference } from './BigObjectsAndArrays.js'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
 import styled from 'styled-components'
 import HookTheoryChordButton from './Components/HookTheoryChordButton'
@@ -18,9 +19,6 @@ import RowOfNotes from './Components/RowOfNotes'
 import BeatMarkers from './Components/BeatMarkers'
 import CheckboxRow from './Components/CheckboxRow'
 const Sequencer = () => {
-    // const [tempo, setTempo] = useState(150)
-    // todo make this context one object?
-    // todo what gets used here in sequencer as opposed to elsewhere? mb i can skip bringing them into here
     const {
         // tempo,
         // setTempo,
@@ -80,6 +78,7 @@ const Sequencer = () => {
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
+
     const [clickedNote, setClickedNote] = useState({
         beatNum: null,
         scaleIndex: null,
@@ -93,25 +92,6 @@ const Sequencer = () => {
     // todo find out what these are used for
     // const playingRef = useRef(playing)
     const currentBeatRef = useRef(1)
-    const romanNumeralReference = {
-        major: {
-            1: 'I',
-            2: 'ii',
-            3: 'iii',
-            4: 'IV',
-            5: 'V',
-            6: 'vi',
-            7: 'vii',
-            8: 'I',
-        },
-    }
-
-    // * this array is for visual purposes. try state though?
-    const notesInQueue = []
-    const scheduleBeat = (beatNumber, time) => {
-        notesInQueue.push({ note: beatNumber, time })
-    }
-    const secondsPerBeat = tempo / 60
 
     // todo make helper
     const handleChordClick = (chordID, index) => {
@@ -187,28 +167,26 @@ const Sequencer = () => {
         }
     }
 
+    // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
-        fetch('https://api.hooktheory.com/v1/trends/nodes', {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
-            },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
+        if (hookTheoryChords.length === 0) {
+            fetch('https://api.hooktheory.com/v1/trends/nodes', {
+                method: 'GET',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
+                },
             })
-            .catch((error) => {
-                console.log(error)
-            })
-    }, [chosenAPIChords])
-
-    // todo ? show songs with the given chord progression
-    useEffect(() => {
-        // todo fit chosen chords in format 1,4 in ${}
-        if (chosenAPIChords.length > 0) {
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(data)
+                    setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
+        } else if (chosenAPIChords.length > 0) {
             fetch(
                 `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
                 {
@@ -235,6 +213,7 @@ const Sequencer = () => {
         }
 
         // * the below is for getting songs with the specific chord progression.
+        // todo give back 3 random songs, provide link to hooktheory site?
         if (chosenAPIChords.length >= 4) {
             // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
             const APISongs = []
@@ -264,59 +243,50 @@ const Sequencer = () => {
     }, [chosenAPIChords])
 
     // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
-    useEffect(() => {
-        if (chordInputStep > stepCount) setChordInputStep(1)
-    }, [chordInputStep])
+    // useEffect(() => {
+    //     if (chordInputStep > stepCount) setChordInputStep(1)
+    // }, [chordInputStep])
 
     // when the user selects a different amount of steps, change the notes arrays to accomodate that.
-    useEffect(() => {
-        const newMaster = makeNewChordMaster(
-            makeChordNotesState,
-            areChordBeatsChecked,
-            blankStepCountArray
-        )
-        setAreChordBeatsChecked(newMaster)
-        const newMelodyMaster = makeNewMelodyMaster(
-            makeMelodyNotesState,
-            areMelodyBeatsChecked,
-            blankStepCountArray
-        )
-        // setAreMelodyBeatsChecked(newMelodyMaster)
-        setNotesToPlay(makeNotesToPlayMaster(stepCount))
-    }, [stepCount])
-    // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
-    useEffect(() => {
-        if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
-            // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
-            const song = loadUserSongs[loadSong]
-            setRootNote(song['rootNote'])
-            setStepCount(song['stepCount'])
-            setTempo(song['tempo'])
-            setWonkFactor(song['wonkFactor'])
-            setMelodyVolume(song['melodyVolume'])
-            setChordsVolume(song['chordsVolume'])
-            setSound(song['sound'])
-            setFilterCutoff(song['filterCutoff'])
-            setAttack(song['attack'])
-            setDecay(song['decay'])
-            setSustain(song['sustain'])
-            setRelease(song['release'])
-            setAreChordBeatsChecked(song['areChordBeatsChecked'])
-            // setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
-            console.log('load song?!?!?!?')
-        }
-    }, [loadSong])
 
-    // upon saving or deleting a song, update the song list.
-    useEffect(() => {
-        loadChangedSongList(
-            songSavedOrDeleted,
-            user,
-            setLoadUserSongs,
-            setSongSavedOrDeleted,
-            handleLoadSongsFetch
-        )
-    }, [songSavedOrDeleted])
+    if (stepCount !== Object.keys(notesToPlay).length) {
+        setNotesToPlay(makeNotesToPlayMaster(stepCount))
+    }
+
+    // todo either set all these things wherever you change loadSong, or ask if song !== current song, if so, change these states. remove useFX
+    // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
+    // useEffect(() => {
+    //     if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
+    //         // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
+    //         const song = loadUserSongs[loadSong]
+    //         setRootNote(song['rootNote'])
+    //         setStepCount(song['stepCount'])
+    //         setTempo(song['tempo'])
+    //         setWonkFactor(song['wonkFactor'])
+    //         setMelodyVolume(song['melodyVolume'])
+    //         setChordsVolume(song['chordsVolume'])
+    //         setSound(song['sound'])
+    //         setFilterCutoff(song['filterCutoff'])
+    //         setAttack(song['attack'])
+    //         setDecay(song['decay'])
+    //         setSustain(song['sustain'])
+    //         setRelease(song['release'])
+    //         setAreChordBeatsChecked(song['areChordBeatsChecked'])
+    //         // setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
+    //         console.log('load song?!?!?!?')
+    //     }
+    // }, [loadSong])
+
+    // // upon saving or deleting a song, update the song list.
+    // useEffect(() => {
+    //     loadChangedSongList(
+    //         songSavedOrDeleted,
+    //         user,
+    //         setLoadUserSongs,
+    //         setSongSavedOrDeleted,
+    //         handleLoadSongsFetch
+    //     )
+    // }, [songSavedOrDeleted])
 
     const countReRenders = useRef(1)
 
@@ -330,16 +300,18 @@ const Sequencer = () => {
     // this requires the if (clickedNote) seen below to watch for changes. according to dev tools, 1/10th the render time without notesToPlay in useCallback!!
     const bubbleUpCheckboxInfo = useCallback(
         (beatNum, scaleIndex, whichGrid) => {
-            console.log('bubble up callback, set clicked note')
             setClickedNote({
                 beatNum: beatNum,
                 scaleIndex: scaleIndex,
                 whichGrid: whichGrid,
             })
+            console.log('useCallback only gets called ONCE')
         },
         []
     )
-    if (clickedNote) {
+    // ? without both if conditions, problems. only 1st, we add note-null to beat-1. only 2nd, 'cannot read properties of null'
+    if (clickedNote && clickedNote.scaleIndex !== null) {
+        console.log('handleNoteClick gets called A BUNCH OF TIMES')
         handleNoteClick(
             notesToPlay,
             setNotesToPlay,
@@ -446,6 +418,7 @@ const Sequencer = () => {
                                 noteTitle={
                                     romanNumeralReference['major'][scaleIndex]
                                 }
+                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
                             />
                         )
                     })}

@@ -149,9 +149,8 @@ export const handleNoteClick = (
     { beatNum, scaleIndex, whichGrid },
     setClickedNote
 ) => {
-    console.log(beatNum, 'clicked note?E')
+    console.log('we clicked  NOTeeeEEEEEEEEEE')
     const arrayKey = `note-${scaleIndex}`
-    console.log(whichGrid, 'whichgrid')
     let obj = { ...notesToPlay }
     if (obj[`beat-${beatNum + 1}`][arrayKey]) {
         delete obj[`beat-${beatNum + 1}`][arrayKey][whichGrid]
@@ -161,7 +160,6 @@ export const handleNoteClick = (
             delete obj[`beat-${beatNum + 1}`][arrayKey]
         }
 
-        console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
         setClickedNote(null)
     } else {
@@ -180,7 +178,6 @@ export const handleNoteClick = (
             ...obj[`beat-${beatNum + 1}`],
         }
         // ? hopefully does something idfk
-        console.log(obj, 'newnotestoplay')
         setNotesToPlay(obj)
         setClickedNote(null)
     }

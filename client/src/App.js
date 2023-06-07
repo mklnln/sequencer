@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Sequencer from './Sequencer'
 import GlobalStyle from './globalStyles'
-import { generateAreXBeatsCheckedInitialState } from './Helpers'
+import { generateAreXBeatsCheckedInitialState } from './FrontEndHelpers'
 export const MusicParametersContext = createContext()
 const App = () => {
     const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
@@ -24,7 +24,6 @@ const App = () => {
     // [0,0,0,0,0,0,0,0] where stepCount = 8
     for (let i = stepCount; i > 0; i--) {
         blankStepCountArray.push(0)
-        console.log('blankstepcount gen')
     }
     const [areChordBeatsChecked, setAreChordBeatsChecked] = useState(
         generateAreXBeatsCheckedInitialState(

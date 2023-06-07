@@ -15,6 +15,19 @@ export const rootNoteOptions = [
 
 export const stepCountOptions = ['8', '16', '24', '32', '64']
 
+export const romanNumeralReference = {
+    major: {
+        1: 'I',
+        2: 'ii',
+        3: 'iii',
+        4: 'IV',
+        5: 'V',
+        6: 'vi',
+        7: 'vii',
+        8: 'I',
+    },
+}
+
 export const slidersToShowObj = {
     tempo: {
         id: 0,

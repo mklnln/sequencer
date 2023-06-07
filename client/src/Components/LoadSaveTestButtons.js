@@ -5,7 +5,7 @@ import { MusicParametersContext } from '../App'
 import {
     clearAreChordBeatsChecked,
     clearAreMelodyBeatsChecked,
-} from '../Helpers'
+} from '../FrontEndHelpers'
 
 const LoadSaveTestButtons = () => {
     const {

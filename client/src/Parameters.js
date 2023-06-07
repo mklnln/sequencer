@@ -158,6 +158,11 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
     let eighthNoteTicks = 0
     let intervalTicks = 0
     let sentToPlayEngine = false // prevents sending >1 playEngine calls while on the same eighth note but different intervals
+    console.log(notesToPlay)
+    console.log(
+        notesToPlay[`beat-${(currentBeatRef.current % stepCount) + 1}`],
+        'sednc'
+    )
     if (playing) {
         timeFromStart = audioTime()
         nextNoteTime = null
@@ -180,10 +185,9 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
                 // &&                nextNoteTime < audioTime() + scheduleAheadTime
             ) {
                 futureBeatNotesArray.forEach((note) => {
-                    console.log(futureBeatTarget, note)
                     const scaleIndex = note.substring(5)
                     Object.keys(futureBeatTarget[note]).forEach((type) => {
-                        console.log(type, 'WE SENDINNNNNNNNNNN')
+                        console.log('play, ', scaleIndex, 'type ', type)
                         playEngine(nextNoteTime, parseInt(scaleIndex), type)
                     })
                 })
@@ -228,7 +232,6 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
         const detectKeyDown = (e) => {
             if (e.key === 's' && e.target.type !== 'text') {
                 togglePlayback()
-                document.removeEventListener('keydown', detectKeyDown, true)
             }
         }
         document.addEventListener('keydown', detectKeyDown, true)
@@ -281,21 +284,12 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
         value: null,
     })
 
-    const bubbleUpSliderInfo = useCallback(
-        (
-            value,
-            title
-            // todo put in necessary args from Slider
-        ) => {
-            // todo change parameterValuesObj
-            console.log(value, title)
-            setChangedParameter({
-                title: title.toLowerCase(),
-                value: value,
-            })
-        },
-        []
-    )
+    const bubbleUpSliderInfo = useCallback((value, title) => {
+        setChangedParameter({
+            title: title.toLowerCase(),
+            value: value,
+        })
+    }, [])
 
     if (changedParameter) {
         let obj = { ...parameterValuesObj }
@@ -313,7 +307,6 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
     //     }
     // }, [changedParameter])
 
-    console.log(parameterValuesObj, 'param values before rturn')
     return (
         <>
             <MainDiv>
