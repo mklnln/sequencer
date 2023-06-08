@@ -14,12 +14,26 @@ const CheckboxRow = memo(
         // notesToPlay,
         // setNotesToPlay,
         blankStepCountArray,
+        sendChordPattern,
+        setSendChordPattern,
+        chordInputStep,
     }) => {
+        console.log(sendChordPattern, 'chordpatt', scaleIndex)
         useEffect(() => {
             if (countCheckboxRenders) {
                 countCheckboxRenders.current = countCheckboxRenders.current + 1
             }
         })
+        let sendCheckPatternArr = []
+        if (sendChordPattern) {
+            // make array corresponding to the thing
+            for (let i = 1; i <= blankStepCountArray.length; i++) {
+                // array reflects non-zero indexing
+                if (i === chordInputStep) {
+                    sendCheckPatternArr.push()
+                }
+            }
+        }
         return (
             <React.Fragment
             // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatNum}}`}

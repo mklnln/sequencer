@@ -6,6 +6,31 @@ import GlobalStyle from './globalStyles'
 import { generateAreXBeatsCheckedInitialState } from './FrontEndHelpers'
 export const MusicParametersContext = createContext()
 const App = () => {
+    // useEffect(() => {
+    //     console.log(process.env.REACT_APP_HOOK_THEORY_USER)
+    //     if (hookTheoryChords.length === 0) {
+    //         fetch('https://api.hooktheory.com/v1/users/auth', {
+    //             method: 'POST',
+    //             headers: {
+    //                 Accept: 'application/json',
+    //                 'Content-Type': 'application/json',
+    //                 // Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
+    //             },
+    //             body: JSON.stringify({
+    //                 username: `"${process.env.REACT_APP_HOOK_THEORY_USER}"`,
+    //                 password: `"${process.env.REACT_APP_HOOK_THEORY_PASS}"`,
+    //             }),
+    //         })
+    //             .then((res) => res.json())
+    //             .then((data) => {
+    //                 console.log(data, 'app')
+    //             })
+    //             .catch((error) => {
+    //                 console.log(error, 'NOOOOOOOOOO')
+    //             })
+    //     }
+    // }, [])
+
     const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
     const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
 
