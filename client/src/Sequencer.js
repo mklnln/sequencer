@@ -8,6 +8,7 @@ import {
     giveOctaveNumber,
     makeNotesToPlayMaster,
     handleNoteClick,
+    makeDeepCopy,
 } from './FrontEndHelpers.js'
 import { romanNumeralReference } from './BigObjectsAndArrays.js'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
@@ -78,6 +79,7 @@ const Sequencer = () => {
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
+    const [sendChordPattern, setSendChordPattern] = useState(null)
 
     const [clickedNote, setClickedNote] = useState({
         beatNum: null,
@@ -95,77 +97,73 @@ const Sequencer = () => {
 
     // todo make helper
     const handleChordClick = (chordID, index) => {
-        setHookTheoryChords([])
-        console.log(hookTheoryChords)
-        let newChosenAPIChords = []
-        console.log(chosenAPIChords)
-        console.log(chordID)
+        setHookTheoryChords([]) // may have previously used this to trigger useEffect
+        let newChosenAPIChords = [] // new array to setState with
         if (chosenAPIChords === '') {
+            //
             newChosenAPIChords.push(chordID)
         } else {
             newChosenAPIChords = [...chosenAPIChords]
             newChosenAPIChords.push(chordID)
         }
+        // we want to track this so we can send the request to the API to get chords based on this
         setChosenAPIChords(newChosenAPIChords)
-        const chordShortcut = `chord-${chordID}`
-        const arrayReplacement = []
-        blankStepCountArray.forEach((step, index) => {
-            if (
-                index + 1 === chordInputStep ||
-                index + 1 === chordInputStep + 1 ||
-                index + 1 === chordInputStep + 2 ||
-                index + 1 === chordInputStep + 3
-            ) {
-                arrayReplacement.push(1)
-            } else {
-                arrayReplacement.push(
-                    areChordBeatsChecked[`chord-${chordID}`][index]
-                )
-            }
-        })
-        console.log(arrayReplacement.length, stepCount)
-        if (arrayReplacement.length === stepCount) {
-            setAreChordBeatsChecked({
-                ...areChordBeatsChecked,
-                [chordShortcut]: [...arrayReplacement],
-            })
+        // finished, logic for tracking chords
 
-            setChordInputStep((chordInputStep) => chordInputStep + 4)
-        }
-    }
+        // begin logic for updating noteState
+        // todo adapt for notesToPlay
+        // ! consider pattern
+        let pattern = [1, 1, 1, 1] // play all notes
 
-    // todo make helper
-    const handleChordRemove = (chordAtStep, chordID) => {
-        const arrayReplacement = []
-        const chordShortcut = `chord-${chosenAPIChords[chordID]}`
-        const removeAtStep = (chordAtStep - 1) * 4 + 1
-        blankStepCountArray.forEach((step, index) => {
-            if (
-                index + 1 === removeAtStep ||
-                index + 1 === removeAtStep + 1 ||
-                index + 1 === removeAtStep + 2 ||
-                index + 1 === removeAtStep + 3
-            ) {
-                arrayReplacement.push(0)
-            } else {
-                arrayReplacement.push(
-                    areChordBeatsChecked[`chord-${chosenAPIChords[chordID]}`][
-                        index
-                    ]
-                )
+        // ? most efficient way to take the pattern and then put it into notesToPlay?
+        // notesToPlay: {beat-1: {}, beat-2: {}, beat-3: {}, etc}
+        // for loop and if pattern[i] === 1, add to notesToPlay?
+        // how do i access the beat? its related to chordInputStep + i
+
+        // todo TWO IDEAS:
+        // * makeDeepCopy
+        // ---- have
+        // * spread operate
+        // ---- blech gotta do many ones, and if i do the pattern it might not be easy to setState with that
+
+        let notesCopy = makeDeepCopy(notesToPlay)
+
+        // ? do i want to go in and delete what's already there?
+        // if there's nothing there, then we wont be able to delete nothing, then we're adding a process every time to ask if it exists
+        // mb not worth it
+        // ! idk, just leave it for now, test it once its running
+        // gpt4
+        for (let i = 0; i < pattern.length; i++) {
+            if (pattern[i]) {
+                let inputBeat = chordInputStep + i
+                let beat = `beat-${inputBeat}`
+                let note = `note-${chordID}`
+
+                // || means if it doesn't exist, create it
+                notesCopy[beat] = notesCopy[beat] || {}
+                notesCopy[beat][note] = notesCopy[beat][note] || {}
+                notesCopy[beat][note]['chords'] = 1
             }
-            console.log(chordID)
-            console.log(arrayReplacement)
-        })
-        if (arrayReplacement.length === stepCount) {
-            // todo update chosenapichords state
-            const replaceAPIChords = []
-            setAreChordBeatsChecked({
-                ...areChordBeatsChecked,
-                [chordShortcut]: [...arrayReplacement],
-            })
+
+            // ! if we want to delete what's already there, do this. gpt3
+            // for (let i = 0; i < pattern.length; i++) {
+            //     const inputBeat = chordInputStep + i;
+            //     const beatNotes = notesCopy[`beat-${inputBeat}`] || (notesCopy[`beat-${inputBeat}`] = {});
+            //     const chordNotes = beatNotes[`note-${chordID}`] || (beatNotes[`note-${chordID}`] = {});
+
+            //     if (pattern[i]) {
+            //         chordNotes['chords'] = 1;
+            //     } else {
+            //         delete chordNotes['chords'];
+            //     }
+            // }
         }
+
+        setNotesToPlay(notesCopy)
+        setSendChordPattern({ pattern: pattern, note: chordID })
+        setChordInputStep((chordInputStep) => chordInputStep + 4)
     }
+    console.log(notesToPlay, 'notestoplay')
 
     // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
@@ -184,7 +182,7 @@ const Sequencer = () => {
                     setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
                 })
                 .catch((error) => {
-                    console.log(error)
+                    console.log(error, 'NOOOOOOOOOO')
                 })
         } else if (chosenAPIChords.length > 0) {
             fetch(
@@ -320,6 +318,12 @@ const Sequencer = () => {
         )
     }
 
+    console.log(
+        Object.keys(areChordBeatsChecked),
+        makeChordNotesState,
+        'compare'
+    )
+
     return (
         <>
             <span>
@@ -406,19 +410,62 @@ const Sequencer = () => {
             </MelodySequencerGrid>
             <ChordSequencerGrid>
                 <AllBoxesDiv>
-                    {Object.keys(areChordBeatsChecked).map((note, index) => {
+                    {/* {makeChordNotesState.map((note, index) => {
                         const scaleIndex = note.substring(5)
+                        const commonProps = {
+
+                        }
+                        if (sendChordPattern) {
+                            return (
+                                <CheckboxRow
+                                    
+                                    sendChordPattern={sendChordPattern}
+                                    setSendChordPattern={setSendChordPattern}
+                                />
+                            )
+                        } else {
+                            return (
+                                <CheckboxRow
+                                    key={`${note}`}
+                                    blankStepCountArray={blankStepCountArray}
+                                    scaleIndex={scaleIndex}
+                                    beatNum={index + 1}
+                                    whichGrid="chords"
+                                    noteTitle={
+                                        romanNumeralReference['major'][
+                                            scaleIndex
+                                        ]
+                                    }
+                                    bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
+                                />
+                            )
+                        }
+                    })} */}
+
+                    {makeChordNotesState.map((note, index) => {
+                        const scaleIndex = note.substring(5)
+                        const commonProps = {
+                            key: `${note}`,
+                            blankStepCountArray,
+                            scaleIndex,
+                            beatNum: index + 1,
+                            whichGrid: 'chords',
+                            noteTitle:
+                                romanNumeralReference['major'][scaleIndex],
+                            bubbleUpCheckboxInfo,
+                        }
+                        console.log(
+                            sendChordPattern?.note === scaleIndex,
+                            'note'
+                        )
                         return (
                             <CheckboxRow
-                                key={`${note}`}
-                                blankStepCountArray={blankStepCountArray}
-                                scaleIndex={scaleIndex}
-                                beatNum={index + 1}
-                                whichGrid="chords"
-                                noteTitle={
-                                    romanNumeralReference['major'][scaleIndex]
-                                }
-                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
+                                {...commonProps}
+                                {...(sendChordPattern?.note === scaleIndex && {
+                                    sendChordPattern,
+                                    setSendChordPattern,
+                                    chordInputStep,
+                                })}
                             />
                         )
                     })}
@@ -442,7 +489,6 @@ const Sequencer = () => {
                                 handleChordClick={handleChordClick}
                                 chordInputStep={chordInputStep}
                                 index={index}
-                                handleChordRemove={handleChordRemove}
                                 blankStepCountArray={blankStepCountArray}
                                 hookTheoryChords={hookTheoryChords}
                             />

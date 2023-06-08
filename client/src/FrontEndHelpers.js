@@ -132,17 +132,10 @@ export const giveOctaveNumber = (note) => {
     return note
 }
 
-const makeDeepCopy = (areXBeatsChecked) => {
-    const obj = {}
-    Object.keys(areXBeatsChecked).forEach((note) => {
-        const arr = []
-        areXBeatsChecked[note].forEach((beat, index) => {
-            arr.push(beat)
-        })
-        obj[note] = arr
-    })
-    return obj
+export const makeDeepCopy = (original) => {
+    return JSON.parse(JSON.stringify(original))
 }
+
 export const handleNoteClick = (
     notesToPlay,
     setNotesToPlay,
