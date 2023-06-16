@@ -158,11 +158,7 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
     let eighthNoteTicks = 0
     let intervalTicks = 0
     let sentToPlayEngine = false // prevents sending >1 playEngine calls while on the same eighth note but different intervals
-    console.log(notesToPlay)
-    console.log(
-        notesToPlay[`beat-${(currentBeatRef.current % stepCount) + 1}`],
-        'sednc'
-    )
+
     if (playing) {
         timeFromStart = audioTime()
         nextNoteTime = null
