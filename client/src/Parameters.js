@@ -16,11 +16,18 @@ import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
-const Parameters = ({ currentBeatRef, notesToPlay, tempo, setTempo }) => {
+const Parameters = ({
+    currentBeatRef,
+    notesToPlay,
+    tempo,
+    setTempo,
+    beatForAnimation,
+    setBeatForAnimation,
+}) => {
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
     const intervalIDRef = useRef('')
-    let root = 1
+    const sentToPlayEngineRef = useRef(false) // prevents sending playEngine calls that have already been sent
     const [wonk, setWonk] = useState(0)
     const [melodyVolume, setMelodyVolume] = useState(100)
     const [chordsVolume, setChordsVolume] = useState(100)
@@ -57,85 +64,6 @@ const Parameters = ({ currentBeatRef, notesToPlay, tempo, setTempo }) => {
         )
     }
 
-    // ! DRY: playSynth and playSample could be joined
-    // const sendToPlayFxns = (nextNoteTime) => {
-    //     makeMelodyNotesState.forEach((noteRow, index) => {
-    //         console.log('send to play fxns')
-    //         if (
-    //             areMelodyBeatsChecked[`note-${noteRow}`][
-    //                 currentBeatRef.current - 1
-    //             ] === 1 &&
-    //             playing
-    //         ) {
-    //             if (!sound.includes('sample')) {
-    //                 playSynth(
-    //                     // audioCtx,
-    //                     makeMelodyNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     melodyVolume,
-    //                     chordsVolume,
-    //                     sound,
-    //                     filterCutoff,
-    //                     attack,
-    //                     decay,
-    //                     sustain,
-    //                     release,
-    //                     'melody',
-    //                     nextNoteTime
-    //                 )
-    //             } else {
-    //                 playSample(
-    //                     // audioCtx,
-    //                     makeMelodyNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     'melody'
-    //                 )
-    //             }
-    //         }
-    //     })
-
-    //     makeChordNotesState.forEach((noteRow, index) => {
-    //         if (
-    //             areChordBeatsChecked[`note-${noteRow}`][
-    //                 currentBeatRef.current - 1
-    //             ] === 1 &&
-    //             playing
-    //         ) {
-    //             if (!sound.includes('sample')) {
-    //                 console.log('play chords!!!!!!!!!!!!')
-    //                 playSynth(
-    //                     // audioCtx,
-    //                     makeChordNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     melodyVolume,
-    //                     chordsVolume,
-    //                     sound,
-    //                     filterCutoff,
-    //                     attack,
-    //                     decay,
-    //                     sustain,
-    //                     release,
-    //                     'chords'
-    //                 )
-    //             } else {
-    //                 playSample(
-    //                     // audioCtx,
-    //                     makeChordNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     'chords'
-    //                 )
-    //             }
-    //         }
-    //     })
-    // }
     const stopIntervalAndFalsifyRef = () => {
         clearInterval(intervalIDRef.current)
         intervalRunningRef.current = false
@@ -145,7 +73,7 @@ const Parameters = ({ currentBeatRef, notesToPlay, tempo, setTempo }) => {
     let timeFromStart = 0
     let eighthNoteTicks = 0
     let intervalTicks = 0
-    const sentToPlayEngineRef = useRef(false) // prevents sending playEngine calls that have already been sent
+
     console.log(sentToPlayEngineRef.current, 'sent is falsified!!')
     if (playing) {
         timeFromStart = audioTime()
@@ -193,8 +121,13 @@ const Parameters = ({ currentBeatRef, notesToPlay, tempo, setTempo }) => {
     }
 
     const advanceCurrentBeat = () => {
-        currentBeatRef.current = currentBeatRef.current + 1
-        if (currentBeatRef.current > stepCount) currentBeatRef.current = 1
+        if (currentBeatRef.current >= stepCount) {
+            currentBeatRef.current = 1
+            // setBeatForAnimation(1)
+        } else {
+            currentBeatRef.current = currentBeatRef.current + 1
+            // setBeatForAnimation((prevProp) => prevProp + 1)
+        }
     }
 
     // * this useEffect is necessary to make sure theres only ever one event listener

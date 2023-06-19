@@ -36,13 +36,13 @@ const App = () => {
 
     const makeMelodyNotesState = []
     // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-    for (let i = amtOfNotes * 2 - 1; i > 0; i--) {
+    for (let i = 15; i > 0; i--) {
         makeMelodyNotesState.push(`note-${i}`)
     }
 
     const makeChordNotesState = []
     // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-    for (let i = amtOfNotes; i > 0; i--) {
+    for (let i = 8; i > 0; i--) {
         makeChordNotesState.push(`note-${i}`)
     }
     const blankStepCountArray = []
@@ -168,8 +168,6 @@ const App = () => {
                     areChordBeatsChecked,
                     setAreChordBeatsChecked,
                     areMelodyBeatsChecked,
-                    amtOfNotes,
-                    setAmtOfNotes,
                     // setAreMelodyBeatsChecked,
                     makeChordNotesState,
                     makeMelodyNotesState,

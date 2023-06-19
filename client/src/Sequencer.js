@@ -21,8 +21,6 @@ import BeatMarkers from './Components/BeatMarkers'
 import CheckboxRow from './Components/CheckboxRow'
 const Sequencer = () => {
     const {
-        // tempo,
-        // setTempo,
         stepCount,
         setStepCount,
         rootNote,
@@ -33,22 +31,6 @@ const Sequencer = () => {
         setChordInputStep,
         loadUserSongs,
         setLoadUserSongs,
-        melodyVolume,
-        chordsVolume,
-        sound,
-        filterCutoff,
-        attack,
-        decay,
-        sustain,
-        release,
-        setMelodyVolume,
-        setChordsVolume,
-        setSound,
-        setFilterCutoff,
-        setAttack,
-        setDecay,
-        setSustain,
-        setRelease,
         songSavedOrDeleted,
         setSongSavedOrDeleted,
         setSongDeleted,
@@ -64,27 +46,24 @@ const Sequencer = () => {
         makeChordNotesState,
         makeMelodyNotesState,
         blankStepCountArray,
-        amtOfNotes,
         chosenAPIChords,
         setChosenAPIChords,
-        setAmtOfNotes,
         hookTheoryChords,
         setHookTheoryChords,
     } = useContext(MusicParametersContext)
     const { isAuthenticated, user } = useAuth0()
-
     const [tempo, setTempo] = useState(120)
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
     const [sendChordPattern, setSendChordPattern] = useState(null)
+    const [beatForAnimation, setBeatForAnimation] = useState(1)
 
     const [clickedNote, setClickedNote] = useState({
         beatNum: null,
         scaleIndex: null,
         whichGrid: null,
     })
-    // let playing = false
 
     const currentBeatRef = useRef(0)
 
@@ -290,6 +269,8 @@ const Sequencer = () => {
                 notesToPlay={notesToPlay}
                 tempo={tempo}
                 setTempo={setTempo}
+                beatForAnimation={beatForAnimation}
+                setBeatForAnimation={setBeatForAnimation}
             />
             <MelodySequencerGrid>
                 {countCheckboxRenders.current}
@@ -320,6 +301,7 @@ const Sequencer = () => {
                         <BeatMarkers
                             blankStepCountArray={blankStepCountArray}
                             currentBeatRef={currentBeatRef}
+                            beatForAnimation={beatForAnimation}
                         />
                         {/* //! dont delete this until we sure that we can highlight the beats without it */}
                         {/* {blankStepCountArray.map((step, index) => {
@@ -331,9 +313,8 @@ const Sequencer = () => {
                                         <BeatMarker
                                             key={num}
                                             className={
-                                                currentBeat === num ||
-                                                currentBeat === num + 1 ||
-                                                num === currentBeatRef.current
+                                                beatForAnimation === num ||
+                                                beatForAnimation === num + 1
                                                     ? 'current'
                                                     : ''
                                             }
@@ -341,10 +322,8 @@ const Sequencer = () => {
                                             <BeatSpan
                                                 key={num}
                                                 className={
-                                                    currentBeat === num ||
-                                                    currentBeat === num + 1 ||
-                                                    num ===
-                                                        currentBeatRef.current
+                                                    beatForAnimation === num ||
+                                                    beatForAnimation === num + 1
                                                         ? 'current'
                                                         : ''
                                                 }
@@ -423,6 +402,7 @@ const Sequencer = () => {
                         <BeatMarkers
                             blankStepCountArray={blankStepCountArray}
                             currentBeatRef={currentBeatRef}
+                            beatForAnimation={beatForAnimation}
                         />
                     </PointerContainer>
                 </AllBoxesDiv>
@@ -497,4 +477,21 @@ const PointerContainer = styled.div`
     align-items: center;
     height: 10px;
     padding-left: 20px;
+`
+const BeatMarker = styled.div`
+    border-left: 1px solid var(--lightest-color);
+    width: 26.5px;
+    height: 20px;
+    opacity: 100%;
+    padding-right: 26.5px;
+    display: flex;
+    justify-content: center;
+    &.current {
+        border: 1px solid fuchsia;
+    }
+`
+const BeatSpan = styled.span`
+    // padding-left: 9px;
+    color: var(--lighter-color);
+    opacity: 50%;
 `
