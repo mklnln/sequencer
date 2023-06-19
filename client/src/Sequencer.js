@@ -158,15 +158,22 @@ const Sequencer = () => {
             //     }
             // }
         }
-
+        let chordInputStepCopy = chordInputStep
+        console.log(chordInputStepCopy)
         setNotesToPlay(notesCopy)
-        setSendChordPattern({ pattern: pattern, note: chordID })
+        setSendChordPattern({
+            pattern: pattern,
+            note: chordID,
+            chordInputStepCopy: chordInputStepCopy,
+        })
         setChordInputStep((chordInputStep) => chordInputStep + 4)
+        console.log(chordInputStepCopy, 'input step copy')
     }
-    console.log(notesToPlay, 'notestoplay')
+    console.log(chordInputStep, 'input step')
 
     // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
+        console.log(process.env.REACT_APP_HOOK_THEORY_BEARER, 'ENV VARIABLE!!')
         if (hookTheoryChords.length === 0) {
             fetch('https://api.hooktheory.com/v1/trends/nodes', {
                 method: 'GET',
@@ -176,9 +183,8 @@ const Sequencer = () => {
                     Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
                 },
             })
-                .then((res) => res.json())
+                .then((res) => res.json()) // D-04-33-02 9pm-6am, glen royal vic 1001 decarie 843-1568 grace
                 .then((data) => {
-                    console.log(data)
                     setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
                 })
                 .catch((error) => {
@@ -192,7 +198,7 @@ const Sequencer = () => {
                     headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                        Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
+                        Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
                     },
                 }
             )
@@ -317,12 +323,6 @@ const Sequencer = () => {
             setClickedNote
         )
     }
-
-    console.log(
-        Object.keys(areChordBeatsChecked),
-        makeChordNotesState,
-        'compare'
-    )
 
     return (
         <>
@@ -454,11 +454,8 @@ const Sequencer = () => {
                                 romanNumeralReference['major'][scaleIndex],
                             bubbleUpCheckboxInfo,
                         }
-                        console.log(
-                            sendChordPattern?.note === scaleIndex,
-                            'note'
-                        )
                         return (
+                            // send normal props, but also give sendChordPattern if that particular row needs it, according to scaleIndex
                             <CheckboxRow
                                 {...commonProps}
                                 {...(sendChordPattern?.note === scaleIndex && {

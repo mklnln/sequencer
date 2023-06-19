@@ -1,6 +1,8 @@
-import React, { memo, useEffect } from 'react'
+// send normal props, but also give sendChordPattern if that particular row needs it, according to scaleIndeximport React, { memo, useEffect } from 'react'
 import styled from 'styled-components'
 import SingleCheckbox from './SingleCheckbox'
+import { memo, useEffect } from 'react'
+import React from 'react'
 const CheckboxRow = memo(
     ({
         makeMelodyNotesState,
@@ -18,22 +20,12 @@ const CheckboxRow = memo(
         setSendChordPattern,
         chordInputStep,
     }) => {
-        console.log(sendChordPattern, 'chordpatt', scaleIndex)
         useEffect(() => {
             if (countCheckboxRenders) {
                 countCheckboxRenders.current = countCheckboxRenders.current + 1
             }
         })
-        let sendCheckPatternArr = []
-        if (sendChordPattern) {
-            // make array corresponding to the thing
-            for (let i = 1; i <= blankStepCountArray.length; i++) {
-                // array reflects non-zero indexing
-                if (i === chordInputStep) {
-                    sendCheckPatternArr.push()
-                }
-            }
-        }
+
         return (
             <React.Fragment
             // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatNum}}`}
@@ -44,20 +36,56 @@ const CheckboxRow = memo(
                     </TitleSpanDiv>
                     <ChordDiv>
                         {blankStepCountArray.map((check, index) => {
-                            const beatNum = index
-                            return (
-                                <SingleCheckbox
-                                    key={`sglchk${whichGrid}-row-${scaleIndex}-beat-${beatNum}`}
-                                    // areXBeatsChecked={areXBeatsChecked}
-                                    // setAreXBeatsChecked={setAreXBeatsChecked}
-                                    beatNum={beatNum}
-                                    scaleIndex={scaleIndex}
-                                    whichGrid={whichGrid}
-                                    // notesToPlay={notesToPlay}
-                                    // setNotesToPlay={setNotesToPlay}
-                                    bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
-                                />
-                            )
+                            const beatNum = index + 1
+                            const commonProps = {
+                                key: `sglchk${whichGrid}-row-${scaleIndex}-beat-${beatNum}`,
+                                beatNum,
+                                scaleIndex,
+                                whichGrid,
+                                bubbleUpCheckboxInfo,
+                            }
+                            // ? why not invert the crazy thing and just say
+                            // ? if
+
+                            if (sendChordPattern) {
+                                console.log(
+                                    sendChordPattern,
+                                    'chordo',
+                                    noteTitle
+                                )
+                                if (
+                                    beatNum <
+                                        sendChordPattern.chordInputStepCopy ||
+                                    beatNum >=
+                                        sendChordPattern.chordInputStepCopy +
+                                            sendChordPattern.pattern.length
+                                ) {
+                                    // beatNum = changing index of map fxn, 1-16
+                                    // if beatNum is less than 1 OR
+                                    // beatNum greater than or equal to (inputStep (1) +4 i.e. 5)
+
+                                    return <SingleCheckbox {...commonProps} />
+                                } else {
+                                    console.log(
+                                        beatNum,
+                                        sendChordPattern.chordInputStepCopy +
+                                            sendChordPattern.pattern.length,
+                                        'this is the LOG THAT CHANGES PROPS'
+                                    )
+                                    return (
+                                        <SingleCheckbox
+                                            {...commonProps}
+                                            {...{
+                                                sendChordPattern,
+                                                setSendChordPattern,
+                                                chordInputStep,
+                                            }}
+                                        />
+                                    )
+                                }
+                            } else {
+                                return <SingleCheckbox {...commonProps} />
+                            }
                         })}
                     </ChordDiv>
                 </TitleAndBoxesDiv>

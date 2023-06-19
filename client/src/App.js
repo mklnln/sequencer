@@ -17,8 +17,8 @@ const App = () => {
     //                 // Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
     //             },
     //             body: JSON.stringify({
-    //                 username: `"${process.env.REACT_APP_HOOK_THEORY_USER}"`,
-    //                 password: `"${process.env.REACT_APP_HOOK_THEORY_PASS}"`,
+    //                 username: `${process.env.REACT_APP_HOOK_THEORY_USER}`,
+    //                 password: `${process.env.REACT_APP_HOOK_THEORY_PASS}`,
     //             }),
     //         })
     //             .then((res) => res.json())
