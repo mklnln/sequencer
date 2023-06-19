@@ -1,7 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
-const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
+const BeatMarkers = ({
+    blankStepCountArray,
+    currentBeatRef,
+    beatForAnimation,
+}) => {
+    console.log(beatForAnimation)
     return (
         <>
             {blankStepCountArray.map((step, index) => {
@@ -13,9 +18,9 @@ const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
                             <BeatMarker
                                 key={num}
                                 className={
-                                    currentBeat === num ||
-                                    currentBeat === num + 1 ||
-                                    num === currentBeatRef.current
+                                    beatForAnimation === num ||
+                                    beatForAnimation === num + 1 ||
+                                    num === beatForAnimation
                                         ? 'current'
                                         : ''
                                 }
@@ -23,9 +28,9 @@ const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
                                 <BeatSpan
                                     key={num}
                                     className={
-                                        currentBeat === num ||
-                                        currentBeat === num + 1 ||
-                                        num === currentBeatRef.current
+                                        beatForAnimation === num ||
+                                        beatForAnimation === num + 1 ||
+                                        num === beatForAnimation
                                             ? 'current'
                                             : ''
                                     }
@@ -51,6 +56,9 @@ const BeatMarker = styled.div`
     padding-right: 26.5px;
     display: flex;
     justify-content: center;
+    &.current {
+        font-size: 1.5em;
+    }
 `
 const BeatSpan = styled.span`
     // padding-left: 9px;

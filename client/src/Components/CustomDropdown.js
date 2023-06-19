@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 import DropdownArrow from '../assets/SVGs/DropdownArrow'
-
+import { rootNoteOptions } from '../BigObjectsAndArrays'
 const CustomDropdown = ({
     title,
     stateValue,
@@ -16,7 +16,12 @@ const CustomDropdown = ({
     const handleOptionClick = (option, index) => {
         let set = option
         console.log(typeof parseInt(option))
-        if (title === 'Steps') set = parseInt(option)
+        if (title === 'Steps') {
+            set = parseInt(option)
+        } 
+        // else if (title === 'Root') {
+        //     set = rootNoteOptions.indexOf(option) + 1
+        // }
         setState(set)
         setIsDropdownOpen(false)
         console.log('option thereby click`d')

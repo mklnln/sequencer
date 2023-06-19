@@ -187,7 +187,36 @@ now to fix parameters re-rendering:
 				> done? remove extra lines at end of BigObjectsand..
 
 
+sendChordPattern:
+	> how to only change the effected beats?
+	> i have successfully gotten a checkboxrow receiving the pattern only in the relevant spot
+	> how to send it, such that only the appropriate checkboxes update?
+		> change map, if < chordInputStep || > chordInputStep + pattern.length
+	> its possible im getting many re-renders bc of changes to chordInputStep
+		> no, actually. i set up an infinite loop by setting a state on checked, this causing a rerender of the singleCheckbox, then it kept the same prop values whereupon it asked again 'does the sent pattern exist', which was still tre, so it set state again on checked. i needed to verify that checked was now indeed true and then NOT set state any more.
+	
 
-> A POSSIBLE ALTERNATIVE is simply making a state for each horizontal note row. alreday, that would be 1/16th the work. very worth it
+todo today june 19th
+	>V clicking notes, beat 1 is never used, clicking beat 1 puts it on notesToPlay beat 2. fix dat
+		> was sending beatNum + 1, removing + 1 fixed it
+	>V cant click both a chord and melody intot he same beat on ontesToPlay
+		> was bad object setting
+	>V not playing 1st note upon start
+		>V nother problem: tempo isnt updating. 
+	>V start investigating why notes get sent twice
+		> remove clg noise
+		> because for a brief moment, my failsafe sentToPlayEngine boolean was becoming false as the component rerendered. i keep it in ref now, no issues.
+
+todo june 20th
+	> remove areChordBeats, areMelodyBeats
+		> ensure we can reset chords/melodies
+			> remove buttons from header, set 'Clear' button next to grids?
+	> fix up sound
+		> filter, melody chords volume
+		> distortion when melo/chords play same time
+		> ADSR sounds like shit
+
+
+
 
 //

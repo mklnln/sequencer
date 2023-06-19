@@ -17,7 +17,6 @@ const SingleCheckbox = ({
     chordInputStep,
 }) => {
     const [checked, setChecked] = useState(false)
-
     const handleChange = () => {
         bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
         setChecked(!checked)

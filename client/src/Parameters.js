@@ -16,19 +16,21 @@ import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
-const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
+const Parameters = ({
+    currentBeatRef,
+    notesToPlay,
+    tempo,
+    setTempo,
+    beatForAnimation,
+    setBeatForAnimation,
+}) => {
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
     const intervalIDRef = useRef('')
-    let root = 1
-    const [tempo, setTempo] = useState(120)
+    const sentToPlayEngineRef = useRef(false) // prevents sending playEngine calls that have already been sent
     const [wonk, setWonk] = useState(0)
     const [melodyVolume, setMelodyVolume] = useState(100)
     const [chordsVolume, setChordsVolume] = useState(100)
-    // const [attack, setAttack] = useState(1)
-    // const [decay, setDecay] = useState(15)
-    // const [sustain, setSustain] = useState(60)
-    // const [release, setRelease] = useState(5)
     const [rootNote, setRootNote] = useState('A')
     const [filterCutoff, setFilterCutoff] = useState(7500)
     const [sound, setSound] = useState('sine')
@@ -36,7 +38,6 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
     const { stepCount, setStepCount } = useContext(MusicParametersContext)
 
     const tempoToSeconds = (tempo) => {
-        // calculate: how many seconds does a beat take?
         return 60 / (tempo * 2)
     }
 
@@ -46,10 +47,9 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
 
     const playEngine = (nextNoteTime, scaleIndex, type) => {
         playSynth(
-            // audioCtx,
             scaleIndex,
             playing,
-            root,
+            rootNoteOptions.indexOf(rootNote) + 1,
             wonk,
             melodyVolume,
             chordsVolume,
@@ -64,138 +64,54 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
         )
     }
 
-    // ! DRY: playSynth and playSample could be joined
-    // const sendToPlayFxns = (nextNoteTime) => {
-    //     makeMelodyNotesState.forEach((noteRow, index) => {
-    //         console.log('send to play fxns')
-    //         if (
-    //             areMelodyBeatsChecked[`note-${noteRow}`][
-    //                 currentBeatRef.current - 1
-    //             ] === 1 &&
-    //             playing
-    //         ) {
-    //             if (!sound.includes('sample')) {
-    //                 playSynth(
-    //                     // audioCtx,
-    //                     makeMelodyNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     melodyVolume,
-    //                     chordsVolume,
-    //                     sound,
-    //                     filterCutoff,
-    //                     attack,
-    //                     decay,
-    //                     sustain,
-    //                     release,
-    //                     'melody',
-    //                     nextNoteTime
-    //                 )
-    //             } else {
-    //                 playSample(
-    //                     // audioCtx,
-    //                     makeMelodyNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     'melody'
-    //                 )
-    //             }
-    //         }
-    //     })
-
-    //     makeChordNotesState.forEach((noteRow, index) => {
-    //         if (
-    //             areChordBeatsChecked[`note-${noteRow}`][
-    //                 currentBeatRef.current - 1
-    //             ] === 1 &&
-    //             playing
-    //         ) {
-    //             if (!sound.includes('sample')) {
-    //                 console.log('play chords!!!!!!!!!!!!')
-    //                 playSynth(
-    //                     // audioCtx,
-    //                     makeChordNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     melodyVolume,
-    //                     chordsVolume,
-    //                     sound,
-    //                     filterCutoff,
-    //                     attack,
-    //                     decay,
-    //                     sustain,
-    //                     release,
-    //                     'chords'
-    //                 )
-    //             } else {
-    //                 playSample(
-    //                     // audioCtx,
-    //                     makeChordNotesState.length - index,
-    //                     playing,
-    //                     root,
-    //                     wonk,
-    //                     'chords'
-    //                 )
-    //             }
-    //         }
-    //     })
-    // }
     const stopIntervalAndFalsifyRef = () => {
         clearInterval(intervalIDRef.current)
         intervalRunningRef.current = false
-        console.log('CLEAR INTERVAL cuz no longer playing')
     }
 
-    // todo ugly AF, refactor
-
-    // playing?
-    // yes, setInterval
     let id
     let timeFromStart = 0
     let eighthNoteTicks = 0
     let intervalTicks = 0
-    let sentToPlayEngine = false // prevents sending >1 playEngine calls while on the same eighth note but different intervals
 
+    console.log(sentToPlayEngineRef.current, 'sent is falsified!!')
     if (playing) {
         timeFromStart = audioTime()
-        nextNoteTime = null
+        nextNoteTime = 0
         // intervalRunningRef tracks interval ID and resets it upon render to keep up to date synth params
         if (!intervalRunningRef.current) intervalRunningRef.current = true
         else clearInterval(intervalIDRef.current)
         id = setInterval(() => {
-            const futureBeatTarget =
-                notesToPlay[`beat-${(currentBeatRef.current % stepCount) + 1}`]
-
-            const futureBeatNotesArray = Object.keys(futureBeatTarget)
-            const elapsedPlayTime = eighthNoteTicks * beatDuration
-            if (
-                futureBeatNotesArray.length !== 0 // notes exist, play them
-            ) {
-                nextNoteTime = timeFromStart + elapsedPlayTime + beatDuration
-            }
-            if (
-                !sentToPlayEngine
-                // &&                nextNoteTime < audioTime() + scheduleAheadTime
-            ) {
+            // send that time to the synth engine
+            if (!sentToPlayEngineRef.current) {
+                // find potential notes to be played by checking notesToPlay
+                const futureBeatTarget =
+                    notesToPlay[
+                        `beat-${(currentBeatRef.current % stepCount) + 1}`
+                    ]
+                const futureBeatNotesArray = Object.keys(futureBeatTarget)
+                // calculate current elapsed time
+                const elapsedPlayTime = eighthNoteTicks * beatDuration
+                // if a note is to be played, set its time to start playing
+                if (futureBeatNotesArray.length !== 0) {
+                    nextNoteTime =
+                        timeFromStart + elapsedPlayTime + beatDuration
+                }
                 futureBeatNotesArray.forEach((note) => {
-                    const scaleIndex = note.substring(5)
+                    const scaleIndex = parseInt(note.substring(5))
                     Object.keys(futureBeatTarget[note]).forEach((type) => {
-                        console.log('play, ', scaleIndex, 'type ', type)
-                        playEngine(nextNoteTime, parseInt(scaleIndex), type)
+                        // console.log('play, ', scaleIndex, 'type ', type)
+                        playEngine(nextNoteTime, scaleIndex, type)
                     })
                 })
-                sentToPlayEngine = true
+                sentToPlayEngineRef.current = true
             }
 
             intervalTicks++
             if (intervalTicks % 3 === 0) {
                 eighthNoteTicks++
                 advanceCurrentBeat()
-                sentToPlayEngine = false
-                console.log('every 3rd tick')
+                sentToPlayEngineRef.current = false // move on to a new beat, thus we have potential new notes to play
             }
         }, scheduleAheadTime * 1000) // maybe 250? so 1000 divided by 4, so there are 4 calls in the window for insurance
 
@@ -203,25 +119,16 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
     } else if (!playing && intervalRunningRef.current) {
         stopIntervalAndFalsifyRef()
     }
-    // playing? true -> setInterval which advancesCurrentBeat and sendsToPlayFxns
-    //
 
     const advanceCurrentBeat = () => {
-        if (
-            currentBeatRef.current <= 0 ||
-            currentBeatRef.current >= stepCount
-        ) {
+        if (currentBeatRef.current >= stepCount) {
             currentBeatRef.current = 1
+            // setBeatForAnimation(1)
         } else {
             currentBeatRef.current = currentBeatRef.current + 1
+            // setBeatForAnimation((prevProp) => prevProp + 1)
         }
     }
-
-    // const scheduleBeat = (startTime) => {
-    //     advanceCurrentBeat() // ~
-
-    //     // todo need to calculate note times based off of ctx.time. thus i need to track which notes play when.
-    // }
 
     // * this useEffect is necessary to make sure theres only ever one event listener
     useEffect(() => {
@@ -238,7 +145,6 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
 
     // ? mb a vestige of an older build. needs to wait until samples are re-integrated
     const parseSound = (e) => {
-        // console.log(audioTime(), 'audiotime')
         setSound(e.target.value)
         if (
             e.target.value === 'samplePianoC2' ||
@@ -257,14 +163,12 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
 
     const togglePlayback = () => {
         if (!playing) {
-            currentBeat = 1
-            currentBeatRef.current = 1
+            currentBeatRef.current = 0
         }
         setPlaying(!playing)
     }
 
     const [parameterValuesObj, setParameterValuesObj] = useState({
-        tempo: 120,
         wonk: 0,
         melodyVolume: 100,
         chordsVolume: 100,
@@ -293,15 +197,6 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
         setParameterValuesObj(obj)
         setChangedParameter(null)
     }
-    // useEffect(() => {
-    //     console.log(changedParameter)
-    //     if (changedParameter.value) {
-    //         let obj = { ...parameterValuesObj }
-    //         obj[changedParameter.title] = changedParameter.value
-    //         setParameterValuesObj(obj)
-    //         setChangedParameter(null)
-    //     }
-    // }, [changedParameter])
 
     return (
         <>
@@ -310,27 +205,8 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
                     <StartStopTextDiv>
                         <span>Start/Stop</span> <span>Press S</span>
                     </StartStopTextDiv>
-                    <StartStopButton
-                        onClick={
-                            togglePlayback
-                            // () => {
-                            //     if (!playing) {
-                            //         setPlaying(true)
-                            //         intervalRunningRef.current =
-                            //             !intervalRunningRef.current
-                            //         // playing = true
-                            //     } else {
-                            //         setPlaying(false)
-                            //         intervalRunningRef.current =
-                            //             !intervalRunningRef.current
-                            //         // playing = false
-                            //     }
-                            //     console.log(playing, 'playing')
-                            // }
-                        }
-                    >
+                    <StartStopButton onClick={togglePlayback}>
                         {playing ? <StopButton /> : <PlayButton />}
-                        {/* <PlayingSpan> {playing ? 'stop' : 'start'}</PlayingSpan> */}
                     </StartStopButton>
                 </StartButtonDiv>
 
@@ -340,41 +216,32 @@ const Parameters = ({ currentBeat, currentBeatRef, notesToPlay }) => {
                         <Slider
                             key={`${index}`}
                             slider={slidersToShowObj[slider]}
-                            // dragging={dragging}
-                            // setDragging={setDragging}
                             sliderStaticInfo={sliderStaticInfo}
                             bubbleUpSliderInfo={bubbleUpSliderInfo}
+                            setTempo={setTempo}
                         />
                     )
                 })}
 
                 <DropdownsDiv>
-                    <SoundFilterDiv
-                    // onMouseLeave={mouseLeave}
-                    >
+                    <SoundFilterDiv>
                         <CustomDropdown
                             title="Steps"
                             stateValue={stepCount}
                             stateValueOptions={stepCountOptions}
                             setState={setStepCount}
-                            // handleOptionClick={handleOptionClick}
                             isDropdownOpen={isDropdownOpen}
                             setIsDropdownOpen={setIsDropdownOpen}
-                            // onMouseLeave={mouseLeave()}
                         />
                     </SoundFilterDiv>
-                    <SoundFilterDiv
-                    // onMouseLeave={mouseLeave}
-                    >
+                    <SoundFilterDiv>
                         <CustomDropdown
                             title="Root"
                             stateValue={rootNote}
                             stateValueOptions={rootNoteOptions}
                             setState={setRootNote}
-                            // // handleOptionClick={handleOptionClick}
                             isDropdownOpen={isDropdownOpen}
                             setIsDropdownOpen={setIsDropdownOpen}
-                            // onMouseLeave={mouseLeave()}
                         />
                     </SoundFilterDiv>
                 </DropdownsDiv>
