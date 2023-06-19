@@ -13,6 +13,7 @@ const Slider = memo(
         // slider,
         sliderStaticInfo,
         bubbleUpSliderInfo,
+        setTempo,
     }) => {
         const [dragStartY, setDragStartY] = useState(null)
         const [dragging, setDragging] = useState(false)
@@ -30,7 +31,12 @@ const Slider = memo(
                     // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
                     Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
                 )
-                bubbleUpSliderInfo(Math.round(newValue), title)
+                console.log(title, 'title')
+                if (title !== 'Tempo') {
+                    bubbleUpSliderInfo(Math.round(newValue), title)
+                } else {
+                    setTempo(Math.round(newValue), title)
+                }
                 setSliderValue(Math.round(newValue))
                 setDragStartY(e.clientY)
             }

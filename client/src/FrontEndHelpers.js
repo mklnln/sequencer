@@ -136,44 +136,34 @@ export const makeDeepCopy = (original) => {
     return JSON.parse(JSON.stringify(original))
 }
 
+// handles both turning off and on notes
 export const handleNoteClick = (
     notesToPlay,
     setNotesToPlay,
     { beatNum, scaleIndex, whichGrid },
     setClickedNote
 ) => {
-    console.log('we clicked  NOTeeeEEEEEEEEEE')
     const arrayKey = `note-${scaleIndex}`
     let obj = { ...notesToPlay }
-    if (obj[`beat-${beatNum + 1}`][arrayKey]) {
-        delete obj[`beat-${beatNum + 1}`][arrayKey][whichGrid]
 
-        // ? couldn't figure out another way to validate obj[whichGrid][`beat-${beatNum+1}`]. even if it was an empty object, i couldn't test its equivalency at all at all
-        if (Object.values(obj[`beat-${beatNum + 1}`][arrayKey]).length === 0) {
-            delete obj[`beat-${beatNum + 1}`][arrayKey]
+    if (notesToPlay[`beat-${beatNum}`][arrayKey]?.[whichGrid]) {
+        // if the note already exists, delete it
+        if (obj[`beat-${beatNum}`][arrayKey][whichGrid]) {
+            delete obj[`beat-${beatNum}`][arrayKey][whichGrid]
         }
 
-        setNotesToPlay(obj)
-        setClickedNote(null)
+        // if that note no longer plays anything, clean up the object
+        if (Object.values(obj[`beat-${beatNum}`][arrayKey]).length === 0) {
+            delete obj[`beat-${beatNum}`][arrayKey]
+        }
     } else {
-        // obj[`beat-${beatNum}`] = {
-        //     [arrayKey]: {
-        //         [whichGrid]: 1,
-        //         ...obj[`beat-${beatNum}`][arrayKey],
-        //     },
-        //     ...obj[`beat-${beatNum}`],
-        // }
-        obj[`beat-${beatNum + 1}`] = {
-            [arrayKey]: {
-                [whichGrid]: 1,
-                ...obj[`beat-${beatNum + 1}`][arrayKey],
-            },
-            ...obj[`beat-${beatNum + 1}`],
+        obj[`beat-${beatNum}`][arrayKey] = {
+            [whichGrid]: 1,
+            ...obj[`beat-${beatNum}`][arrayKey],
         }
-        // ? hopefully does something idfk
-        setNotesToPlay(obj)
-        setClickedNote(null)
     }
+    setNotesToPlay(obj)
+    setClickedNote(null)
 }
 
 export const makeNotesToPlayMaster = (stepCount) => {
@@ -184,14 +174,3 @@ export const makeNotesToPlayMaster = (stepCount) => {
     }
     return obj
 }
-
-// export const bubbleUpCheckboxInfo = (beatNum, scaleIndex, whichGrid) => {
-//     handleNoteClick(
-//         beatNum,
-//         scaleIndex,
-//         whichGrid,
-//         // ! gotta adapt away from areXChecked stuff
-//         notesToPlay,
-//         setNotesToPlay
-//     )
-// }

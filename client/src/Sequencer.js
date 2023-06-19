@@ -73,9 +73,8 @@ const Sequencer = () => {
     } = useContext(MusicParametersContext)
     const { isAuthenticated, user } = useAuth0()
 
-    const [tempo, setTempo] = useState(60)
-    // const [notesToPlay, setNotesToPlay] = useState({ melody: {}, chords: {} })
-
+    const [tempo, setTempo] = useState(120)
+    console.log(tempo, 'in seq')
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
@@ -93,7 +92,7 @@ const Sequencer = () => {
 
     // todo find out what these are used for
     // const playingRef = useRef(playing)
-    const currentBeatRef = useRef(1)
+    const currentBeatRef = useRef(0)
 
     // todo make helper
     const handleChordClick = (chordID, index) => {
@@ -304,6 +303,7 @@ const Sequencer = () => {
     // this requires the if (clickedNote) seen below to watch for changes. according to dev tools, 1/10th the render time without notesToPlay in useCallback!!
     const bubbleUpCheckboxInfo = useCallback(
         (beatNum, scaleIndex, whichGrid) => {
+            console.log(beatNum)
             setClickedNote({
                 beatNum: beatNum,
                 scaleIndex: scaleIndex,
@@ -337,6 +337,8 @@ const Sequencer = () => {
                 areMelodyBeatsChecked={areMelodyBeatsChecked}
                 areChordBeatsChecked={areChordBeatsChecked}
                 notesToPlay={notesToPlay}
+                tempo={tempo}
+                setTempo={setTempo}
             />
             <MelodySequencerGrid>
                 {countCheckboxRenders.current}
