@@ -74,7 +74,6 @@ const Sequencer = () => {
     const { isAuthenticated, user } = useAuth0()
 
     const [tempo, setTempo] = useState(120)
-    console.log(tempo, 'in seq')
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
@@ -87,11 +86,6 @@ const Sequencer = () => {
     })
     // let playing = false
 
-    // ! can likely be replaced with good ol' Ref.
-    let currentBeat = 1
-
-    // todo find out what these are used for
-    // const playingRef = useRef(playing)
     const currentBeatRef = useRef(0)
 
     // todo make helper
@@ -105,33 +99,11 @@ const Sequencer = () => {
             newChosenAPIChords = [...chosenAPIChords]
             newChosenAPIChords.push(chordID)
         }
-        // we want to track this so we can send the request to the API to get chords based on this
         setChosenAPIChords(newChosenAPIChords)
-        // finished, logic for tracking chords
-
-        // begin logic for updating noteState
-        // todo adapt for notesToPlay
-        // ! consider pattern
         let pattern = [1, 1, 1, 1] // play all notes
-
-        // ? most efficient way to take the pattern and then put it into notesToPlay?
-        // notesToPlay: {beat-1: {}, beat-2: {}, beat-3: {}, etc}
-        // for loop and if pattern[i] === 1, add to notesToPlay?
-        // how do i access the beat? its related to chordInputStep + i
-
-        // todo TWO IDEAS:
-        // * makeDeepCopy
-        // ---- have
-        // * spread operate
-        // ---- blech gotta do many ones, and if i do the pattern it might not be easy to setState with that
 
         let notesCopy = makeDeepCopy(notesToPlay)
 
-        // ? do i want to go in and delete what's already there?
-        // if there's nothing there, then we wont be able to delete nothing, then we're adding a process every time to ask if it exists
-        // mb not worth it
-        // ! idk, just leave it for now, test it once its running
-        // gpt4
         for (let i = 0; i < pattern.length; i++) {
             if (pattern[i]) {
                 let inputBeat = chordInputStep + i
@@ -143,22 +115,8 @@ const Sequencer = () => {
                 notesCopy[beat][note] = notesCopy[beat][note] || {}
                 notesCopy[beat][note]['chords'] = 1
             }
-
-            // ! if we want to delete what's already there, do this. gpt3
-            // for (let i = 0; i < pattern.length; i++) {
-            //     const inputBeat = chordInputStep + i;
-            //     const beatNotes = notesCopy[`beat-${inputBeat}`] || (notesCopy[`beat-${inputBeat}`] = {});
-            //     const chordNotes = beatNotes[`note-${chordID}`] || (beatNotes[`note-${chordID}`] = {});
-
-            //     if (pattern[i]) {
-            //         chordNotes['chords'] = 1;
-            //     } else {
-            //         delete chordNotes['chords'];
-            //     }
-            // }
         }
         let chordInputStepCopy = chordInputStep
-        console.log(chordInputStepCopy)
         setNotesToPlay(notesCopy)
         setSendChordPattern({
             pattern: pattern,
@@ -166,13 +124,10 @@ const Sequencer = () => {
             chordInputStepCopy: chordInputStepCopy,
         })
         setChordInputStep((chordInputStep) => chordInputStep + 4)
-        console.log(chordInputStepCopy, 'input step copy')
     }
-    console.log(chordInputStep, 'input step')
 
     // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
-        console.log(process.env.REACT_APP_HOOK_THEORY_BEARER, 'ENV VARIABLE!!')
         if (hookTheoryChords.length === 0) {
             fetch('https://api.hooktheory.com/v1/trends/nodes', {
                 method: 'GET',
@@ -303,19 +258,16 @@ const Sequencer = () => {
     // this requires the if (clickedNote) seen below to watch for changes. according to dev tools, 1/10th the render time without notesToPlay in useCallback!!
     const bubbleUpCheckboxInfo = useCallback(
         (beatNum, scaleIndex, whichGrid) => {
-            console.log(beatNum)
             setClickedNote({
                 beatNum: beatNum,
                 scaleIndex: scaleIndex,
                 whichGrid: whichGrid,
             })
-            console.log('useCallback only gets called ONCE')
         },
         []
     )
     // ? without both if conditions, problems. only 1st, we add note-null to beat-1. only 2nd, 'cannot read properties of null'
-    if (clickedNote && clickedNote.scaleIndex !== null) {
-        console.log('handleNoteClick gets called A BUNCH OF TIMES')
+    if (clickedNote && clickedNote?.scaleIndex !== null) {
         handleNoteClick(
             notesToPlay,
             setNotesToPlay,
@@ -330,7 +282,6 @@ const Sequencer = () => {
                 Sequencer.js has rendered {countReRenders.current} times.
             </span>
             <Parameters
-                currentBeat={currentBeat}
                 currentBeatRef={currentBeatRef}
                 makeChordNotesState={makeChordNotesState}
                 makeMelodyNotesState={makeMelodyNotesState}
@@ -368,7 +319,6 @@ const Sequencer = () => {
                         {/* make component, pass it blankstepcountarray, bob uncle */}
                         <BeatMarkers
                             blankStepCountArray={blankStepCountArray}
-                            currentBeat={currentBeat}
                             currentBeatRef={currentBeatRef}
                         />
                         {/* //! dont delete this until we sure that we can highlight the beats without it */}
@@ -472,7 +422,6 @@ const Sequencer = () => {
                     <PointerContainer>
                         <BeatMarkers
                             blankStepCountArray={blankStepCountArray}
-                            currentBeat={currentBeat}
                             currentBeatRef={currentBeatRef}
                         />
                     </PointerContainer>

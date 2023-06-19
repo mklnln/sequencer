@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
+const BeatMarkers = ({ blankStepCountArray, currentBeatRef }) => {
     return (
         <>
             {blankStepCountArray.map((step, index) => {
@@ -13,8 +13,8 @@ const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
                             <BeatMarker
                                 key={num}
                                 className={
-                                    currentBeat === num ||
-                                    currentBeat === num + 1 ||
+                                    currentBeatRef.current === num ||
+                                    currentBeatRef.current === num + 1 ||
                                     num === currentBeatRef.current
                                         ? 'current'
                                         : ''
@@ -23,8 +23,8 @@ const BeatMarkers = ({ blankStepCountArray, currentBeat, currentBeatRef }) => {
                                 <BeatSpan
                                     key={num}
                                     className={
-                                        currentBeat === num ||
-                                        currentBeat === num + 1 ||
+                                        currentBeatRef.current === num ||
+                                        currentBeatRef.current === num + 1 ||
                                         num === currentBeatRef.current
                                             ? 'current'
                                             : ''

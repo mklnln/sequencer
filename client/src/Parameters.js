@@ -35,7 +35,6 @@ const Parameters = ({ currentBeatRef, notesToPlay, tempo, setTempo }) => {
     }
 
     let beatDuration = tempoToSeconds(tempo) // time of one eighth note in seconds
-    console.log(tempo, 'tempo')
     const scheduleAheadTime = beatDuration / 3 // for setInterval, check ahead to see if a note is to be played
     let nextNoteTime = 0
 
@@ -146,44 +145,46 @@ const Parameters = ({ currentBeatRef, notesToPlay, tempo, setTempo }) => {
     let timeFromStart = 0
     let eighthNoteTicks = 0
     let intervalTicks = 0
-    let sentToPlayEngine = false // prevents sending playEngine calls that have already been sent
-
+    const sentToPlayEngineRef = useRef(false) // prevents sending playEngine calls that have already been sent
+    console.log(sentToPlayEngineRef.current, 'sent is falsified!!')
     if (playing) {
         timeFromStart = audioTime()
-        nextNoteTime = null
+        nextNoteTime = 0
         // intervalRunningRef tracks interval ID and resets it upon render to keep up to date synth params
         if (!intervalRunningRef.current) intervalRunningRef.current = true
         else clearInterval(intervalIDRef.current)
         id = setInterval(() => {
-            const futureBeatTarget =
-                notesToPlay[`beat-${(currentBeatRef.current % stepCount) + 1}`]
-
-            const futureBeatNotesArray = Object.keys(futureBeatTarget)
-            const elapsedPlayTime = eighthNoteTicks * beatDuration
-            if (
-                futureBeatNotesArray.length !== 0 // notes exist, play them
-            ) {
-                nextNoteTime = timeFromStart + elapsedPlayTime + beatDuration
-            }
-            if (!sentToPlayEngine) {
+            // send that time to the synth engine
+            if (!sentToPlayEngineRef.current) {
+                // find potential notes to be played by checking notesToPlay
+                const futureBeatTarget =
+                    notesToPlay[
+                        `beat-${(currentBeatRef.current % stepCount) + 1}`
+                    ]
+                const futureBeatNotesArray = Object.keys(futureBeatTarget)
+                // calculate current elapsed time
+                const elapsedPlayTime = eighthNoteTicks * beatDuration
+                // if a note is to be played, set its time to start playing
+                if (futureBeatNotesArray.length !== 0) {
+                    nextNoteTime =
+                        timeFromStart + elapsedPlayTime + beatDuration
+                }
                 futureBeatNotesArray.forEach((note) => {
                     const scaleIndex = parseInt(note.substring(5))
                     Object.keys(futureBeatTarget[note]).forEach((type) => {
-                        console.log('play, ', scaleIndex, 'type ', type)
+                        // console.log('play, ', scaleIndex, 'type ', type)
                         playEngine(nextNoteTime, scaleIndex, type)
                     })
                 })
-                sentToPlayEngine = true
+                sentToPlayEngineRef.current = true
             }
 
             intervalTicks++
             if (intervalTicks % 3 === 0) {
                 eighthNoteTicks++
                 advanceCurrentBeat()
-                sentToPlayEngine = false
-                console.log('every 3rd tick')
+                sentToPlayEngineRef.current = false // move on to a new beat, thus we have potential new notes to play
             }
-            console.log('tick')
         }, scheduleAheadTime * 1000) // maybe 250? so 1000 divided by 4, so there are 4 calls in the window for insurance
 
         intervalIDRef.current = id
