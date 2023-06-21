@@ -209,12 +209,23 @@ todo today june 19th
 
 todo june 20th
 	> remove areChordBeats, areMelodyBeats
-		> ensure we can reset chords/melodies
-			> remove buttons from header, set 'Clear' button next to grids?
+		> my initial render method for the grids was using areXBeats and then mapping on them, now im using an array of just one of the axes and mapping over that in Sequencer.js. this is a normal const not kept in state and im wondering if i should keep it in state.
+			> if in state, it would potentially not trigger a rerender from App, which might be nice
+			> also it could easily be a helper
+		> technically i've removed them, but there's some questions remaining:
+			> load/save songs
+			> resetting chords/melodies
+				> remove buttons from header, set 'Clear' button next to grids?
+			> 
+	>V playback starts on 2nd beat sometimes, once starting/stopping a lot
+		> sentToPlayEngine was only resetting after one cycle, thus it needed the first beat to reset. fixed by falsifying it right after playback stops.
 	> fix up sound
 		> filter, melody chords volume
 		> distortion when melo/chords play same time
 		> ADSR sounds like shit
+	> bonus: how to highlight currently playing beat?
+	> bonus: debounce parameters
+	> bonus: changing step seems to mess up notesToPlay, visually notes are clicked but do not play
 
 
 

@@ -6,7 +6,6 @@ const BeatMarkers = ({
     currentBeatRef,
     beatForAnimation,
 }) => {
-    console.log(beatForAnimation)
     return (
         <>
             {blankStepCountArray.map((step, index) => {
