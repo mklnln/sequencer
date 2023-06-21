@@ -228,55 +228,58 @@ const Sequencer = () => {
 
     return (
         <>
-            <span>
-                Sequencer.js has rendered {countReRenders.current} times.
-            </span>
-            <Parameters
-                currentBeatRef={currentBeatRef}
-                notesToPlay={notesToPlay}
-                tempo={tempo}
-                setTempo={setTempo}
-                beatForAnimation={beatForAnimation}
-                setBeatForAnimation={setBeatForAnimation}
-                stepCount={stepCount}
-                setStepCount={setStepCount}
-            />
-            <MelodySequencerGrid>
-                {countCheckboxRenders.current}
-                <AllBoxesDiv>
-                    <GridTitleAndResetDiv>
-                        <GridTitle>MELODY</GridTitle>
-                        <ResetButton onClick={handleResetGrid}>
-                            <span id="melody">RESET</span>
-                        </ResetButton>
-                    </GridTitleAndResetDiv>
-                    {melodyNotes.map((note, index) => {
-                        const scaleIndex = index + 1
-                        return (
-                            <CheckboxRow
-                                key={`${note}`}
-                                countCheckboxRenders={countCheckboxRenders}
+            <SequencerContainer>
+                <span>
+                    Sequencer.js has rendered {countReRenders.current} times.
+                </span>
+                <Parameters
+                    currentBeatRef={currentBeatRef}
+                    notesToPlay={notesToPlay}
+                    tempo={tempo}
+                    setTempo={setTempo}
+                    beatForAnimation={beatForAnimation}
+                    setBeatForAnimation={setBeatForAnimation}
+                    stepCount={stepCount}
+                    setStepCount={setStepCount}
+                />
+                <MelodySequencerGrid>
+                    {countCheckboxRenders.current}
+                    <AllBoxesDiv>
+                        <GridTitleAndResetDiv>
+                            <GridTitle>MELODY</GridTitle>
+                            <ResetButton onClick={handleResetGrid}>
+                                <span id="melody">RESET</span>
+                            </ResetButton>
+                        </GridTitleAndResetDiv>
+                        {melodyNotes.map((note, index) => {
+                            const scaleIndex = index + 1
+                            return (
+                                <CheckboxRow
+                                    key={`${note}`}
+                                    countCheckboxRenders={countCheckboxRenders}
+                                    blankStepCountArray={blankStepCountArray}
+                                    scaleIndex={
+                                        Object.keys(melodyNotes).length +
+                                        1 -
+                                        scaleIndex
+                                    }
+                                    whichGrid="melody"
+                                    noteTitle={giveOctaveNumber(
+                                        note.substring(5)
+                                    )} // convert "note-5" to just "5"
+                                    bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
+                                />
+                            )
+                        })}
+                        <PointerContainer>
+                            {/* make component, pass it blankstepcountarray, bob uncle */}
+                            <BeatMarkers
                                 blankStepCountArray={blankStepCountArray}
-                                scaleIndex={
-                                    Object.keys(melodyNotes).length +
-                                    1 -
-                                    scaleIndex
-                                }
-                                whichGrid="melody"
-                                noteTitle={giveOctaveNumber(note.substring(5))} // convert "note-5" to just "5"
-                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
+                                currentBeatRef={currentBeatRef}
+                                beatForAnimation={beatForAnimation}
                             />
-                        )
-                    })}
-                    <PointerContainer>
-                        {/* make component, pass it blankstepcountarray, bob uncle */}
-                        <BeatMarkers
-                            blankStepCountArray={blankStepCountArray}
-                            currentBeatRef={currentBeatRef}
-                            beatForAnimation={beatForAnimation}
-                        />
-                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                        {/* {blankStepCountArray.map((step, index) => {
+                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
+                            {/* {blankStepCountArray.map((step, index) => {
                             const num = index + 1
                             // every 2 beats make a div
                             if ((index + 1) % 2 === 0) {
@@ -307,82 +310,89 @@ const Sequencer = () => {
                                 )
                             }
                         })} */}
-                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                    </PointerContainer>
-                </AllBoxesDiv>
-            </MelodySequencerGrid>
-            <ChordSequencerGrid>
-                <AllBoxesDiv>
-                    <GridTitleAndResetDiv>
-                        <GridTitle>CHORDS</GridTitle>
-                        <ResetButton onClick={handleResetGrid}>
-                            <span id="chords">RESET</span>
-                        </ResetButton>
-                    </GridTitleAndResetDiv>
-                    {chordNotes.map((note, index) => {
-                        const scaleIndex = note.substring(5)
-                        const commonProps = {
-                            key: `${note}`,
-                            blankStepCountArray,
-                            scaleIndex,
-                            beatNum: index + 1,
-                            whichGrid: 'chords',
-                            noteTitle:
-                                romanNumeralReference['major'][scaleIndex],
-                            bubbleUpCheckboxInfo,
-                        }
-                        return (
-                            // send normal props, but also give sendChordPattern if that particular row needs it, according to scaleIndex
-                            <CheckboxRow
-                                {...commonProps}
-                                {...(sendChordPattern?.note === scaleIndex && {
-                                    sendChordPattern,
-                                    setSendChordPattern,
-                                    chordInputStep,
-                                })}
-                            />
-                        )
-                    })}
+                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
+                        </PointerContainer>
+                    </AllBoxesDiv>
+                </MelodySequencerGrid>
+                <ChordSequencerGrid>
+                    <AllBoxesDiv>
+                        <GridTitleAndResetDiv>
+                            <GridTitle>CHORDS</GridTitle>
+                            <ResetButton onClick={handleResetGrid}>
+                                <span id="chords">RESET</span>
+                            </ResetButton>
+                        </GridTitleAndResetDiv>
+                        {chordNotes.map((note, index) => {
+                            const scaleIndex = note.substring(5)
+                            const commonProps = {
+                                key: `${note}`,
+                                blankStepCountArray,
+                                scaleIndex,
+                                beatNum: index + 1,
+                                whichGrid: 'chords',
+                                noteTitle:
+                                    romanNumeralReference['major'][scaleIndex],
+                                bubbleUpCheckboxInfo,
+                            }
+                            return (
+                                // send normal props, but also give sendChordPattern if that particular row needs it, according to scaleIndex
+                                <CheckboxRow
+                                    {...commonProps}
+                                    {...(sendChordPattern?.note ===
+                                        scaleIndex && {
+                                        sendChordPattern,
+                                        setSendChordPattern,
+                                        chordInputStep,
+                                    })}
+                                />
+                            )
+                        })}
 
-                    <PointerContainer>
-                        <BeatMarkers
-                            blankStepCountArray={blankStepCountArray}
-                            currentBeatRef={currentBeatRef}
-                            beatForAnimation={beatForAnimation}
-                        />
-                    </PointerContainer>
-                </AllBoxesDiv>
-            </ChordSequencerGrid>
-            <HookTheoryChordsDiv>
-                {hookTheoryChords.length !== 0 && hookTheoryChords !== '' ? (
-                    hookTheoryChords.map((chord, index) => {
-                        return (
-                            <HookTheoryChordButton
-                                key={chord.chord_ID}
-                                chord={chord}
-                                handleChordClick={handleChordClick}
-                                chordInputStep={chordInputStep}
-                                index={index}
+                        <PointerContainer>
+                            <BeatMarkers
                                 blankStepCountArray={blankStepCountArray}
-                                hookTheoryChords={hookTheoryChords}
+                                currentBeatRef={currentBeatRef}
+                                beatForAnimation={beatForAnimation}
                             />
-                        )
-                    })
-                ) : (
-                    <>
-                        {hookTheoryChords === '' ? (
-                            <>reset the chords to see suggestions</>
-                        ) : (
-                            <>loading chords from the HookTheory API...</>
-                        )}
-                    </>
-                )}
-            </HookTheoryChordsDiv>
+                        </PointerContainer>
+                    </AllBoxesDiv>
+                </ChordSequencerGrid>
+                <HookTheoryChordsDiv>
+                    {hookTheoryChords.length !== 0 &&
+                    hookTheoryChords !== '' ? (
+                        hookTheoryChords.map((chord, index) => {
+                            return (
+                                <HookTheoryChordButton
+                                    key={chord.chord_ID}
+                                    chord={chord}
+                                    handleChordClick={handleChordClick}
+                                    chordInputStep={chordInputStep}
+                                    index={index}
+                                    blankStepCountArray={blankStepCountArray}
+                                    hookTheoryChords={hookTheoryChords}
+                                />
+                            )
+                        })
+                    ) : (
+                        <>
+                            {hookTheoryChords === '' ? (
+                                <>reset the chords to see suggestions</>
+                            ) : (
+                                <>loading chords from the HookTheory API...</>
+                            )}
+                        </>
+                    )}
+                </HookTheoryChordsDiv>
+            </SequencerContainer>
         </>
     )
 }
 
 export default Sequencer
+
+const SequencerContainer = styled.div`
+    margin: 15px;
+`
 
 const ChordSequencerGrid = styled.div`
     height: 300px;

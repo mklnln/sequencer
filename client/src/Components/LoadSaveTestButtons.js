@@ -162,31 +162,6 @@ const LoadSaveTestButtons = () => {
                 >
                     test
                 </StyledButton>
-                <StyledButton
-                // onClick={() => {
-                //     clearAreChordBeatsChecked(
-                //         chordNotes,
-                //         blankStepCountArray,
-                //         setAreChordBeatsChecked,
-                //         setChosenAPIChords,
-                //         setChordInputStep,
-                //         setHookTheoryChords
-                //     )
-                // }}
-                >
-                    reset chords
-                </StyledButton>
-                <StyledButton
-                // onClick={() => {
-                //     clearAreMelodyBeatsChecked(
-                //         melodyNotes,
-                //         blankStepCountArray,
-                //         setAreMelodyBeatsChecked
-                //     )
-                // }}
-                >
-                    reset melodies
-                </StyledButton>
             </ColumnDiv>
             <br />
             {loadUserSongs ? (
