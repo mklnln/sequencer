@@ -63,8 +63,6 @@ const App = () => {
         <BrowserRouter>
             <MusicParametersContext.Provider
                 value={{
-                    // stepCount,
-                    // setStepCount,
                     chordInputStep,
                     setChordInputStep,
                     loadUserSongs,

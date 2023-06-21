@@ -204,6 +204,28 @@ const Sequencer = () => {
         )
     }
 
+    const handleResetGrid = (e) => {
+        let deleteGrid = e.target.id
+        let notesCopy = { ...notesToPlay }
+        for (let i = 1; i <= Object.keys(notesToPlay).length; i++) {
+            let objKeys = Object.keys(notesCopy[`beat-${i}`])
+            if (objKeys.length > 0) {
+                for (let j = 0; j < objKeys.length; j++) {
+                    if (notesCopy[`beat-${i}`][objKeys[j]]?.[deleteGrid]) {
+                        delete notesCopy[`beat-${i}`][objKeys[j]]?.[deleteGrid]
+                    }
+
+                    if (
+                        Object.keys(notesCopy[`beat-${i}`][objKeys[j]]).length <
+                        1
+                    ) {
+                        delete notesCopy[`beat-${i}`][objKeys[j]]
+                    }
+                }
+            }
+        }
+    }
+
     return (
         <>
             <span>
@@ -222,6 +244,12 @@ const Sequencer = () => {
             <MelodySequencerGrid>
                 {countCheckboxRenders.current}
                 <AllBoxesDiv>
+                    <GridTitleAndResetDiv>
+                        <GridTitle>MELODY</GridTitle>
+                        <ResetButton onClick={handleResetGrid}>
+                            <span id="melody">RESET</span>
+                        </ResetButton>
+                    </GridTitleAndResetDiv>
                     {melodyNotes.map((note, index) => {
                         const scaleIndex = index + 1
                         return (
@@ -240,7 +268,6 @@ const Sequencer = () => {
                             />
                         )
                     })}
-
                     <PointerContainer>
                         {/* make component, pass it blankstepcountarray, bob uncle */}
                         <BeatMarkers
@@ -286,6 +313,12 @@ const Sequencer = () => {
             </MelodySequencerGrid>
             <ChordSequencerGrid>
                 <AllBoxesDiv>
+                    <GridTitleAndResetDiv>
+                        <GridTitle>CHORDS</GridTitle>
+                        <ResetButton onClick={handleResetGrid}>
+                            <span id="chords">RESET</span>
+                        </ResetButton>
+                    </GridTitleAndResetDiv>
                     {chordNotes.map((note, index) => {
                         const scaleIndex = note.substring(5)
                         const commonProps = {
@@ -372,6 +405,30 @@ const AllBoxesDiv = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+`
+const GridTitleAndResetDiv = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 7px;
+    align-items: center;
+`
+const GridTitle = styled.span`
+    letter-spacing: 0.1em;
+    margin: auto;
+`
+
+const ResetButton = styled.div`
+    border: 1px solid var(--lightest-color);
+    padding: 4px 6px;
+    margin: 4px;
+    letter-spacing: 0.1em;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    :hover {
+        cursor: pointer;
+    }
 `
 
 const HookTheoryChordsDiv = styled.div`
