@@ -28,6 +28,35 @@ export const romanNumeralReference = {
     },
 }
 
+export const melodyNotesArr = [
+    'note-15',
+    'note-14',
+    'note-13',
+    'note-12',
+    'note-11',
+    'note-10',
+    'note-9',
+    'note-8',
+    'note-7',
+    'note-6',
+    'note-5',
+    'note-4',
+    'note-3',
+    'note-2',
+    'note-1',
+]
+
+export const chordNotesArr = [
+    'note-8',
+    'note-7',
+    'note-6',
+    'note-5',
+    'note-4',
+    'note-3',
+    'note-2',
+    'note-1',
+]
+
 export const slidersToShowObj = {
     tempo: {
         id: 0,

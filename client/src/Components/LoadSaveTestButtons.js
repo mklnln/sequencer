@@ -2,20 +2,16 @@ import { useAuth0 } from '@auth0/auth0-react'
 import React, { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
-import {
-    clearAreChordBeatsChecked,
-    clearAreMelodyBeatsChecked,
-} from '../FrontEndHelpers'
 
 const LoadSaveTestButtons = () => {
     const {
         areMelodyBeatsChecked,
-        makeChordNotesState,
+        chordNotes,
         setAreChordBeatsChecked,
         setChosenAPIChords,
         setChordInputStep,
         setHookTheoryChords,
-        makeMelodyNotesState,
+        melodyNotes,
         blankStepCountArray,
         setAreMelodyBeatsChecked,
         songName,
@@ -165,31 +161,6 @@ const LoadSaveTestButtons = () => {
                     }}
                 >
                     test
-                </StyledButton>
-                <StyledButton
-                    onClick={() => {
-                        clearAreChordBeatsChecked(
-                            makeChordNotesState,
-                            blankStepCountArray,
-                            setAreChordBeatsChecked,
-                            setChosenAPIChords,
-                            setChordInputStep,
-                            setHookTheoryChords
-                        )
-                    }}
-                >
-                    reset chords
-                </StyledButton>
-                <StyledButton
-                    onClick={() => {
-                        clearAreMelodyBeatsChecked(
-                            makeMelodyNotesState,
-                            blankStepCountArray,
-                            setAreMelodyBeatsChecked
-                        )
-                    }}
-                >
-                    reset melodies
                 </StyledButton>
             </ColumnDiv>
             <br />

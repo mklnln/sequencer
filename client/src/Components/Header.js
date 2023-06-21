@@ -65,22 +65,24 @@ export default Header
 
 const TitleDiv = styled.div`
     position: relative;
+    padding: 0px 15px;
 `
 const ShadowH1 = styled.h1`
     position: absolute;
     // border: 1px solid fuchsia;
-    top: 2.5%;
-    left: 2%;
+    top: 6.5%;
+    left: 9%;
     opacity: 45%;
 `
 
 const Banner = styled.div`
     display: flex;
-    width: 97vw;
+    width: 95vw;
     align-items: center;
-    margin: 15px 0px;
-    padding-bottom: 15px;
-    border-bottom: 3px solid lightgray;
+    justify-content: center;
+    /* padding-bottom: 15px; */
+    margin: 5px;
+    border: 6px double var(--lightest-color);
 `
 const ProfilePic = styled.img`
     width: 50px;

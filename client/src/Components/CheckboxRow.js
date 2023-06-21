@@ -5,16 +5,11 @@ import { memo, useEffect } from 'react'
 import React from 'react'
 const CheckboxRow = memo(
     ({
-        makeMelodyNotesState,
         countCheckboxRenders,
-        // areXBeatsChecked,
-        // setAreXBeatsChecked,
         scaleIndex,
         whichGrid,
         noteTitle,
         bubbleUpCheckboxInfo,
-        // notesToPlay,
-        // setNotesToPlay,
         blankStepCountArray,
         sendChordPattern,
         setSendChordPattern,

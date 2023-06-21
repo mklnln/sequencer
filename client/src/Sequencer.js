@@ -1,61 +1,33 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { MusicParametersContext } from './App.js'
 import {
-    generateAreChordBeatsCheckedInitialState,
-    makeNewChordMaster,
-    makeNewMelodyMaster,
-    loadChangedSongList,
     giveOctaveNumber,
     makeNotesToPlayMaster,
     handleNoteClick,
     makeDeepCopy,
+    makeBlankStepCountArray,
 } from './FrontEndHelpers.js'
-import { romanNumeralReference } from './BigObjectsAndArrays.js'
-import { playSample, getFile, setupSample, playSynth } from './AudioEngine.js'
+import {
+    chordNotesArr,
+    melodyNotesArr,
+    romanNumeralReference,
+} from './BigObjectsAndArrays.js'
 import styled from 'styled-components'
 import HookTheoryChordButton from './Components/HookTheoryChordButton'
 import Parameters from './Parameters'
-import { useAuth0 } from '@auth0/auth0-react'
-import RowOfNotes from './Components/RowOfNotes'
 import BeatMarkers from './Components/BeatMarkers'
 import CheckboxRow from './Components/CheckboxRow'
 const Sequencer = () => {
     const {
-        stepCount,
-        setStepCount,
-        rootNote,
-        setRootNote,
-        wonkFactor,
-        setWonkFactor,
         chordInputStep,
         setChordInputStep,
-        loadUserSongs,
-        setLoadUserSongs,
-        songSavedOrDeleted,
-        setSongSavedOrDeleted,
-        setSongDeleted,
-        handleLoadSongsFetch,
-        loadSong,
-        setLoadSong,
-        setSongName,
-        songName,
-        areChordBeatsChecked,
-        setAreChordBeatsChecked,
-        areMelodyBeatsChecked,
-        // setAreMelodyBeatsChecked,
-        makeChordNotesState,
-        makeMelodyNotesState,
-        blankStepCountArray,
         chosenAPIChords,
         setChosenAPIChords,
         hookTheoryChords,
         setHookTheoryChords,
     } = useContext(MusicParametersContext)
-    const { isAuthenticated, user } = useAuth0()
     const [tempo, setTempo] = useState(120)
-    const [notesToPlay, setNotesToPlay] = useState(
-        makeNotesToPlayMaster(stepCount)
-    )
+
     const [sendChordPattern, setSendChordPattern] = useState(null)
     const [beatForAnimation, setBeatForAnimation] = useState(1)
 
@@ -64,6 +36,24 @@ const Sequencer = () => {
         scaleIndex: null,
         whichGrid: null,
     })
+    const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
+
+    const [notesToPlay, setNotesToPlay] = useState(
+        makeNotesToPlayMaster(stepCount)
+    )
+
+    // ! "When something can be calculated from the existing props or state, don’t put it in state.
+    // ! .. Instead, calculate it during rendering."
+    // const [blankStepCountArray, setBlankStepCountArray] = useState(
+    //     makeBlankStepCountArray(stepCount)
+    // )
+
+    const blankStepCountArray = makeBlankStepCountArray(stepCount)
+
+    // ? keep as state? getting less renders in CheckboxRow thanks to state, but could use memo for a normal const instead
+    // ! experiments needed: test state vs memo'd const vs non-memo const. may be inconsequential
+    const [melodyNotes] = useState(melodyNotesArr)
+    const [chordNotes] = useState(chordNotesArr)
 
     const currentBeatRef = useRef(0)
 
@@ -179,51 +169,10 @@ const Sequencer = () => {
         }
     }, [chosenAPIChords])
 
-    // when inputting a chord via the API buttons, chordInputStep will increment. if it becomes greater than the stepCount, it will reset.
-    // useEffect(() => {
-    //     if (chordInputStep > stepCount) setChordInputStep(1)
-    // }, [chordInputStep])
-
-    // when the user selects a different amount of steps, change the notes arrays to accomodate that.
-
+    // when the user selects a different amount of steps, change notesToPlay to accomodate that
     if (stepCount !== Object.keys(notesToPlay).length) {
         setNotesToPlay(makeNotesToPlayMaster(stepCount))
     }
-
-    // todo either set all these things wherever you change loadSong, or ask if song !== current song, if so, change these states. remove useFX
-    // upon clicking a different song to load, the loadSong state changes. this updates all the parameters on screen to match those saved in the DB
-    // useEffect(() => {
-    //     if (loadSong !== '75442486-0878-440c-9db1-a7006c25a39f') {
-    //         // when the user clicks on a button after loading a song, i want to consider that loadSong is no longer the song on the screen, so we can't delete it. we can only delete it if no changes are made. in order to determine what is the new, unsaved song, we give it this long, complicated name so that a user is exceedingly unlikely to accidentally delete one of their own songs by mistake
-    //         const song = loadUserSongs[loadSong]
-    //         setRootNote(song['rootNote'])
-    //         setStepCount(song['stepCount'])
-    //         setTempo(song['tempo'])
-    //         setWonkFactor(song['wonkFactor'])
-    //         setMelodyVolume(song['melodyVolume'])
-    //         setChordsVolume(song['chordsVolume'])
-    //         setSound(song['sound'])
-    //         setFilterCutoff(song['filterCutoff'])
-    //         setAttack(song['attack'])
-    //         setDecay(song['decay'])
-    //         setSustain(song['sustain'])
-    //         setRelease(song['release'])
-    //         setAreChordBeatsChecked(song['areChordBeatsChecked'])
-    //         // setAreMelodyBeatsChecked(song['areMelodyBeatsChecked'])
-    //         console.log('load song?!?!?!?')
-    //     }
-    // }, [loadSong])
-
-    // // upon saving or deleting a song, update the song list.
-    // useEffect(() => {
-    //     loadChangedSongList(
-    //         songSavedOrDeleted,
-    //         user,
-    //         setLoadUserSongs,
-    //         setSongSavedOrDeleted,
-    //         handleLoadSongsFetch
-    //     )
-    // }, [songSavedOrDeleted])
 
     const countReRenders = useRef(1)
 
@@ -255,56 +204,82 @@ const Sequencer = () => {
         )
     }
 
+    const handleResetGrid = (e) => {
+        let deleteGrid = e.target.id
+        let notesCopy = { ...notesToPlay }
+        for (let i = 1; i <= Object.keys(notesToPlay).length; i++) {
+            let objKeys = Object.keys(notesCopy[`beat-${i}`])
+            if (objKeys.length > 0) {
+                for (let j = 0; j < objKeys.length; j++) {
+                    if (notesCopy[`beat-${i}`][objKeys[j]]?.[deleteGrid]) {
+                        delete notesCopy[`beat-${i}`][objKeys[j]]?.[deleteGrid]
+                    }
+
+                    if (
+                        Object.keys(notesCopy[`beat-${i}`][objKeys[j]]).length <
+                        1
+                    ) {
+                        delete notesCopy[`beat-${i}`][objKeys[j]]
+                    }
+                }
+            }
+        }
+    }
+
     return (
         <>
-            <span>
-                Sequencer.js has rendered {countReRenders.current} times.
-            </span>
-            <Parameters
-                currentBeatRef={currentBeatRef}
-                makeChordNotesState={makeChordNotesState}
-                makeMelodyNotesState={makeMelodyNotesState}
-                areMelodyBeatsChecked={areMelodyBeatsChecked}
-                areChordBeatsChecked={areChordBeatsChecked}
-                notesToPlay={notesToPlay}
-                tempo={tempo}
-                setTempo={setTempo}
-                beatForAnimation={beatForAnimation}
-                setBeatForAnimation={setBeatForAnimation}
-            />
-            <MelodySequencerGrid>
-                {countCheckboxRenders.current}
-                <AllBoxesDiv>
-                    {makeMelodyNotesState.map((note, index) => {
-                        const scaleIndex = index + 1
-                        return (
-                            <CheckboxRow
-                                key={`${note}`}
-                                countCheckboxRenders={countCheckboxRenders}
-                                areXBeatsChecked={areMelodyBeatsChecked}
+            <SequencerContainer>
+                <span>
+                    Sequencer.js has rendered {countReRenders.current} times.
+                </span>
+                <Parameters
+                    currentBeatRef={currentBeatRef}
+                    notesToPlay={notesToPlay}
+                    tempo={tempo}
+                    setTempo={setTempo}
+                    beatForAnimation={beatForAnimation}
+                    setBeatForAnimation={setBeatForAnimation}
+                    stepCount={stepCount}
+                    setStepCount={setStepCount}
+                />
+                <MelodySequencerGrid>
+                    {countCheckboxRenders.current}
+                    <AllBoxesDiv>
+                        <GridTitleAndResetDiv>
+                            <GridTitle>MELODY</GridTitle>
+                            <ResetButton onClick={handleResetGrid}>
+                                <span id="melody">RESET</span>
+                            </ResetButton>
+                        </GridTitleAndResetDiv>
+                        {melodyNotes.map((note, index) => {
+                            const scaleIndex = index + 1
+                            return (
+                                <CheckboxRow
+                                    key={`${note}`}
+                                    countCheckboxRenders={countCheckboxRenders}
+                                    blankStepCountArray={blankStepCountArray}
+                                    scaleIndex={
+                                        Object.keys(melodyNotes).length +
+                                        1 -
+                                        scaleIndex
+                                    }
+                                    whichGrid="melody"
+                                    noteTitle={giveOctaveNumber(
+                                        note.substring(5)
+                                    )} // convert "note-5" to just "5"
+                                    bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
+                                />
+                            )
+                        })}
+                        <PointerContainer>
+                            {/* make component, pass it blankstepcountarray, bob uncle */}
+                            <BeatMarkers
                                 blankStepCountArray={blankStepCountArray}
-                                makeMelodyNotesState={makeMelodyNotesState}
-                                scaleIndex={
-                                    Object.keys(areMelodyBeatsChecked).length +
-                                    1 -
-                                    scaleIndex
-                                }
-                                whichGrid="melody"
-                                noteTitle={giveOctaveNumber(note.substring(5))} // convert "note-5" to just "5"
-                                bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
+                                currentBeatRef={currentBeatRef}
+                                beatForAnimation={beatForAnimation}
                             />
-                        )
-                    })}
-
-                    <PointerContainer>
-                        {/* make component, pass it blankstepcountarray, bob uncle */}
-                        <BeatMarkers
-                            blankStepCountArray={blankStepCountArray}
-                            currentBeatRef={currentBeatRef}
-                            beatForAnimation={beatForAnimation}
-                        />
-                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                        {/* {blankStepCountArray.map((step, index) => {
+                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
+                            {/* {blankStepCountArray.map((step, index) => {
                             const num = index + 1
                             // every 2 beats make a div
                             if ((index + 1) % 2 === 0) {
@@ -335,108 +310,89 @@ const Sequencer = () => {
                                 )
                             }
                         })} */}
-                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                    </PointerContainer>
-                </AllBoxesDiv>
-            </MelodySequencerGrid>
-            <ChordSequencerGrid>
-                <AllBoxesDiv>
-                    {/* {makeChordNotesState.map((note, index) => {
-                        const scaleIndex = note.substring(5)
-                        const commonProps = {
-
-                        }
-                        if (sendChordPattern) {
+                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
+                        </PointerContainer>
+                    </AllBoxesDiv>
+                </MelodySequencerGrid>
+                <ChordSequencerGrid>
+                    <AllBoxesDiv>
+                        <GridTitleAndResetDiv>
+                            <GridTitle>CHORDS</GridTitle>
+                            <ResetButton onClick={handleResetGrid}>
+                                <span id="chords">RESET</span>
+                            </ResetButton>
+                        </GridTitleAndResetDiv>
+                        {chordNotes.map((note, index) => {
+                            const scaleIndex = note.substring(5)
+                            const commonProps = {
+                                key: `${note}`,
+                                blankStepCountArray,
+                                scaleIndex,
+                                beatNum: index + 1,
+                                whichGrid: 'chords',
+                                noteTitle:
+                                    romanNumeralReference['major'][scaleIndex],
+                                bubbleUpCheckboxInfo,
+                            }
                             return (
+                                // send normal props, but also give sendChordPattern if that particular row needs it, according to scaleIndex
                                 <CheckboxRow
-                                    
-                                    sendChordPattern={sendChordPattern}
-                                    setSendChordPattern={setSendChordPattern}
+                                    {...commonProps}
+                                    {...(sendChordPattern?.note ===
+                                        scaleIndex && {
+                                        sendChordPattern,
+                                        setSendChordPattern,
+                                        chordInputStep,
+                                    })}
                                 />
                             )
-                        } else {
-                            return (
-                                <CheckboxRow
-                                    key={`${note}`}
-                                    blankStepCountArray={blankStepCountArray}
-                                    scaleIndex={scaleIndex}
-                                    beatNum={index + 1}
-                                    whichGrid="chords"
-                                    noteTitle={
-                                        romanNumeralReference['major'][
-                                            scaleIndex
-                                        ]
-                                    }
-                                    bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
-                                />
-                            )
-                        }
-                    })} */}
+                        })}
 
-                    {makeChordNotesState.map((note, index) => {
-                        const scaleIndex = note.substring(5)
-                        const commonProps = {
-                            key: `${note}`,
-                            blankStepCountArray,
-                            scaleIndex,
-                            beatNum: index + 1,
-                            whichGrid: 'chords',
-                            noteTitle:
-                                romanNumeralReference['major'][scaleIndex],
-                            bubbleUpCheckboxInfo,
-                        }
-                        return (
-                            // send normal props, but also give sendChordPattern if that particular row needs it, according to scaleIndex
-                            <CheckboxRow
-                                {...commonProps}
-                                {...(sendChordPattern?.note === scaleIndex && {
-                                    sendChordPattern,
-                                    setSendChordPattern,
-                                    chordInputStep,
-                                })}
-                            />
-                        )
-                    })}
-
-                    <PointerContainer>
-                        <BeatMarkers
-                            blankStepCountArray={blankStepCountArray}
-                            currentBeatRef={currentBeatRef}
-                            beatForAnimation={beatForAnimation}
-                        />
-                    </PointerContainer>
-                </AllBoxesDiv>
-            </ChordSequencerGrid>
-            <HookTheoryChordsDiv>
-                {hookTheoryChords.length !== 0 && hookTheoryChords !== '' ? (
-                    hookTheoryChords.map((chord, index) => {
-                        return (
-                            <HookTheoryChordButton
-                                key={chord.chord_ID}
-                                chord={chord}
-                                handleChordClick={handleChordClick}
-                                chordInputStep={chordInputStep}
-                                index={index}
+                        <PointerContainer>
+                            <BeatMarkers
                                 blankStepCountArray={blankStepCountArray}
-                                hookTheoryChords={hookTheoryChords}
+                                currentBeatRef={currentBeatRef}
+                                beatForAnimation={beatForAnimation}
                             />
-                        )
-                    })
-                ) : (
-                    <>
-                        {hookTheoryChords === '' ? (
-                            <>reset the chords to see suggestions</>
-                        ) : (
-                            <>loading chords from the HookTheory API...</>
-                        )}
-                    </>
-                )}
-            </HookTheoryChordsDiv>
+                        </PointerContainer>
+                    </AllBoxesDiv>
+                </ChordSequencerGrid>
+                <HookTheoryChordsDiv>
+                    {hookTheoryChords.length !== 0 &&
+                    hookTheoryChords !== '' ? (
+                        hookTheoryChords.map((chord, index) => {
+                            return (
+                                <HookTheoryChordButton
+                                    key={chord.chord_ID}
+                                    chord={chord}
+                                    handleChordClick={handleChordClick}
+                                    chordInputStep={chordInputStep}
+                                    index={index}
+                                    blankStepCountArray={blankStepCountArray}
+                                    hookTheoryChords={hookTheoryChords}
+                                />
+                            )
+                        })
+                    ) : (
+                        <>
+                            {hookTheoryChords === '' ? (
+                                <>reset the chords to see suggestions</>
+                            ) : (
+                                <>loading chords from the HookTheory API...</>
+                            )}
+                        </>
+                    )}
+                </HookTheoryChordsDiv>
+            </SequencerContainer>
         </>
     )
 }
 
 export default Sequencer
+
+const SequencerContainer = styled.div`
+    margin: 15px;
+`
 
 const ChordSequencerGrid = styled.div`
     height: 300px;
@@ -459,6 +415,30 @@ const AllBoxesDiv = styled.div`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+`
+const GridTitleAndResetDiv = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 7px;
+    align-items: center;
+`
+const GridTitle = styled.span`
+    letter-spacing: 0.1em;
+    margin: auto;
+`
+
+const ResetButton = styled.div`
+    border: 1px solid var(--lightest-color);
+    padding: 4px 6px;
+    margin: 4px;
+    letter-spacing: 0.1em;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    :hover {
+        cursor: pointer;
+    }
 `
 
 const HookTheoryChordsDiv = styled.div`

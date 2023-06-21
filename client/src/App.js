@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Sequencer from './Sequencer'
 import GlobalStyle from './globalStyles'
-import { generateAreXBeatsCheckedInitialState } from './FrontEndHelpers'
 export const MusicParametersContext = createContext()
 const App = () => {
     // useEffect(() => {
@@ -26,75 +25,11 @@ const App = () => {
     //                 console.log(data, 'app')
     //             })
     //             .catch((error) => {
-    //                 console.log(error, 'NOOOOOOOOOO')
+    //                 console.log(error)
     //             })
     //     }
     // }, [])
 
-    const [amtOfNotes, setAmtOfNotes] = useState(8) // amt of chords, i.e. how many ROWS are there
-    const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
-
-    const makeMelodyNotesState = []
-    // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-    for (let i = 15; i > 0; i--) {
-        makeMelodyNotesState.push(`note-${i}`)
-    }
-
-    const makeChordNotesState = []
-    // [8,7,6,5,4,3,2,1] where amtofnotes = 8
-    for (let i = 8; i > 0; i--) {
-        makeChordNotesState.push(`note-${i}`)
-    }
-    const blankStepCountArray = []
-    // [0,0,0,0,0,0,0,0] where stepCount = 8
-    for (let i = stepCount; i > 0; i--) {
-        blankStepCountArray.push(0)
-    }
-    const [areChordBeatsChecked, setAreChordBeatsChecked] = useState(
-        generateAreXBeatsCheckedInitialState(
-            makeChordNotesState,
-            makeMelodyNotesState,
-            blankStepCountArray,
-            'chords'
-        )
-    )
-    // this is the proper format of the master reference of notes areChordBeatsChecked. the amtOfNotes would be 8
-    // {
-    // chord-8: [1, 0, 0, 0, 0, 0, 0, 1],
-    // chord-7: [0, 1, 0, 0, 0, 0, 0, 0],
-    // chord-6: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-5: [0, 0, 0, 0, 0, 1, 0, 0],
-    // chord-4: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-3: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-2: [0, 0, 0, 0, 0, 0, 0, 0],
-    // chord-1: [0, 0, 0, 1, 0, 0, 0, 0],
-    // }
-    // const [areMelodyBeatsChecked, setAreMelodyBeatsChecked] = useState(
-    //     generateAreXBeatsCheckedInitialState(
-    //         makeChordNotesState,
-    //         makeMelodyNotesState,
-    //         blankStepCountArray,
-    //         'melody'
-    //     )
-    // )
-
-    const areMelodyBeatsChecked = generateAreXBeatsCheckedInitialState(
-        makeChordNotesState,
-        makeMelodyNotesState,
-        blankStepCountArray,
-        'melody'
-    )
-
-    // // const [tempo, setTempo] = useState(60)
-    // const [rootNote, setRootNote] = useState(0)
-    // const [wonkFactor, setWonkFactor] = useState(1)
-    // const [attack, setAttack] = useState(2)
-    // const [melodyVolume, setMelodyVolume] = useState(75)
-    // const [chordsVolume, setChordsVolume] = useState(50)
-
-    // const [decay, setDecay] = useState(20)
-    // const [sustain, setSustain] = useState(20)
-    // const [release, setRelease] = useState(20)
     const [chordInputStep, setChordInputStep] = useState(1)
     const [chosenAPIChords, setChosenAPIChords] = useState([])
     const [hookTheoryChords, setHookTheoryChords] = useState([])
@@ -123,19 +58,11 @@ const App = () => {
         appRendersRef.current = appRendersRef.current + 1
         console.log(appRendersRef.current, 'App renders')
     })
+
     return (
         <BrowserRouter>
             <MusicParametersContext.Provider
                 value={{
-                    // audioContext,
-                    // tempo,
-                    // setTempo,
-                    stepCount,
-                    setStepCount,
-                    // rootNote,
-                    // setRootNote,
-                    // wonkFactor,
-                    // setWonkFactor,
                     chordInputStep,
                     setChordInputStep,
                     loadUserSongs,
@@ -144,34 +71,11 @@ const App = () => {
                     setLoadSong,
                     songName,
                     setSongName,
-                    // melodyVolume,
-                    // setMelodyVolume,
-                    // chordsVolume,
-                    // setChordsVolume,
-                    // sound,
-                    // setSound,
-                    // filterCutoff,
-                    // setFilterCutoff,
-                    // attack,
-                    // setAttack,
-                    // decay,
-                    // setDecay,
-                    // sustain,
-                    // setSustain,
-                    // release,
-                    // setRelease,
                     songSavedOrDeleted,
                     setSongSavedOrDeleted,
                     songDeleted,
                     setSongDeleted,
                     handleLoadSongsFetch,
-                    areChordBeatsChecked,
-                    setAreChordBeatsChecked,
-                    areMelodyBeatsChecked,
-                    // setAreMelodyBeatsChecked,
-                    makeChordNotesState,
-                    makeMelodyNotesState,
-                    blankStepCountArray,
                     chosenAPIChords,
                     hookTheoryChords,
                     setHookTheoryChords,

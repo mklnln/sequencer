@@ -1,102 +1,3 @@
-// ? trying to use useContext, i can only import those things inside of a custom hook or a react function component. otherwise, it may need to be tons of arguments passed to JS functions.
-
-export const generateAreXBeatsCheckedInitialState = (
-    makeChordNotesState,
-    makeMelodyNotesState,
-    blankStepCountArray,
-    whichGrid
-) => {
-    const makeAreXBeatsChecked = {}
-    // DRYDRYDRY
-    // TODO refactor and only pass in one of the makeXNotesState, no need to check chords/melody
-    // ! did        makeAreXBeatsChecked[`note-${num}`].push(0) because using blankstepcountarray caused problems with spread operator down the road, each array used the same reference and so a change to one lead to a change to all
-    let amtOfArraysToMake
-
-    whichGrid === 'chords'
-        ? (amtOfArraysToMake = makeChordNotesState)
-        : (amtOfArraysToMake = makeMelodyNotesState)
-
-    amtOfArraysToMake.forEach((num) => {
-        makeAreXBeatsChecked[`${num}`] = []
-        blankStepCountArray.forEach((step) => {
-            makeAreXBeatsChecked[`${num}`].push(0)
-        })
-    })
-    return makeAreXBeatsChecked
-}
-
-export const clearAreChordBeatsChecked = (
-    makeChordNotesState,
-    blankStepCountArray,
-    setAreChordBeatsChecked,
-    setChosenAPIChords,
-    setChordInputStep,
-    setHookTheoryChords
-) => {
-    const makeAreChordBeatsChecked = {}
-    makeChordNotesState.forEach((num) => {
-        makeAreChordBeatsChecked[`note-${num}`] = [...blankStepCountArray]
-    })
-    setAreChordBeatsChecked(makeAreChordBeatsChecked)
-    setChosenAPIChords('')
-    setChordInputStep(1)
-    setHookTheoryChords([])
-}
-export const clearAreMelodyBeatsChecked = (
-    makeMelodyNotesState,
-    blankStepCountArray,
-    setAreMelodyBeatsChecked
-) => {
-    const makeAreMelodyBeatsChecked = {}
-    makeMelodyNotesState.forEach((num) => {
-        makeAreMelodyBeatsChecked[`note-${num}`] = [...blankStepCountArray]
-    })
-    setAreMelodyBeatsChecked(makeAreMelodyBeatsChecked)
-    console.log('set new melody beats')
-}
-
-export const makeNewChordMaster = (
-    makeChordNotesState,
-    areChordBeatsChecked,
-    blankStepCountArray
-) => {
-    const newMaster = {}
-    makeChordNotesState.forEach((note) => {
-        newMaster[`${note}`] = areChordBeatsChecked[`${note}`]
-        // this takes away if the new length is smaller
-        while (newMaster[`${note}`].length > blankStepCountArray.length) {
-            newMaster[`${note}`].pop()
-        }
-
-        // this puts more in if the new length is greater
-        while (newMaster[`${note}`].length < blankStepCountArray.length) {
-            newMaster[`${note}`].push(0)
-        }
-    })
-    return newMaster
-}
-
-export const makeNewMelodyMaster = (
-    makeMelodyNotesState,
-    areMelodyBeatsChecked,
-    blankStepCountArray
-) => {
-    const newMelodyMaster = {}
-    makeMelodyNotesState.forEach((note) => {
-        newMelodyMaster[`${note}`] = areMelodyBeatsChecked[`${note}`]
-        // this takes away if the new length is smaller
-        while (newMelodyMaster[`${note}`].length > blankStepCountArray.length) {
-            newMelodyMaster[`${note}`].pop()
-        }
-
-        // this puts more in if the new length is greater
-        while (newMelodyMaster[`${note}`].length < blankStepCountArray.length) {
-            newMelodyMaster[`${note}`].push(0)
-        }
-    })
-    return newMelodyMaster
-}
-
 export const loadChangedSongList = (
     songSavedOrDeleted,
     user,
@@ -173,4 +74,12 @@ export const makeNotesToPlayMaster = (stepCount) => {
         obj[`beat-${i}`] = {}
     }
     return obj
+}
+
+export const makeBlankStepCountArray = (stepCount) => {
+    let arr = []
+    for (let i = stepCount; i > 0; i--) {
+        arr.push(0)
+    }
+    return arr
 }

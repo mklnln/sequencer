@@ -23,6 +23,8 @@ const Parameters = ({
     setTempo,
     beatForAnimation,
     setBeatForAnimation,
+    stepCount,
+    setStepCount,
 }) => {
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
@@ -35,8 +37,8 @@ const Parameters = ({
     const [filterCutoff, setFilterCutoff] = useState(7500)
     const [sound, setSound] = useState('sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-    const { stepCount, setStepCount } = useContext(MusicParametersContext)
-
+    // const { stepCount, setStepCount } = useContext(MusicParametersContext)
+    console.log(notesToPlay)
     const tempoToSeconds = (tempo) => {
         return 60 / (tempo * 2)
     }
@@ -74,7 +76,6 @@ const Parameters = ({
     let eighthNoteTicks = 0
     let intervalTicks = 0
 
-    console.log(sentToPlayEngineRef.current, 'sent is falsified!!')
     if (playing) {
         timeFromStart = audioTime()
         nextNoteTime = 0
@@ -100,7 +101,6 @@ const Parameters = ({
                 futureBeatNotesArray.forEach((note) => {
                     const scaleIndex = parseInt(note.substring(5))
                     Object.keys(futureBeatTarget[note]).forEach((type) => {
-                        // console.log('play, ', scaleIndex, 'type ', type)
                         playEngine(nextNoteTime, scaleIndex, type)
                     })
                 })
@@ -164,6 +164,7 @@ const Parameters = ({
     const togglePlayback = () => {
         if (!playing) {
             currentBeatRef.current = 0
+            sentToPlayEngineRef.current = false
         }
         setPlaying(!playing)
     }
