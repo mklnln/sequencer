@@ -216,7 +216,9 @@ todo june 20th
 			> load/save songs
 			> resetting chords/melodies
 				> remove buttons from header, set 'Clear' button next to grids?
-			> 
+
+	>V reset chords and melodies
+
 	>V playback starts on 2nd beat sometimes, once starting/stopping a lot
 		> sentToPlayEngine was only resetting after one cycle, thus it needed the first beat to reset. fixed by falsifying it right after playback stops.
 	> fix up sound

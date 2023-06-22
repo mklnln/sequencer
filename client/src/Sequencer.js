@@ -248,7 +248,7 @@ const Sequencer = () => {
                         <GridTitleAndResetDiv>
                             <GridTitle>MELODY</GridTitle>
                             <ResetButton onClick={handleResetGrid}>
-                                <span id="melody">RESET</span>
+                                <ResetSpan id="melody">RESET</ResetSpan>
                             </ResetButton>
                         </GridTitleAndResetDiv>
                         {melodyNotes.map((note, index) => {
@@ -319,7 +319,7 @@ const Sequencer = () => {
                         <GridTitleAndResetDiv>
                             <GridTitle>CHORDS</GridTitle>
                             <ResetButton onClick={handleResetGrid}>
-                                <span id="chords">RESET</span>
+                                <ResetSpan id="chords">RESET</ResetSpan>
                             </ResetButton>
                         </GridTitleAndResetDiv>
                         {chordNotes.map((note, index) => {
@@ -430,7 +430,7 @@ const GridTitle = styled.span`
 
 const ResetButton = styled.div`
     border: 1px solid var(--lightest-color);
-    padding: 4px 6px;
+
     margin: 4px;
     letter-spacing: 0.1em;
     position: absolute;
@@ -438,6 +438,21 @@ const ResetButton = styled.div`
     align-items: center;
     :hover {
         cursor: pointer;
+        background-color: var(--primary-color);
+        color: black;
+    }
+    .span {
+        font-size: 4em;
+        background-color: fuchsia;
+    }
+`
+
+const ResetSpan = styled.span`
+    width: 100%;
+    height: 100%;
+    padding: 4px 6px;
+    :hover {
+        color: black;
     }
 `
 
