@@ -1,7 +1,7 @@
 import { useState, createContext, useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
-import Sequencer from './Sequencer'
+import Grids from './Grids'
 import GlobalStyle from './globalStyles'
 export const MusicParametersContext = createContext()
 const App = () => {
@@ -86,7 +86,7 @@ const App = () => {
                 <Header />
                 <Routes>
                     <Route>
-                        <Route path="/*" element={<Sequencer />} />
+                        <Route path="/*" element={<Grids />} />
                     </Route>
                 </Routes>
             </MusicParametersContext.Provider>

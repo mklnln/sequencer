@@ -83,3 +83,19 @@ export const makeBlankStepCountArray = (stepCount) => {
     }
     return arr
 }
+
+let trackCheckboxes = []
+
+export const trackAndResetPattern = (sendChordPattern, setSendChordPattern) => {
+    // push to track checkboxes
+    trackCheckboxes.push(1)
+    if (
+        trackCheckboxes.length / sendChordPattern.pattern.length >=
+        sendChordPattern.note.length
+    ) {
+        // re-init trackcheckboxes
+        trackCheckboxes = []
+        setSendChordPattern(undefined)
+    }
+    console.log(trackCheckboxes, 'we done?')
+}

@@ -13,7 +13,8 @@ const CheckboxRow = memo(
         blankStepCountArray,
         sendChordPattern,
         setSendChordPattern,
-        chordInputStep,
+        notesToPlay,
+        setNotesToPlay,
     }) => {
         useEffect(() => {
             if (countCheckboxRenders) {
@@ -22,14 +23,12 @@ const CheckboxRow = memo(
         })
 
         return (
-            <React.Fragment
-            // key={`${whichGrid}-chkrow-note-${scaleIndex}-beat-${beatNum}}`}
-            >
+            <React.Fragment>
                 <TitleAndBoxesDiv>
                     <TitleSpanDiv>
                         <NoteTitle>{noteTitle}</NoteTitle>
                     </TitleSpanDiv>
-                    <ChordDiv>
+                    <NoteRowDiv>
                         {blankStepCountArray.map((check, index) => {
                             const beatNum = index + 1
                             const commonProps = {
@@ -38,51 +37,25 @@ const CheckboxRow = memo(
                                 scaleIndex,
                                 whichGrid,
                                 bubbleUpCheckboxInfo,
+                                notesToPlay,
+                                setNotesToPlay,
                             }
-                            // ? why not invert the crazy thing and just say
-                            // ? if
 
                             if (sendChordPattern) {
-                                console.log(
-                                    sendChordPattern,
-                                    'chordo',
-                                    noteTitle
+                                return (
+                                    <SingleCheckbox
+                                        {...commonProps}
+                                        {...{
+                                            sendChordPattern,
+                                            setSendChordPattern,
+                                        }}
+                                    />
                                 )
-                                if (
-                                    beatNum <
-                                        sendChordPattern.chordInputStepCopy ||
-                                    beatNum >=
-                                        sendChordPattern.chordInputStepCopy +
-                                            sendChordPattern.pattern.length
-                                ) {
-                                    // beatNum = changing index of map fxn, 1-16
-                                    // if beatNum is less than 1 OR
-                                    // beatNum greater than or equal to (inputStep (1) +4 i.e. 5)
-
-                                    return <SingleCheckbox {...commonProps} />
-                                } else {
-                                    console.log(
-                                        beatNum,
-                                        sendChordPattern.chordInputStepCopy +
-                                            sendChordPattern.pattern.length,
-                                        'this is the LOG THAT CHANGES PROPS'
-                                    )
-                                    return (
-                                        <SingleCheckbox
-                                            {...commonProps}
-                                            {...{
-                                                sendChordPattern,
-                                                setSendChordPattern,
-                                                chordInputStep,
-                                            }}
-                                        />
-                                    )
-                                }
                             } else {
                                 return <SingleCheckbox {...commonProps} />
                             }
                         })}
-                    </ChordDiv>
+                    </NoteRowDiv>
                 </TitleAndBoxesDiv>
             </React.Fragment>
         )
@@ -102,7 +75,7 @@ const TitleSpanDiv = styled.div`
     display: flex;
     justify-content: flex-end;
 `
-const ChordDiv = styled.div`
+const NoteRowDiv = styled.div`
     position: relative;
     display: flex;
     justify-content: space-between;
