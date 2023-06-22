@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
-import { handleNoteClick } from '../FrontEndHelpers'
+import { handleNoteClick, trackAndResetPattern } from '../FrontEndHelpers'
 const SingleCheckbox = ({
     beatNum,
     // areXBeatsChecked,
@@ -10,23 +10,49 @@ const SingleCheckbox = ({
     scaleIndex,
     whichGrid,
     bubbleUpCheckboxInfo,
-    // notesToPlay,
-    // setNotesToPlay,
+    notesToPlay,
+    setNotesToPlay,
     sendChordPattern,
     setSendChordPattern,
-    chordInputStep,
 }) => {
     const [checked, setChecked] = useState(false)
     const handleChange = () => {
         bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
         setChecked(!checked)
     }
-    if (sendChordPattern !== undefined) {
-        if (sendChordPattern.pattern && checked === false) {
-            setChecked(true)
-            setSendChordPattern(null)
+    // console.log(notesToPlay)
+    if (
+        sendChordPattern?.pattern?.[beatNum - 1] !== undefined &&
+        sendChordPattern?.grid === whichGrid
+    ) {
+        let numBool = checked ? 1 : 0
+        if (numBool !== sendChordPattern.pattern[beatNum - 1]) {
+            setChecked(sendChordPattern.pattern[beatNum - 1])
         }
+        // ! how do i stop this call once we've clearly gone through everything?
+        trackAndResetPattern(sendChordPattern, setSendChordPattern)
     }
+
+    // // this is currently resetting the state on all the notes of a row
+    // // i want to only set state on the ones that are changed
+    // // beatNum <? chordInputStep + 4
+    // // e.g. 1,2,3,4 for 1+4 = 5
+    // // 1 <, good
+    // //
+    // // if (sendChordPattern?.pattern && checked === false) {
+    // let stateNum = checked ? 1 : 0
+    // let patternNum = sendChordPattern?.pattern[beatNum - 1]
+    // if (
+    //     sendChordPattern?.pattern &&
+    //     beatNum < sendChordPattern.chordInputStepCopy + 4
+    // ) {
+    //     if (stateNum !== patternNum) {
+    //         setChecked(patternNum)
+    //     }
+    //     console.log(beatNum, scaleIndex, 'checked done setted, hereby')
+    //     setSendChordPattern(null)
+    // }
+
     return (
         <SVGContainer
             className={whichGrid}
