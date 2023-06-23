@@ -4,6 +4,7 @@ import Header from './Components/Header'
 import Grids from './Grids'
 import GlobalStyle from './globalStyles'
 import SorryMobile from './Components/SorryMobile'
+import SorryNarrowWindow from './Components/SorryNarrowWindow'
 export const MusicParametersContext = createContext()
 const App = () => {
     // useEffect(() => {
@@ -66,6 +67,10 @@ const App = () => {
             navigator.userAgent
         )
 
+    const narrowWindow = window.innerWidth < 900
+
+    console.log(mobileDevice, ' app rendered')
+
     return (
         <BrowserRouter>
             <MusicParametersContext.Provider
@@ -92,6 +97,8 @@ const App = () => {
                 <GlobalStyle />
                 {mobileDevice ? (
                     <SorryMobile />
+                ) : narrowWindow ? (
+                    <SorryNarrowWindow />
                 ) : (
                     <>
                         <Header />

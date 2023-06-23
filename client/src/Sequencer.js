@@ -25,6 +25,8 @@ const Sequencer = ({
     setBeatForAnimation,
     stepCount,
     setStepCount,
+    currentBeat,
+    setCurrentBeat,
 }) => {
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
@@ -39,7 +41,6 @@ const Sequencer = ({
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     // const { stepCount, setStepCount } = useContext(MusicParametersContext)
-    console.log(notesToPlay)
     const tempoToSeconds = (tempo) => {
         return 60 / (tempo * 2)
     }
@@ -124,10 +125,10 @@ const Sequencer = ({
     const advanceCurrentBeat = () => {
         if (currentBeatRef.current >= stepCount) {
             currentBeatRef.current = 1
-            // setBeatForAnimation(1)
+            setCurrentBeat(1)
         } else {
             currentBeatRef.current = currentBeatRef.current + 1
-            // setBeatForAnimation((prevProp) => prevProp + 1)
+            setCurrentBeat((prevState) => prevState + 1)
         }
     }
 
@@ -166,8 +167,10 @@ const Sequencer = ({
         if (!playing) {
             currentBeatRef.current = 0
             sentToPlayEngineRef.current = false
+            setCurrentBeat(0)
         }
         setPlaying(!playing)
+        setCurrentBeat(0)
     }
 
     const [parameterValuesObj, setParameterValuesObj] = useState({

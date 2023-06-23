@@ -30,10 +30,13 @@ export const giveOctaveNumber = (note) => {
     } else if (note > 7) {
         note = note - 7
     }
+    console.log('give oct')
+
     return note
 }
 
 export const makeDeepCopy = (original) => {
+    console.log('deep copy')
     return JSON.parse(JSON.stringify(original))
 }
 
@@ -44,6 +47,7 @@ export const handleNoteClick = (
     { beatNum, scaleIndex, whichGrid },
     setClickedNote
 ) => {
+    console.log('note click?')
     const arrayKey = `note-${scaleIndex}`
     let obj = { ...notesToPlay }
 
@@ -77,6 +81,7 @@ export const makeNotesToPlayMaster = (stepCount) => {
 }
 
 export const makeBlankStepCountArray = (stepCount) => {
+    console.log('blankstepcount')
     let arr = []
     for (let i = stepCount; i > 0; i--) {
         arr.push(0)
@@ -84,18 +89,17 @@ export const makeBlankStepCountArray = (stepCount) => {
     return arr
 }
 
-let trackCheckboxes = []
+let trackCheckboxes = 0
 
 export const trackAndResetPattern = (sendChordPattern, setSendChordPattern) => {
-    // push to track checkboxes
-    trackCheckboxes.push(1)
+    // increment track checkboxes
+    trackCheckboxes++
     if (
         trackCheckboxes.length / sendChordPattern.pattern.length >=
         sendChordPattern.note.length
     ) {
         // re-init trackcheckboxes
-        trackCheckboxes = []
+        trackCheckboxes = 0
         setSendChordPattern(undefined)
     }
-    console.log(trackCheckboxes, 'we done?')
 }

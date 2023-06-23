@@ -41,6 +41,7 @@ const Grids = () => {
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
+    const [currentBeat, setCurrentBeat] = useState(0)
 
     const [resetMelody, setResetMelody] = useState(false)
     const [resetChords, setResetChords] = useState(false)
@@ -60,7 +61,6 @@ const Grids = () => {
     const [chordNotes] = useState(chordNotesArr)
 
     const currentBeatRef = useRef(0)
-    console.log(sendChordPattern, 'chordpatt INITINITNIT')
     // todo make helper
     const handleChordClick = (chordID, index) => {
         setHookTheoryChords([]) // may have previously used this to trigger useEffect
@@ -247,7 +247,6 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
-    console.log(notesToPlay, 'notes')
     return (
         <>
             <GridsContainer>
@@ -263,9 +262,11 @@ const Grids = () => {
                     setBeatForAnimation={setBeatForAnimation}
                     stepCount={stepCount}
                     setStepCount={setStepCount}
+                    currentBeat={currentBeat}
+                    setCurrentBeat={setCurrentBeat}
                 />
                 <MelodySequencerGrid>
-                    {countCheckboxRenders.current}
+                    {/* {countCheckboxRenders.current} */}
                     <AllBoxesDiv>
                         <GridTitleAndResetDiv>
                             <GridTitle>MELODY</GridTitle>
@@ -314,15 +315,14 @@ const Grids = () => {
                                 />
                             )
                         })}
-                        <PointerContainer>
-                            {/* make component, pass it blankstepcountarray, bob uncle */}
-                            <BeatMarkers
-                                blankStepCountArray={blankStepCountArray}
-                                currentBeatRef={currentBeatRef}
-                                beatForAnimation={beatForAnimation}
-                            />
-                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                            {/* {blankStepCountArray.map((step, index) => {
+                        {/* make component, pass it blankstepcountarray, bob uncle */}
+                        <BeatMarkers
+                            blankStepCountArray={blankStepCountArray}
+                            currentBeat={currentBeat}
+                            whichGrid="melody"
+                        />
+                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
+                        {/* {blankStepCountArray.map((step, index) => {
                             const num = index + 1
                             // every 2 beats make a div
                             if ((index + 1) % 2 === 0) {
@@ -353,8 +353,7 @@ const Grids = () => {
                                 )
                             }
                         })} */}
-                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                        </PointerContainer>
+                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
                     </AllBoxesDiv>
                 </MelodySequencerGrid>
                 <ChordSequencerGrid>
@@ -393,13 +392,11 @@ const Grids = () => {
                             )
                         })}
 
-                        <PointerContainer>
-                            <BeatMarkers
-                                blankStepCountArray={blankStepCountArray}
-                                currentBeatRef={currentBeatRef}
-                                beatForAnimation={beatForAnimation}
-                            />
-                        </PointerContainer>
+                        <BeatMarkers
+                            blankStepCountArray={blankStepCountArray}
+                            currentBeat={currentBeat}
+                            whichGrid="chords"
+                        />
                     </AllBoxesDiv>
                 </ChordSequencerGrid>
                 <HookTheoryChordsDiv>
@@ -507,31 +504,4 @@ const HookTheoryChordsDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-`
-
-const PointerContainer = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    align-items: center;
-    height: 10px;
-    padding-left: 20px;
-`
-const BeatMarker = styled.div`
-    border-left: 1px solid var(--lightest-color);
-    width: 26.5px;
-    height: 20px;
-    opacity: 100%;
-    padding-right: 26.5px;
-    display: flex;
-    justify-content: center;
-    &.current {
-        border: 1px solid fuchsia;
-    }
-`
-const BeatSpan = styled.span`
-    // padding-left: 9px;
-    color: var(--lighter-color);
-    opacity: 50%;
 `
