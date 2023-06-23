@@ -55,6 +55,7 @@ const PlaybackHighlight = styled.div`
     background-color: var(--lightest-color);
     opacity: 70%;
     margin-left: -40px;
+    border-radius: 10px;
     &.melody {
         height: 300px;
         margin-top: -300px;

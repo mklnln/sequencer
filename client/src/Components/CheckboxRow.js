@@ -41,7 +41,15 @@ const CheckboxRow = memo(
                                 setNotesToPlay,
                             }
 
-                            if (sendChordPattern) {
+                            if (
+                                sendChordPattern &&
+                                sendChordPattern?.chordInputStepCopy <=
+                                    beatNum &&
+                                beatNum <
+                                    sendChordPattern?.chordInputStepCopy +
+                                        sendChordPattern.pattern?.length
+                            ) {
+                                console.log(sendChordPattern, 'row')
                                 return (
                                     <SingleCheckbox
                                         {...commonProps}

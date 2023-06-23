@@ -99,7 +99,6 @@ const Grids = () => {
         })
         setChordInputStep((chordInputStep) => chordInputStep + 4)
     }
-
     // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
         if (hookTheoryChords.length === 0) {
@@ -249,6 +248,7 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
+    console.log(notesToPlay, 'NOTESNOTES')
     return (
         <>
             <GridsContainer>

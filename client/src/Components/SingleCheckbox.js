@@ -20,38 +20,6 @@ const SingleCheckbox = ({
         bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
         setChecked(!checked)
     }
-    // console.log(notesToPlay)
-    if (
-        sendChordPattern?.pattern?.[beatNum - 1] !== undefined &&
-        sendChordPattern?.grid === whichGrid
-    ) {
-        let numBool = checked ? 1 : 0
-        if (numBool !== sendChordPattern.pattern[beatNum - 1]) {
-            setChecked(sendChordPattern.pattern[beatNum - 1])
-        }
-        // ! how do i stop this call once we've clearly gone through everything?
-        trackAndResetPattern(sendChordPattern, setSendChordPattern)
-    }
-
-    // // this is currently resetting the state on all the notes of a row
-    // // i want to only set state on the ones that are changed
-    // // beatNum <? chordInputStep + 4
-    // // e.g. 1,2,3,4 for 1+4 = 5
-    // // 1 <, good
-    // //
-    // // if (sendChordPattern?.pattern && checked === false) {
-    // let stateNum = checked ? 1 : 0
-    // let patternNum = sendChordPattern?.pattern[beatNum - 1]
-    // if (
-    //     sendChordPattern?.pattern &&
-    //     beatNum < sendChordPattern.chordInputStepCopy + 4
-    // ) {
-    //     if (stateNum !== patternNum) {
-    //         setChecked(patternNum)
-    //     }
-    //     console.log(beatNum, scaleIndex, 'checked done setted, hereby')
-    //     setSendChordPattern(null)
-    // }
 
     return (
         <SVGContainer

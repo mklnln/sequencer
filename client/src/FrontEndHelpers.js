@@ -96,7 +96,7 @@ export const trackAndResetPattern = (sendChordPattern, setSendChordPattern) => {
     // increment track checkboxes
     trackCheckboxes++
     if (
-        trackCheckboxes.length / sendChordPattern.pattern.length >=
+        trackCheckboxes / sendChordPattern.pattern.length >=
         sendChordPattern.note.length
     ) {
         // re-init trackcheckboxes
