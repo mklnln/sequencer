@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Grids from './Grids'
 import GlobalStyle from './globalStyles'
+import SorryMobile from './Components/SorryMobile'
 export const MusicParametersContext = createContext()
 const App = () => {
     // useEffect(() => {
@@ -59,6 +60,12 @@ const App = () => {
         console.log(appRendersRef.current, 'App renders')
     })
 
+    // see if the user's browser is on a mobile device
+    const mobileDevice =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent
+        )
+
     return (
         <BrowserRouter>
             <MusicParametersContext.Provider
@@ -83,12 +90,18 @@ const App = () => {
                 }}
             >
                 <GlobalStyle />
-                <Header />
-                <Routes>
-                    <Route>
-                        <Route path="/*" element={<Grids />} />
-                    </Route>
-                </Routes>
+                {mobileDevice ? (
+                    <SorryMobile />
+                ) : (
+                    <>
+                        <Header />
+                        <Routes>
+                            <Route>
+                                <Route path="/*" element={<Grids />} />
+                            </Route>
+                        </Routes>
+                    </>
+                )}
             </MusicParametersContext.Provider>
         </BrowserRouter>
     )
