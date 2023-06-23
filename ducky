@@ -229,7 +229,26 @@ todo june 20th
 	> bonus: debounce parameters
 	> bonus: changing step seems to mess up notesToPlay, visually notes are clicked but do not play
 
+todo june 22
+	>V reset button style
+	>V reset checkboxes upon reset push
+		> ideal tht we have a cascade of state changing rendering but mb no happen due to our checkboxes keeping their own individual states
+		> mb i could use sendChordPatternt that i've already worked on to do the same thing. 
+		> i'm having a real think about how i structured this. i chose to have each ind'l SingleCheckbox report its own state with a bubble up function. now im having to drill stuff down in order to change it. i did this as an alternative to having it reset its state based on a changing notesToPlay, which seemed computationally expensive to have it check everytime
+		> i still think its wroth it to keep it this way
+	>V make reset buttons 
+		> may have an error of simultaneous setState calls
+		> i imported notesToPlay to SingleCheckbox, it doesn't seem to be too bad
 
+todo june 23
+	>V add note sayin 'no mobile'
+	>V playback highlight
+	> holy cow im doin a lot of helpin' every render!!
+		> give octave number, make notesto play master, new blANKSTEPcount. 
+			> try putting these in state, compare performance
+
+future ideas:
+	> fit everything on one page?
 
 
 //

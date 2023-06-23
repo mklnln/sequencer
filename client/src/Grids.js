@@ -41,6 +41,7 @@ const Grids = () => {
     const [notesToPlay, setNotesToPlay] = useState(
         makeNotesToPlayMaster(stepCount)
     )
+    const [currentBeat, setCurrentBeat] = useState(0)
 
     const [resetMelody, setResetMelody] = useState(false)
     const [resetChords, setResetChords] = useState(false)
@@ -60,7 +61,6 @@ const Grids = () => {
     const [chordNotes] = useState(chordNotesArr)
 
     const currentBeatRef = useRef(0)
-    console.log(sendChordPattern, 'chordpatt INITINITNIT')
     // todo make helper
     const handleChordClick = (chordID, index) => {
         setHookTheoryChords([]) // may have previously used this to trigger useEffect
@@ -99,7 +99,6 @@ const Grids = () => {
         })
         setChordInputStep((chordInputStep) => chordInputStep + 4)
     }
-
     // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
         if (hookTheoryChords.length === 0) {
@@ -176,9 +175,11 @@ const Grids = () => {
 
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
     if (stepCount !== Object.keys(notesToPlay).length) {
+        console.log('we know we changed stepCount')
         setNotesToPlay(makeNotesToPlayMaster(stepCount))
+        setBlankStepCountArray(makeBlankStepCountArray(stepCount))
     }
-
+    console.log(notesToPlay, 'notesTOOOOOOOOOOOOO', blankStepCountArray, 'blnk')
     const countReRenders = useRef(1)
 
     useEffect(() => {
@@ -247,7 +248,7 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
-    console.log(notesToPlay, 'notes')
+    console.log(notesToPlay, 'NOTESNOTES')
     return (
         <>
             <GridsContainer>
@@ -263,9 +264,11 @@ const Grids = () => {
                     setBeatForAnimation={setBeatForAnimation}
                     stepCount={stepCount}
                     setStepCount={setStepCount}
+                    currentBeat={currentBeat}
+                    setCurrentBeat={setCurrentBeat}
                 />
                 <MelodySequencerGrid>
-                    {countCheckboxRenders.current}
+                    {/* {countCheckboxRenders.current} */}
                     <AllBoxesDiv>
                         <GridTitleAndResetDiv>
                             <GridTitle>MELODY</GridTitle>
@@ -314,15 +317,14 @@ const Grids = () => {
                                 />
                             )
                         })}
-                        <PointerContainer>
-                            {/* make component, pass it blankstepcountarray, bob uncle */}
-                            <BeatMarkers
-                                blankStepCountArray={blankStepCountArray}
-                                currentBeatRef={currentBeatRef}
-                                beatForAnimation={beatForAnimation}
-                            />
-                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                            {/* {blankStepCountArray.map((step, index) => {
+                        {/* make component, pass it blankstepcountarray, bob uncle */}
+                        <BeatMarkers
+                            blankStepCountArray={blankStepCountArray}
+                            currentBeat={currentBeat}
+                            whichGrid="melody"
+                        />
+                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
+                        {/* {blankStepCountArray.map((step, index) => {
                             const num = index + 1
                             // every 2 beats make a div
                             if ((index + 1) % 2 === 0) {
@@ -353,8 +355,7 @@ const Grids = () => {
                                 )
                             }
                         })} */}
-                            {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                        </PointerContainer>
+                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
                     </AllBoxesDiv>
                 </MelodySequencerGrid>
                 <ChordSequencerGrid>
@@ -393,13 +394,11 @@ const Grids = () => {
                             )
                         })}
 
-                        <PointerContainer>
-                            <BeatMarkers
-                                blankStepCountArray={blankStepCountArray}
-                                currentBeatRef={currentBeatRef}
-                                beatForAnimation={beatForAnimation}
-                            />
-                        </PointerContainer>
+                        <BeatMarkers
+                            blankStepCountArray={blankStepCountArray}
+                            currentBeat={currentBeat}
+                            whichGrid="chords"
+                        />
                     </AllBoxesDiv>
                 </ChordSequencerGrid>
                 <HookTheoryChordsDiv>
@@ -456,7 +455,7 @@ const MelodySequencerGrid = styled.div`
 
 const AllBoxesDiv = styled.div`
     display: flex;
-    height: 300px;
+    width: auto;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -467,34 +466,26 @@ const GridTitleAndResetDiv = styled.div`
     flex-direction: row-reverse;
     margin: 7px;
     align-items: center;
+    padding-bottom: 2px;
 `
 const GridTitle = styled.span`
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     margin: auto;
 `
 
 const ResetButton = styled.div`
     border: 1px solid var(--lightest-color);
 
-    margin: 4px;
-    letter-spacing: 0.1em;
     position: absolute;
     display: flex;
-    align-items: center;
     :hover {
         cursor: pointer;
         background-color: var(--primary-color);
         color: black;
     }
-    .span {
-        font-size: 4em;
-        background-color: fuchsia;
-    }
 `
 
 const ResetSpan = styled.span`
-    width: 100%;
-    height: 100%;
     padding: 4px 6px;
     :hover {
         color: black;
@@ -507,31 +498,4 @@ const HookTheoryChordsDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-`
-
-const PointerContainer = styled.div`
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    align-items: center;
-    height: 10px;
-    padding-left: 20px;
-`
-const BeatMarker = styled.div`
-    border-left: 1px solid var(--lightest-color);
-    width: 26.5px;
-    height: 20px;
-    opacity: 100%;
-    padding-right: 26.5px;
-    display: flex;
-    justify-content: center;
-    &.current {
-        border: 1px solid fuchsia;
-    }
-`
-const BeatSpan = styled.span`
-    // padding-left: 9px;
-    color: var(--lighter-color);
-    opacity: 50%;
 `
