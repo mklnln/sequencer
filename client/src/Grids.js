@@ -176,9 +176,11 @@ const Grids = () => {
 
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
     if (stepCount !== Object.keys(notesToPlay).length) {
+        console.log('we know we changed stepCount')
         setNotesToPlay(makeNotesToPlayMaster(stepCount))
+        setBlankStepCountArray(makeBlankStepCountArray(stepCount))
     }
-
+    console.log(notesToPlay, 'notesTOOOOOOOOOOOOO', blankStepCountArray, 'blnk')
     const countReRenders = useRef(1)
 
     useEffect(() => {
@@ -453,7 +455,7 @@ const MelodySequencerGrid = styled.div`
 
 const AllBoxesDiv = styled.div`
     display: flex;
-    height: 300px;
+    width: auto;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -464,34 +466,26 @@ const GridTitleAndResetDiv = styled.div`
     flex-direction: row-reverse;
     margin: 7px;
     align-items: center;
+    padding-bottom: 2px;
 `
 const GridTitle = styled.span`
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     margin: auto;
 `
 
 const ResetButton = styled.div`
     border: 1px solid var(--lightest-color);
 
-    margin: 4px;
-    letter-spacing: 0.1em;
     position: absolute;
     display: flex;
-    align-items: center;
     :hover {
         cursor: pointer;
         background-color: var(--primary-color);
         color: black;
     }
-    .span {
-        font-size: 4em;
-        background-color: fuchsia;
-    }
 `
 
 const ResetSpan = styled.span`
-    width: 100%;
-    height: 100%;
     padding: 4px 6px;
     :hover {
         color: black;

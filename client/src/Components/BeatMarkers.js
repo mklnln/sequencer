@@ -31,21 +31,19 @@ export default BeatMarkers
 
 const Container = styled.div`
     display: flex;
-    width: 320px;
+    width: auto;
     padding-left: 20px;
-    position: static;
-    overflow: visible;
+    position: relative;
+    justify-content: flex-start;
 `
 
 const BeatMarker = styled.div`
     border-left: 1px solid var(--lightest-color);
-    width: 39px;
     height: 20px;
     opacity: 100%;
     display: flex;
-    justify-content: center;
     align-items: center;
-    padding-right: 20px;
+    padding-right: 18px;
     &.current {
         font-size: 1.5em;
     }
@@ -70,5 +68,6 @@ const BeatSpan = styled.span`
     // padding-left: 9px;
     color: var(--lighter-color);
     opacity: 50%;
+    width: 21px;
     text-align: center;
 `

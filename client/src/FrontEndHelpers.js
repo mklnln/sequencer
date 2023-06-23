@@ -77,6 +77,7 @@ export const makeNotesToPlayMaster = (stepCount) => {
     for (let i = 1; i <= stepCount; i++) {
         obj[`beat-${i}`] = {}
     }
+    console.log(obj)
     return obj
 }
 
