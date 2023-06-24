@@ -6,6 +6,7 @@ import {
     handleNoteClick,
     makeDeepCopy,
     makeBlankStepCountArray,
+    updateNotesToPlayMaster,
 } from './FrontEndHelpers.js'
 import {
     chordNotesArr,
@@ -176,10 +177,9 @@ const Grids = () => {
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
     if (stepCount !== Object.keys(notesToPlay).length) {
         console.log('we know we changed stepCount')
-        setNotesToPlay(makeNotesToPlayMaster(stepCount))
+        setNotesToPlay((prev) => updateNotesToPlayMaster(stepCount, prev))
         setBlankStepCountArray(makeBlankStepCountArray(stepCount))
     }
-    console.log(notesToPlay, 'notesTOOOOOOOOOOOOO', blankStepCountArray, 'blnk')
     const countReRenders = useRef(1)
 
     useEffect(() => {

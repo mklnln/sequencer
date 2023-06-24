@@ -14,6 +14,15 @@ export const rootNoteOptions = [
 ]
 
 export const stepCountOptions = ['8', '16', '24', '32', '64']
+export const soundOptions = [
+    'Sine',
+    'Triangle',
+    'Sawtooth',
+    'Square',
+    'Aah',
+    'Ooh',
+    'Piano',
+]
 
 export const romanNumeralReference = {
     major: {

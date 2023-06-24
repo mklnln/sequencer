@@ -149,7 +149,8 @@ export const playSynth = (
         // 1/12, 1.0075
         const osc = audioCtx.createOscillator()
         osc.frequency.value = note // (1.1/12) 1.075*
-        osc.type = sound
+        osc.type = sound.toLowerCase()
+        console.log(sound, 'engine')
         const lowPassFilter = audioCtx.createBiquadFilter()
         lowPassFilter.frequency.value = filterCutoff
         lowPassFilter.type = 'lowpass'

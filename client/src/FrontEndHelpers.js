@@ -81,6 +81,23 @@ export const makeNotesToPlayMaster = (stepCount) => {
     return obj
 }
 
+export const updateNotesToPlayMaster = (stepCount, notesToPlay) => {
+    const obj = { ...notesToPlay }
+
+    const oldLength = Object.keys(notesToPlay).length
+    if (oldLength < stepCount) {
+        for (let i = oldLength + 1; i <= stepCount; i++) {
+            obj[`beat-${i}`] = {}
+        }
+    } else {
+        for (let i = stepCount + 1; i <= oldLength; i++) {
+            delete obj[`beat-${i}`]
+        }
+    }
+
+    return obj
+}
+
 export const makeBlankStepCountArray = (stepCount) => {
     console.log('blankstepcount')
     let arr = []
