@@ -71,14 +71,28 @@ export const handleNoteClick = (
     setClickedNote(null)
 }
 
-export const makeNotesToPlayMaster = (stepCount) => {
+export const makeNotesToPlayMaster = () => {
     const obj = {}
-    console.log('makeNotesToPlayMaster')
-    for (let i = 1; i <= stepCount; i++) {
+    for (let i = 1; i <= 16; i++) {
         obj[`beat-${i}`] = {}
     }
-    console.log(obj)
     return obj
+}
+
+export const makeBlankStepCountArray = () => {
+    let arr = []
+    for (let i = 16; i > 0; i--) {
+        arr.push(0)
+    }
+    return arr
+}
+
+export const updateBlankStepCountArray = (stepCount) => {
+    let arr = []
+    for (let i = stepCount; i > 0; i--) {
+        arr.push(0)
+    }
+    return arr
 }
 
 export const updateNotesToPlayMaster = (stepCount, notesToPlay) => {
@@ -96,15 +110,6 @@ export const updateNotesToPlayMaster = (stepCount, notesToPlay) => {
     }
 
     return obj
-}
-
-export const makeBlankStepCountArray = (stepCount) => {
-    console.log('blankstepcount')
-    let arr = []
-    for (let i = stepCount; i > 0; i--) {
-        arr.push(0)
-    }
-    return arr
 }
 
 let trackCheckboxes = 0

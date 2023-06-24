@@ -202,7 +202,6 @@ const Sequencer = ({
         setParameterValuesObj(obj)
         setChangedParameter(null)
     }
-    console.log(sound, 'sound')
     return (
         <>
             <MainDiv>
