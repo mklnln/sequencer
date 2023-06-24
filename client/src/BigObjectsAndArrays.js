@@ -14,6 +14,15 @@ export const rootNoteOptions = [
 ]
 
 export const stepCountOptions = ['8', '16', '24', '32', '64']
+export const soundOptions = [
+    'Sine',
+    'Triangle',
+    'Sawtooth',
+    'Square',
+    'Aah',
+    'Ooh',
+    'Piano',
+]
 
 export const romanNumeralReference = {
     major: {
@@ -28,23 +37,23 @@ export const romanNumeralReference = {
     },
 }
 
-export const melodyNotesArr = [
-    'note-15',
-    'note-14',
-    'note-13',
-    'note-12',
-    'note-11',
-    'note-10',
-    'note-9',
-    'note-8',
-    'note-7',
-    'note-6',
-    'note-5',
-    'note-4',
-    'note-3',
-    'note-2',
-    'note-1',
-]
+export const melodyNotesObj = {
+    'note-15': '1',
+    'note-14': '7',
+    'note-13': '6',
+    'note-12': '5',
+    'note-11': '4',
+    'note-10': '3',
+    'note-9': '2',
+    'note-8': '1',
+    'note-7': '7',
+    'note-6': '6',
+    'note-5': '5',
+    'note-4': '4',
+    'note-3': '3',
+    'note-2': '2',
+    'note-1': '1',
+}
 
 export const chordNotesArr = [
     'note-8',

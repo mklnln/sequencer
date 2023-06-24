@@ -11,7 +11,7 @@ import { loadSample } from './AudioEngine'
 import { audioTime } from './AudioEngine'
 import Slider from './Components/Slider'
 import { playSample, getFile, setupSample, playSynth } from './AudioEngine'
-import { slidersToShowObj } from './BigObjectsAndArrays'
+import { slidersToShowObj, soundOptions } from './BigObjectsAndArrays'
 import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
@@ -37,7 +37,7 @@ const Sequencer = ({
     const [chordsVolume, setChordsVolume] = useState(100)
     const [rootNote, setRootNote] = useState('A')
     const [filterCutoff, setFilterCutoff] = useState(7500)
-    const [sound, setSound] = useState('sine')
+    const [sound, setSound] = useState('Sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     // const { stepCount, setStepCount } = useContext(MusicParametersContext)
@@ -202,7 +202,6 @@ const Sequencer = ({
         setParameterValuesObj(obj)
         setChangedParameter(null)
     }
-
     return (
         <>
             <MainDiv>
@@ -229,6 +228,16 @@ const Sequencer = ({
                 })}
 
                 <DropdownsDiv>
+                    <SoundFilterDiv>
+                        <CustomDropdown
+                            title="Sound"
+                            stateValue={sound}
+                            stateValueOptions={soundOptions}
+                            setState={setSound}
+                            isDropdownOpen={isDropdownOpen}
+                            setIsDropdownOpen={setIsDropdownOpen}
+                        />
+                    </SoundFilterDiv>
                     <SoundFilterDiv>
                         <CustomDropdown
                             title="Steps"
@@ -311,12 +320,7 @@ const StartButtonDiv = styled.div`
 `
 
 const DropdownsDiv = styled.div`
-    // display: flex;
-    // flex-direction: column;
-    // justify-content: center;
-    // align-items: flex-start;
-    // border: 1px solid fuchsia;
-    // height: 100%;
+    margin-top: -23px;
 `
 const SoundFilterDiv = styled.div`
     padding: 10px;

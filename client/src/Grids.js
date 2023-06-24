@@ -6,10 +6,12 @@ import {
     handleNoteClick,
     makeDeepCopy,
     makeBlankStepCountArray,
+    updateNotesToPlayMaster,
+    updateBlankStepCountArray,
 } from './FrontEndHelpers.js'
 import {
     chordNotesArr,
-    melodyNotesArr,
+    melodyNotesObj,
     romanNumeralReference,
 } from './BigObjectsAndArrays.js'
 import styled from 'styled-components'
@@ -38,9 +40,7 @@ const Grids = () => {
     })
     const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
 
-    const [notesToPlay, setNotesToPlay] = useState(
-        makeNotesToPlayMaster(stepCount)
-    )
+    const [notesToPlay, setNotesToPlay] = useState(makeNotesToPlayMaster)
     const [currentBeat, setCurrentBeat] = useState(0)
 
     const [resetMelody, setResetMelody] = useState(false)
@@ -49,7 +49,7 @@ const Grids = () => {
     // ! "When something can be calculated from the existing props or state, don’t put it in state.
     // ! .. Instead, calculate it during rendering."
     const [blankStepCountArray, setBlankStepCountArray] = useState(
-        makeBlankStepCountArray(stepCount)
+        makeBlankStepCountArray
     )
 
     // ! idk if i want this array as state or not. need to test more but tbh it doesnt seem to be that much better as state
@@ -57,7 +57,7 @@ const Grids = () => {
 
     // ? keep as state? getting less renders in CheckboxRow thanks to state, but could use memo for a normal const instead
     // ! experiments needed: test state vs memo'd const vs non-memo const. may be inconsequential
-    const [melodyNotes] = useState(melodyNotesArr)
+    const melodyNotes = melodyNotesObj
     const [chordNotes] = useState(chordNotesArr)
 
     const currentBeatRef = useRef(0)
@@ -175,11 +175,15 @@ const Grids = () => {
 
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
     if (stepCount !== Object.keys(notesToPlay).length) {
-        console.log('we know we changed stepCount')
-        setNotesToPlay(makeNotesToPlayMaster(stepCount))
-        setBlankStepCountArray(makeBlankStepCountArray(stepCount))
+        console.log(
+            'we know we changed stepCount',
+            stepCount,
+            Object.keys(notesToPlay).length
+        )
+        setNotesToPlay((prev) => updateNotesToPlayMaster(stepCount, prev))
+        setBlankStepCountArray(updateBlankStepCountArray(stepCount))
     }
-    console.log(notesToPlay, 'notesTOOOOOOOOOOOOO', blankStepCountArray, 'blnk')
+    console.log(blankStepCountArray, 'blnk')
     const countReRenders = useRef(1)
 
     useEffect(() => {
@@ -248,7 +252,6 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
-    console.log(notesToPlay, 'NOTESNOTES')
     return (
         <>
             <GridsContainer>
@@ -276,7 +279,7 @@ const Grids = () => {
                                 <ResetSpan id="melody">RESET</ResetSpan>
                             </ResetButton>
                         </GridTitleAndResetDiv>
-                        {melodyNotes.map((note, index) => {
+                        {Object.keys(melodyNotes).map((note, index) => {
                             const scaleIndex = note.substring(5)
                             const commonProps = {
                                 key: `${note}`,
@@ -284,27 +287,12 @@ const Grids = () => {
                                 scaleIndex,
                                 beatNum: index + 1,
                                 whichGrid: 'melody',
-                                noteTitle: giveOctaveNumber(scaleIndex),
+                                noteTitle: melodyNotes[note],
                                 bubbleUpCheckboxInfo,
                                 notesToPlay,
                                 setNotesToPlay,
                             }
                             return (
-                                // <CheckboxRow
-                                //     key={`${note}`}
-                                //     countCheckboxRenders={countCheckboxRenders}
-                                //     blankStepCountArray={blankStepCountArray}
-                                //     scaleIndex={
-                                //         Object.keys(melodyNotes).length +
-                                //         1 -
-                                //         scaleIndex
-                                //     }
-                                //     whichGrid="melody"
-                                //     noteTitle={giveOctaveNumber(
-                                //         note.substring(5)
-                                //     )} // convert "note-5" to just "5"
-                                //     bubbleUpCheckboxInfo={bubbleUpCheckboxInfo}
-                                // />
                                 <CheckboxRow
                                     {...commonProps}
                                     {...(sendChordPattern?.note.includes(
@@ -323,39 +311,6 @@ const Grids = () => {
                             currentBeat={currentBeat}
                             whichGrid="melody"
                         />
-                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
-                        {/* {blankStepCountArray.map((step, index) => {
-                            const num = index + 1
-                            // every 2 beats make a div
-                            if ((index + 1) % 2 === 0) {
-                                return (
-                                    <>
-                                        <BeatMarker
-                                            key={num}
-                                            className={
-                                                beatForAnimation === num ||
-                                                beatForAnimation === num + 1
-                                                    ? 'current'
-                                                    : ''
-                                            }
-                                        >
-                                            <BeatSpan
-                                                key={num}
-                                                className={
-                                                    beatForAnimation === num ||
-                                                    beatForAnimation === num + 1
-                                                        ? 'current'
-                                                        : ''
-                                                }
-                                            >
-                                                {num / 2}
-                                            </BeatSpan>
-                                        </BeatMarker>
-                                    </>
-                                )
-                            }
-                        })} */}
-                        {/* //! dont delete this until we sure that we can highlight the beats without it */}
                     </AllBoxesDiv>
                 </MelodySequencerGrid>
                 <ChordSequencerGrid>

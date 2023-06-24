@@ -20,6 +20,17 @@ const SingleCheckbox = ({
         bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
         setChecked(!checked)
     }
+    if (
+        sendChordPattern?.pattern?.[beatNum - 1] !== undefined &&
+        sendChordPattern?.grid === whichGrid
+    ) {
+        let numBool = checked ? 1 : 0
+        if (numBool !== sendChordPattern.pattern[beatNum - 1]) {
+            setChecked(sendChordPattern.pattern[beatNum - 1])
+        }
+        // ! how do i stop this call once we've clearly gone through everything?
+        trackAndResetPattern(sendChordPattern, setSendChordPattern)
+    }
 
     return (
         <SVGContainer
@@ -46,20 +57,18 @@ const CheckboxButton = styled.input`
 
     :checked {
         background-color: var(--primary-color);
-        opacity: 60%;
+        opacity: 45%;
         border-radius: 10px;
     }
     :hover {
         cursor: pointer;
         background-color: var(--primary-color);
-        opacity: 30%;
+        opacity: 20%;
         border-radius: 10px;
     }
     :checked:hover {
         background-color: white;
         opacity: 60%;
-    }
-    :focus {
     }
 `
 
@@ -67,8 +76,4 @@ const SVGContainer = styled.div`
     display: flex;
     justify-content: center;
     position: relative;
-    // margin: 0px 3.5px;
-    &.chords {
-        height: 20px;
-    }
 `
