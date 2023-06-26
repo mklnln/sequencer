@@ -1,6 +1,5 @@
 import { createGlobalStyle } from 'styled-components'
-import NouveauIBM from './assets/fonts/Nouveau_IBM.ttf'
-import NouveauIBMStretch from './assets/fonts/Nouveau_IBM_Stretch.ttf'
+import NouveauIBM from '../assets/fonts/Nouveau_IBM.ttf'
 
 const GlobalStyle = createGlobalStyle`
 @font-face {

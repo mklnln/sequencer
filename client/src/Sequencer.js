@@ -7,12 +7,20 @@ import React, {
 } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from './App'
-import { loadSample } from './AudioEngine'
-import { audioTime } from './AudioEngine'
+import { loadSample } from './utilities/AudioEngine'
+import { audioTime } from './utilities/AudioEngine'
 import Slider from './Components/Slider'
-import { playSample, getFile, setupSample, playSynth } from './AudioEngine'
-import { slidersToShowObj, soundOptions } from './BigObjectsAndArrays'
-import { rootNoteOptions, stepCountOptions } from './BigObjectsAndArrays'
+import {
+    playSample,
+    getFile,
+    setupSample,
+    playSynth,
+} from './utilities/AudioEngine'
+import { slidersToShowObj, soundOptions } from './utilities/BigObjectsAndArrays'
+import {
+    rootNoteOptions,
+    stepCountOptions,
+} from './utilities/BigObjectsAndArrays'
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
@@ -289,6 +297,7 @@ const StartStopButton = styled.button`
 
     :hover {
         opacity: 75%;
+        cursor: pointer;
     }
     :active {
         border: 6px double var(--lightest-color);

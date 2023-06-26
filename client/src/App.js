@@ -2,7 +2,7 @@ import { useState, createContext, useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Grids from './Grids'
-import GlobalStyle from './globalStyles'
+import GlobalStyle from './utilities/globalStyles'
 import SorryMobile from './Components/SorryMobile'
 import SorryNarrowWindow from './Components/SorryNarrowWindow'
 export const MusicParametersContext = createContext()
@@ -39,12 +39,13 @@ const App = () => {
     const [loadSong, setLoadSong] = useState(
         '75442486-0878-440c-9db1-a7006c25a39f'
     )
-    const [songName, setSongName] = useState('')
+
     const [songSavedOrDeleted, setSongSavedOrDeleted] = useState(false)
     const [songDeleted, setSongDeleted] = useState(false)
 
     // remove non-song data from the BE document
     const handleLoadSongsFetch = (songsAndIDs) => {
+        console.log(songsAndIDs)
         const keysToUse = Object.keys(songsAndIDs).filter((key) => {
             return key !== 'userID' && key !== '_id'
         })
@@ -52,6 +53,9 @@ const App = () => {
         keysToUse.forEach((key) => {
             newState[key] = songsAndIDs[key]
         })
+        console.log(
+            'handle load songs fetch has run. are we calling it unnecessarily?'
+        )
         return newState
     }
     const appRendersRef = useRef(1)
@@ -69,8 +73,6 @@ const App = () => {
 
     const narrowWindow = window.innerWidth < 900
 
-    console.log(mobileDevice, ' app rendered')
-
     return (
         <BrowserRouter>
             <MusicParametersContext.Provider
@@ -81,8 +83,6 @@ const App = () => {
                     setLoadUserSongs,
                     loadSong,
                     setLoadSong,
-                    songName,
-                    setSongName,
                     songSavedOrDeleted,
                     setSongSavedOrDeleted,
                     songDeleted,

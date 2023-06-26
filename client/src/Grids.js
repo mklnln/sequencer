@@ -1,23 +1,23 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { MusicParametersContext } from './App.js'
 import {
-    giveOctaveNumber,
     makeNotesToPlayMaster,
     handleNoteClick,
     makeDeepCopy,
     makeBlankStepCountArray,
     updateNotesToPlayMaster,
     updateBlankStepCountArray,
-} from './FrontEndHelpers.js'
+} from './utilities/FrontEndHelpers.js'
 import {
     chordNotesArr,
     melodyNotesObj,
     romanNumeralReference,
-} from './BigObjectsAndArrays.js'
+} from './utilities/BigObjectsAndArrays.js'
 import styled from 'styled-components'
 import HookTheoryChordButton from './Components/HookTheoryChordButton.js'
 import BeatMarkers from './Components/BeatMarkers.js'
 import CheckboxRow from './Components/CheckboxRow.js'
+import LoadSaveTestButtons from './Components/LoadSaveTestButtons.js'
 import Sequencer from './Sequencer.js'
 const Grids = () => {
     const {
@@ -62,6 +62,7 @@ const Grids = () => {
 
     const currentBeatRef = useRef(0)
     // todo make helper
+
     const handleChordClick = (chordID, index) => {
         setHookTheoryChords([]) // may have previously used this to trigger useEffect
         let newChosenAPIChords = [] // new array to setState with
@@ -183,7 +184,6 @@ const Grids = () => {
         setNotesToPlay((prev) => updateNotesToPlayMaster(stepCount, prev))
         setBlankStepCountArray(updateBlankStepCountArray(stepCount))
     }
-    console.log(blankStepCountArray, 'blnk')
     const countReRenders = useRef(1)
 
     useEffect(() => {
@@ -258,6 +258,7 @@ const Grids = () => {
                 <span>
                     Grids.js has rendered {countReRenders.current} times.
                 </span>
+
                 <Sequencer
                     currentBeatRef={currentBeatRef}
                     notesToPlay={notesToPlay}
@@ -270,6 +271,7 @@ const Grids = () => {
                     currentBeat={currentBeat}
                     setCurrentBeat={setCurrentBeat}
                 />
+                <LoadSaveTestButtons notesToPlay={notesToPlay} />
                 <MelodySequencerGrid>
                     {/* {countCheckboxRenders.current} */}
                     <AllBoxesDiv>

@@ -1,20 +1,11 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
+import CustomDropdown from './CustomDropdown'
 
-const LoadSaveTestButtons = () => {
+const LoadSaveTestButtons = ({ notesToPlay }) => {
     const {
-        areMelodyBeatsChecked,
-        chordNotes,
-        setAreChordBeatsChecked,
-        setChosenAPIChords,
-        setChordInputStep,
-        setHookTheoryChords,
-        melodyNotes,
-        blankStepCountArray,
-        setAreMelodyBeatsChecked,
-        songName,
         songSavedOrDeleted,
         loadSong,
         loadUserSongs,
@@ -33,14 +24,14 @@ const LoadSaveTestButtons = () => {
         release,
         setSongSavedOrDeleted,
         setLoadUserSongs,
-        setSongName,
         setLoadSong,
     } = useContext(MusicParametersContext)
 
     const { user, isAuthenticated, isLoading, error } = useAuth0()
-    useEffect(() => {}, [loadUserSongs])
+    const [songName, setSongName] = useState('')
 
     const handleLoadSongsFetch = (songsAndIDs) => {
+        console.log(songsAndIDs, 'fetch')
         const keysToUse = Object.keys(songsAndIDs).filter((key) => {
             return key !== 'userID' && key !== '_id'
         })
@@ -52,26 +43,25 @@ const LoadSaveTestButtons = () => {
     }
 
     const handleSave = () => {
-        const testForInput = []
-        Object.keys(areChordBeatsChecked).forEach((chord) => {
-            areChordBeatsChecked[chord].map((beat) => {
-                if (beat === 1) {
-                    testForInput.push(beat)
-                }
-            })
-        })
+        // const testForInput = []
+        // Object.keys(areChordBeatsChecked).forEach((chord) => {
+        //     areChordBeatsChecked[chord].map((beat) => {
+        //         if (beat === 1) {
+        //             testForInput.push(beat)
+        //         }
+        //     })
+        // })
         if (songName === '') {
             alert(`You can't save without a song name.`)
-        } else if (testForInput.length === 0) {
-            alert(
-                `You can't save without actually putting some notes in the sequencer.`
-            )
+            // } else if (testForInput.length === 0) {
+            //     alert(
+            //         `You can't save without actually putting some notes in the sequencer.`
+            //     )
         } else {
             // load all relevant parameters into the body for the backend
             const saveObj = {}
             saveObj[songName] = {}
-            saveObj[songName].areChordBeatsChecked = areChordBeatsChecked
-            saveObj[songName].areMelodyBeatsChecked = areMelodyBeatsChecked
+            saveObj[songName].notesToPlay = notesToPlay
             saveObj.userID = user.sub
             saveObj[songName].stepCount = stepCount
             saveObj[songName].rootNote = rootNote
@@ -86,30 +76,31 @@ const LoadSaveTestButtons = () => {
             saveObj[songName].sustain = sustain
             saveObj[songName].release = release
 
+            console.log(saveObj, songName, stepCount)
             setSongSavedOrDeleted('saving to database...')
-            fetch(`/api/save-song`, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...saveObj }),
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.status === 200) {
-                        setSongSavedOrDeleted('Song saved!')
-                        console.log(data, 'song POST')
-                        setLoadUserSongs(handleLoadSongsFetch(data.data))
+            // fetch(`/api/save-song`, {
+            //     method: 'POST',
+            //     headers: {
+            //         Accept: 'application/json',
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ ...saveObj }),
+            // })
+            //     .then((res) => res.json())
+            //     .then((data) => {
+            //         if (data.status === 200) {
+            //             setSongSavedOrDeleted('Song saved!')
+            //             console.log(data, 'song POST')
+            //             setLoadUserSongs(handleLoadSongsFetch(data.data))
 
-                        setTimeout(() => {
-                            setSongSavedOrDeleted(false)
-                        }, 5000)
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+            //             setTimeout(() => {
+            //                 setSongSavedOrDeleted(false)
+            //             }, 5000)
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         console.log(error)
+            //     })
         }
     }
     const handleDelete = () => {
@@ -147,21 +138,19 @@ const LoadSaveTestButtons = () => {
         }
     }
 
-    // setState was finnicky at times, this helped. to be fixed.
     const handleSongName = (e) => {
         setSongName(e.target.value)
     }
-
     return (
         <MainDiv>
             <ColumnDiv>
-                <StyledButton
+                {/* <StyledButton
                     onClick={() => {
                         console.log(sound)
                     }}
                 >
                     test
-                </StyledButton>
+                </StyledButton> */}
             </ColumnDiv>
             <br />
             {loadUserSongs ? (
@@ -169,15 +158,15 @@ const LoadSaveTestButtons = () => {
                     {isAuthenticated && (
                         <>
                             <ColumnDiv>
-                                <span>Song Name:</span>
-                                <input
+                                <span>Name</span>
+                                <StyledInput
                                     type="text"
                                     onChange={handleSongName}
                                     value={songName}
                                 />
 
-                                <StyledButton onClick={() => handleSave()}>
-                                    save song
+                                <StyledButton onClick={handleSave}>
+                                    <span>Save</span>
                                 </StyledButton>
                             </ColumnDiv>
 
@@ -187,7 +176,15 @@ const LoadSaveTestButtons = () => {
                             {loadUserSongs ? (
                                 <LoadingSongsDiv>
                                     <ColumnDiv>
-                                        <label>Load Song:</label>
+                                        <CustomDropdown
+                                            title="Load Song"
+                                            stateValue={loadSong}
+                                            stateValueOptions={Object.keys(
+                                                loadUserSongs
+                                            )}
+                                            setState={setLoadSong}
+                                        />
+                                        {/* <label>Load Song:</label>
                                         <select
                                             value={loadSong}
                                             onChange={(e) => {
@@ -211,13 +208,13 @@ const LoadSaveTestButtons = () => {
                                                     )
                                                 }
                                             )}
-                                        </select>
+                                        </select> */}
                                     </ColumnDiv>
                                 </LoadingSongsDiv>
                             ) : (
                                 <span>loading songs...</span>
                             )}
-                            <ColumnDiv>
+                            {/* <ColumnDiv>
                                 {loadSong !==
                                     '75442486-0878-440c-9db1-a7006c25a39f' && (
                                     <DeleteButton
@@ -226,7 +223,7 @@ const LoadSaveTestButtons = () => {
                                         delete currently loaded song
                                     </DeleteButton>
                                 )}
-                            </ColumnDiv>
+                            </ColumnDiv> */}
                         </>
                     )}
                 </>
@@ -249,31 +246,46 @@ const DeleteButton = styled.button`
     background-color: red;
 `
 const MainDiv = styled.div`
-    width: 1900px;
     display: flex;
     justify-content: center;
     flex-direction: row;
+    border: 1px solid fuchsia;
 `
 
 const ColumnDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     margin: 0px 20px;
 `
 
-const StyledButton = styled.button`
-    background-color: white;
-    border: 5px solid #b6cfcf;
-    border-radius: 10px;
-    margin: 0px;
-    color: #3d5c5c;
+const StyledInput = styled.input`
+    margin-left: 5px;
+    background: black;
+    color: var(--primary-color);
+    outline: solid 0.2px var(--lightest-color);
+    padding: 4px;
+    font-family: 'MS-DOS';
     font-size: 16px;
+    border: none;
+`
 
-    font-family: Arial, Helvetica, sans-serif;
+const StyledButton = styled.div`
+    border: 1px solid var(--lightest-color);
+    margin: 10px;
+    padding: 4px 8px;
+    // width: 40%;
+    max-width: 100px;
+    && {
+        text-align: center;
+        // padding-left: 0px;
+    }
+    display: flex;
+    justify-content: center;
     :hover {
         cursor: pointer;
-        border: 5px solid #88b1b1;
+        background-color: var(--primary-color);
+        color: black;
     }
 `
