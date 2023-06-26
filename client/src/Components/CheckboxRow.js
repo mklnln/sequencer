@@ -49,7 +49,6 @@ const CheckboxRow = memo(
                                     sendChordPattern?.chordInputStepCopy +
                                         sendChordPattern.pattern?.length
                             ) {
-                                console.log(sendChordPattern, 'row')
                                 return (
                                     <SingleCheckbox
                                         {...commonProps}

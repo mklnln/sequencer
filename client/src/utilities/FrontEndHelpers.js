@@ -1,27 +1,27 @@
-export const loadChangedSongList = (
-    songSavedOrDeleted,
-    user,
-    setLoadUserSongs,
-    setSongSavedOrDeleted,
-    handleLoadSongsFetch
-) => {
-    const newSongList = {}
-    if (
-        songSavedOrDeleted === 'Song saved!' ||
-        songSavedOrDeleted === 'Song deleted!'
-    ) {
-        fetch(`/api/user-login/${user.sub}`)
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data, 'loading user and songs')
-                setLoadUserSongs(handleLoadSongsFetch(data.data))
-            })
-        setTimeout(() => {
-            setSongSavedOrDeleted(false)
-        }, 5000)
-    }
-    return newSongList
-}
+// export const loadChangedSongList = (
+//     songSavedOrDeleted,
+//     user,
+//     setLoadUserSongs,
+//     setSongSavedOrDeleted,
+//     handleLoadSongsFetch
+// ) => {
+//     const newSongList = {}
+//     if (
+//         songSavedOrDeleted === 'Song saved!' ||
+//         songSavedOrDeleted === 'Song deleted!'
+//     ) {
+//         fetch(`/api/user-login/${user.sub}`)
+//             .then((res) => res.json())
+//             .then((data) => {
+//                 console.log(data, 'loading user and songs')
+//                 setLoadUserSongs(handleLoadSongsFetch(data.data))
+//             })
+//         setTimeout(() => {
+//             setSongSavedOrDeleted(false)
+//         }, 5000)
+//     }
+//     return newSongList
+// }
 
 export const makeDeepCopy = (original) => {
     console.log('deep copy')

@@ -18,22 +18,41 @@ const SingleCheckbox = ({
     sendChordPattern,
     setSendChordPattern,
 }) => {
-    const [checked, setChecked] = useState(false)
+    const [checked, setChecked] = useState(0)
     const handleChange = () => {
         bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
-        setChecked(!checked)
+        // setChecked(!checked)
+        console.log('reset checked')
     }
+
     if (
-        sendChordPattern?.pattern?.[beatNum - 1] !== undefined &&
-        sendChordPattern?.grid === whichGrid
+        notesToPlay[`beat-${beatNum}`][`note-${scaleIndex}`]?.[whichGrid] ===
+            1 &&
+        checked === 0
     ) {
-        let numBool = checked ? 1 : 0
-        if (numBool !== sendChordPattern.pattern[beatNum - 1]) {
-            setChecked(sendChordPattern.pattern[beatNum - 1])
-        }
-        // ! how do i stop this call once we've clearly gone through everything?
-        trackAndResetPattern(sendChordPattern, setSendChordPattern)
+        console.log('we set it yes we did')
+        setChecked(1)
+    } else if (
+        // ! we dont have
+        notesToPlay[`beat-${beatNum}`][`note-${scaleIndex}`]?.[whichGrid] ===
+            undefined &&
+        checked === 1
+    ) {
+        console.log('we removed it in fact')
+        setChecked(0)
     }
+
+    // if (
+    //     sendChordPattern?.pattern?.[beatNum - 1] !== undefined &&
+    //     sendChordPattern?.grid === whichGrid
+    // ) {
+    //     let numBool = checked ? 1 : 0
+    //     if (numBool !== sendChordPattern.pattern[beatNum - 1]) {
+    //         setChecked(sendChordPattern.pattern[beatNum - 1])
+    //     }
+    //     // ! how do i stop this call once we've clearly gone through everything?
+    //     trackAndResetPattern(sendChordPattern, setSendChordPattern)
+    // }
 
     return (
         <SVGContainer
@@ -42,8 +61,8 @@ const SingleCheckbox = ({
         >
             <CheckboxButton
                 type="checkbox"
-                checked={checked ? 'checked' : ''}
-                onChange={handleChange}
+                className={checked ? 'checked' : ''}
+                onClick={handleChange}
             />
             <CheckboxNoiseSVG />
         </SVGContainer>
@@ -52,13 +71,13 @@ const SingleCheckbox = ({
 
 export default React.memo(SingleCheckbox)
 
-const CheckboxButton = styled.input`
+const CheckboxButton = styled.div`
     height: 20px;
     width: 20px;
     appearance: none;
     margin: 0px;
 
-    :checked {
+    &.checked {
         background-color: var(--primary-color);
         opacity: 45%;
         border-radius: 10px;
@@ -69,7 +88,7 @@ const CheckboxButton = styled.input`
         opacity: 20%;
         border-radius: 10px;
     }
-    :checked:hover {
+    &.checked:hover {
         background-color: white;
         opacity: 60%;
     }

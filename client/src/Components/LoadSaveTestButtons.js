@@ -1,21 +1,11 @@
 import { useAuth0 } from '@auth0/auth0-react'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import CustomDropdown from './CustomDropdown'
 
-const LoadSaveTestButtons = () => {
+const LoadSaveTestButtons = ({ notesToPlay }) => {
     const {
-        areMelodyBeatsChecked,
-        chordNotes,
-        setAreChordBeatsChecked,
-        setChosenAPIChords,
-        setChordInputStep,
-        setHookTheoryChords,
-        melodyNotes,
-        blankStepCountArray,
-        setAreMelodyBeatsChecked,
-        songName,
         songSavedOrDeleted,
         loadSong,
         loadUserSongs,
@@ -34,13 +24,14 @@ const LoadSaveTestButtons = () => {
         release,
         setSongSavedOrDeleted,
         setLoadUserSongs,
-        setSongName,
         setLoadSong,
     } = useContext(MusicParametersContext)
 
     const { user, isAuthenticated, isLoading, error } = useAuth0()
+    const [songName, setSongName] = useState('')
 
     const handleLoadSongsFetch = (songsAndIDs) => {
+        console.log(songsAndIDs, 'fetch')
         const keysToUse = Object.keys(songsAndIDs).filter((key) => {
             return key !== 'userID' && key !== '_id'
         })
@@ -52,26 +43,25 @@ const LoadSaveTestButtons = () => {
     }
 
     const handleSave = () => {
-        const testForInput = []
-        Object.keys(areChordBeatsChecked).forEach((chord) => {
-            areChordBeatsChecked[chord].map((beat) => {
-                if (beat === 1) {
-                    testForInput.push(beat)
-                }
-            })
-        })
+        // const testForInput = []
+        // Object.keys(areChordBeatsChecked).forEach((chord) => {
+        //     areChordBeatsChecked[chord].map((beat) => {
+        //         if (beat === 1) {
+        //             testForInput.push(beat)
+        //         }
+        //     })
+        // })
         if (songName === '') {
             alert(`You can't save without a song name.`)
-        } else if (testForInput.length === 0) {
-            alert(
-                `You can't save without actually putting some notes in the sequencer.`
-            )
+            // } else if (testForInput.length === 0) {
+            //     alert(
+            //         `You can't save without actually putting some notes in the sequencer.`
+            //     )
         } else {
             // load all relevant parameters into the body for the backend
             const saveObj = {}
             saveObj[songName] = {}
-            saveObj[songName].areChordBeatsChecked = areChordBeatsChecked
-            saveObj[songName].areMelodyBeatsChecked = areMelodyBeatsChecked
+            saveObj[songName].notesToPlay = notesToPlay
             saveObj.userID = user.sub
             saveObj[songName].stepCount = stepCount
             saveObj[songName].rootNote = rootNote
@@ -86,30 +76,31 @@ const LoadSaveTestButtons = () => {
             saveObj[songName].sustain = sustain
             saveObj[songName].release = release
 
+            console.log(saveObj, songName, stepCount)
             setSongSavedOrDeleted('saving to database...')
-            fetch(`/api/save-song`, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...saveObj }),
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.status === 200) {
-                        setSongSavedOrDeleted('Song saved!')
-                        console.log(data, 'song POST')
-                        setLoadUserSongs(handleLoadSongsFetch(data.data))
+            // fetch(`/api/save-song`, {
+            //     method: 'POST',
+            //     headers: {
+            //         Accept: 'application/json',
+            //         'Content-Type': 'application/json',
+            //     },
+            //     body: JSON.stringify({ ...saveObj }),
+            // })
+            //     .then((res) => res.json())
+            //     .then((data) => {
+            //         if (data.status === 200) {
+            //             setSongSavedOrDeleted('Song saved!')
+            //             console.log(data, 'song POST')
+            //             setLoadUserSongs(handleLoadSongsFetch(data.data))
 
-                        setTimeout(() => {
-                            setSongSavedOrDeleted(false)
-                        }, 5000)
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+            //             setTimeout(() => {
+            //                 setSongSavedOrDeleted(false)
+            //             }, 5000)
+            //         }
+            //     })
+            //     .catch((error) => {
+            //         console.log(error)
+            //     })
         }
     }
     const handleDelete = () => {
@@ -167,15 +158,15 @@ const LoadSaveTestButtons = () => {
                     {isAuthenticated && (
                         <>
                             <ColumnDiv>
-                                <span>Song Name:</span>
+                                <span>Name</span>
                                 <StyledInput
                                     type="text"
                                     onChange={handleSongName}
                                     value={songName}
                                 />
 
-                                <StyledButton onClick={() => handleSave()}>
-                                    save song
+                                <StyledButton onClick={handleSave}>
+                                    <span>Save</span>
                                 </StyledButton>
                             </ColumnDiv>
 
@@ -255,21 +246,22 @@ const DeleteButton = styled.button`
     background-color: red;
 `
 const MainDiv = styled.div`
-    width: 1900px;
     display: flex;
     justify-content: center;
     flex-direction: row;
+    border: 1px solid fuchsia;
 `
 
 const ColumnDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    flex-direction: row;
     margin: 0px 20px;
 `
 
 const StyledInput = styled.input`
+    margin-left: 5px;
     background: black;
     color: var(--primary-color);
     outline: solid 0.2px var(--lightest-color);
@@ -282,11 +274,12 @@ const StyledInput = styled.input`
 const StyledButton = styled.div`
     border: 1px solid var(--lightest-color);
     margin: 10px;
-    padding: 5px;
+    padding: 4px 8px;
     // width: 40%;
     max-width: 100px;
     && {
         text-align: center;
+        // padding-left: 0px;
     }
     display: flex;
     justify-content: center;

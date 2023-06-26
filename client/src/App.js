@@ -39,12 +39,13 @@ const App = () => {
     const [loadSong, setLoadSong] = useState(
         '75442486-0878-440c-9db1-a7006c25a39f'
     )
-    const [songName, setSongName] = useState('')
+
     const [songSavedOrDeleted, setSongSavedOrDeleted] = useState(false)
     const [songDeleted, setSongDeleted] = useState(false)
 
     // remove non-song data from the BE document
     const handleLoadSongsFetch = (songsAndIDs) => {
+        console.log(songsAndIDs)
         const keysToUse = Object.keys(songsAndIDs).filter((key) => {
             return key !== 'userID' && key !== '_id'
         })
@@ -82,8 +83,6 @@ const App = () => {
                     setLoadUserSongs,
                     loadSong,
                     setLoadSong,
-                    songName,
-                    setSongName,
                     songSavedOrDeleted,
                     setSongSavedOrDeleted,
                     songDeleted,
