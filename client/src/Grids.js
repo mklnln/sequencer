@@ -1,19 +1,18 @@
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { MusicParametersContext } from './App.js'
 import {
-    giveOctaveNumber,
     makeNotesToPlayMaster,
     handleNoteClick,
     makeDeepCopy,
     makeBlankStepCountArray,
     updateNotesToPlayMaster,
     updateBlankStepCountArray,
-} from './FrontEndHelpers.js'
+} from './utilities/FrontEndHelpers.js'
 import {
     chordNotesArr,
     melodyNotesObj,
     romanNumeralReference,
-} from './BigObjectsAndArrays.js'
+} from './utilities/BigObjectsAndArrays.js'
 import styled from 'styled-components'
 import HookTheoryChordButton from './Components/HookTheoryChordButton.js'
 import BeatMarkers from './Components/BeatMarkers.js'
@@ -183,7 +182,6 @@ const Grids = () => {
         setNotesToPlay((prev) => updateNotesToPlayMaster(stepCount, prev))
         setBlankStepCountArray(updateBlankStepCountArray(stepCount))
     }
-    console.log(blankStepCountArray, 'blnk')
     const countReRenders = useRef(1)
 
     useEffect(() => {

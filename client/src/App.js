@@ -2,7 +2,7 @@ import { useState, createContext, useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from './Components/Header'
 import Grids from './Grids'
-import GlobalStyle from './globalStyles'
+import GlobalStyle from './utilities/globalStyles'
 import SorryMobile from './Components/SorryMobile'
 import SorryNarrowWindow from './Components/SorryNarrowWindow'
 export const MusicParametersContext = createContext()
@@ -52,6 +52,9 @@ const App = () => {
         keysToUse.forEach((key) => {
             newState[key] = songsAndIDs[key]
         })
+        console.log(
+            'handle load songs fetch has run. are we calling it unnecessarily?'
+        )
         return newState
     }
     const appRendersRef = useRef(1)
@@ -68,8 +71,6 @@ const App = () => {
         )
 
     const narrowWindow = window.innerWidth < 900
-
-    console.log(mobileDevice, ' app rendered')
 
     return (
         <BrowserRouter>

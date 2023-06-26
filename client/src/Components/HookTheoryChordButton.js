@@ -21,25 +21,30 @@ export default HookTheoryChordButton
 const ChordButton = styled.button`
     width: 80px;
     height: 50px;
-    background-color: white;
-    border: 5px solid #b6cfcf;
-    border-radius: 10px;
-    margin: 0px;
-    color: #3d5c5c;
     font-size: 24px;
-
-    font-family: Arial, Helvetica, sans-serif;
-    font-weight: 700px;
+    background-color: black;
+    border: 4px double var(--lightest-color);
+    font-family: 'MS-DOS';
+    color: var(--primary-color);
+    // max-width: 100px;
+    && {
+        text-align: center;
+    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
     :hover {
         cursor: pointer;
-        border-color: #88b1b1;
+        background-color: var(--primary-color);
+        color: black;
+        border: 4px double black;
     }
 `
 
 const ProbabilityText = styled.span`
     padding: 10px;
     font-size: 16px;
-    color: white;
+    color: var(--primary-color);
 `
 
 const VerticalAlignDiv = styled.div`

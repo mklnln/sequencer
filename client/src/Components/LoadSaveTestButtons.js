@@ -2,6 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import React, { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
+import CustomDropdown from './CustomDropdown'
 
 const LoadSaveTestButtons = () => {
     const {
@@ -38,7 +39,6 @@ const LoadSaveTestButtons = () => {
     } = useContext(MusicParametersContext)
 
     const { user, isAuthenticated, isLoading, error } = useAuth0()
-    useEffect(() => {}, [loadUserSongs])
 
     const handleLoadSongsFetch = (songsAndIDs) => {
         const keysToUse = Object.keys(songsAndIDs).filter((key) => {
@@ -147,21 +147,19 @@ const LoadSaveTestButtons = () => {
         }
     }
 
-    // setState was finnicky at times, this helped. to be fixed.
     const handleSongName = (e) => {
         setSongName(e.target.value)
     }
-
     return (
         <MainDiv>
             <ColumnDiv>
-                <StyledButton
+                {/* <StyledButton
                     onClick={() => {
                         console.log(sound)
                     }}
                 >
                     test
-                </StyledButton>
+                </StyledButton> */}
             </ColumnDiv>
             <br />
             {loadUserSongs ? (
@@ -170,7 +168,7 @@ const LoadSaveTestButtons = () => {
                         <>
                             <ColumnDiv>
                                 <span>Song Name:</span>
-                                <input
+                                <StyledInput
                                     type="text"
                                     onChange={handleSongName}
                                     value={songName}
@@ -187,7 +185,15 @@ const LoadSaveTestButtons = () => {
                             {loadUserSongs ? (
                                 <LoadingSongsDiv>
                                     <ColumnDiv>
-                                        <label>Load Song:</label>
+                                        <CustomDropdown
+                                            title="Load Song"
+                                            stateValue={loadSong}
+                                            stateValueOptions={Object.keys(
+                                                loadUserSongs
+                                            )}
+                                            setState={setLoadSong}
+                                        />
+                                        {/* <label>Load Song:</label>
                                         <select
                                             value={loadSong}
                                             onChange={(e) => {
@@ -211,13 +217,13 @@ const LoadSaveTestButtons = () => {
                                                     )
                                                 }
                                             )}
-                                        </select>
+                                        </select> */}
                                     </ColumnDiv>
                                 </LoadingSongsDiv>
                             ) : (
                                 <span>loading songs...</span>
                             )}
-                            <ColumnDiv>
+                            {/* <ColumnDiv>
                                 {loadSong !==
                                     '75442486-0878-440c-9db1-a7006c25a39f' && (
                                     <DeleteButton
@@ -226,7 +232,7 @@ const LoadSaveTestButtons = () => {
                                         delete currently loaded song
                                     </DeleteButton>
                                 )}
-                            </ColumnDiv>
+                            </ColumnDiv> */}
                         </>
                     )}
                 </>
@@ -263,17 +269,30 @@ const ColumnDiv = styled.div`
     margin: 0px 20px;
 `
 
-const StyledButton = styled.button`
-    background-color: white;
-    border: 5px solid #b6cfcf;
-    border-radius: 10px;
-    margin: 0px;
-    color: #3d5c5c;
+const StyledInput = styled.input`
+    background: black;
+    color: var(--primary-color);
+    outline: solid 0.2px var(--lightest-color);
+    padding: 4px;
+    font-family: 'MS-DOS';
     font-size: 16px;
+    border: none;
+`
 
-    font-family: Arial, Helvetica, sans-serif;
+const StyledButton = styled.div`
+    border: 1px solid var(--lightest-color);
+    margin: 10px;
+    padding: 5px;
+    // width: 40%;
+    max-width: 100px;
+    && {
+        text-align: center;
+    }
+    display: flex;
+    justify-content: center;
     :hover {
         cursor: pointer;
-        border: 5px solid #88b1b1;
+        background-color: var(--primary-color);
+        color: black;
     }
 `

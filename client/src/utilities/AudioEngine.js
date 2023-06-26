@@ -1,7 +1,7 @@
-const samplePianoC2 = require('./assets/samples/c2.mp3')
-const sampleOohC2 = require('./assets/samples/oohc2.mp3')
-const sampleFeltPianoC3 = require('./assets/samples/feltPianoC3.mp3')
-const sampleRonyA2 = require('./assets/samples/RonyA2.mp3')
+const samplePianoC2 = require('../assets/samples/c2.mp3')
+const sampleOohC2 = require('../assets/samples/oohc2.mp3')
+const sampleFeltPianoC3 = require('../assets/samples/feltPianoC3.mp3')
+const sampleRonyA2 = require('../assets/samples/RonyA2.mp3')
 
 // http://localhost:3000/assets/samples/c2.mp3
 let audioCtx = new AudioContext()
@@ -150,7 +150,6 @@ export const playSynth = (
         const osc = audioCtx.createOscillator()
         osc.frequency.value = note // (1.1/12) 1.075*
         osc.type = sound.toLowerCase()
-        console.log(sound, 'engine')
         const lowPassFilter = audioCtx.createBiquadFilter()
         lowPassFilter.frequency.value = filterCutoff
         lowPassFilter.type = 'lowpass'

@@ -1,26 +1,23 @@
 import React, { useContext, useEffect } from 'react'
 import styled from 'styled-components'
 import LoginButton from './LoginButton'
-import LogoutButton from './LogoutButton'
 import { useAuth0 } from '@auth0/auth0-react'
 import { MusicParametersContext } from '../App'
 import LoadSaveTestButtons from './LoadSaveTestButtons'
 
 const Header = () => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
-    const { setLoadUserSongs, songSaved, handleLoadSongsFetch } = useContext(
-        MusicParametersContext
-    )
-    useEffect(() => {
-        if (user || songSaved === 'Song saved!') {
-            fetch(`/api/user-login/${user.sub}`)
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data, 'loading user and songs')
-                    setLoadUserSongs(handleLoadSongsFetch(data.data))
-                })
-        }
-    }, [user])
+    const { loadUserSongs, setLoadUserSongs, songSaved, handleLoadSongsFetch } =
+        useContext(MusicParametersContext)
+
+    if (user && !loadUserSongs) {
+        fetch(`/api/user-login/${user.sub}`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data, 'loading user and songs')
+                setLoadUserSongs(handleLoadSongsFetch(data.data))
+            })
+    }
 
     return (
         <Banner>
@@ -28,13 +25,13 @@ const Header = () => {
                 <h1>Sequencer</h1>
                 <ShadowH1>Sequencer</ShadowH1>
             </TitleDiv>
-            <button
+            {/* <button
                 onClick={() => {
                     console.log(user)
                 }}
             >
                 check user
-            </button>
+            </button> */}
             <LoadSaveTestButtons />
             {error && <span>Error authenticating.. try again.</span>}
             {!error && isLoading && <span>Loading...</span>}
@@ -54,7 +51,6 @@ const Header = () => {
                         )}
                     </>
                     <LoginButton />
-                    <LogoutButton />
                 </>
             )}
         </Banner>

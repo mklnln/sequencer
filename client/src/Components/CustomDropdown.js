@@ -17,7 +17,7 @@ const CustomDropdown = ({ title, stateValue, stateValueOptions, setState }) => {
         setIsDropdownOpen(false)
     }
     return (
-        <DropdownContainer onMouseLeave={mouseLeave}>
+        <DropdownContainer>
             <ParameterLabel>{title}</ParameterLabel>
             <ULDropdown
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
