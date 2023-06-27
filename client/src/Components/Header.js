@@ -16,11 +16,14 @@ const Header = () => {
             loadUserSongs,
             `loadUserSongs is not, so we fetch loadUserSongs`
         )
-        fetch(`/api/user-login/${user.sub}`, {
+        fetch(`/api/load-songs/${user.sub}`, {
             // ! potential security risk, but may lead to fixing loadUserSongs bug on live site
             // headers: {
             //     'Access-Control-Allow-Origin': '*',
             //     'Access-Control-Allow-Credentials': true,
+            // },
+            // headers: {
+            //     'Access-Control-Allow-Origin': 'https://localhost:3000',
             // },
         })
             .then((res) => res.json())
@@ -31,6 +34,16 @@ const Header = () => {
             .catch((err) => console.log(err))
     }
 
+    const fetchArrow = () => {
+        console.log('lets fetch')
+        fetch(`/api/load-songs/${user.sub}`)
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(data)
+                setLoadUserSongs(handleLoadSongsFetch(data.data))
+            })
+            .catch((err) => console.log(err))
+    }
     return (
         <Banner>
             <TitleDiv>
@@ -44,6 +57,7 @@ const Header = () => {
             >
                 check user
             </button> */}
+            <div onClick={fetchArrow}>fetch test</div>
             {error && <span>Error authenticating.. try again.</span>}
             {!error && isLoading && <span>Loading...</span>}
             {!error && !isLoading && (

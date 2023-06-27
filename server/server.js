@@ -3,9 +3,10 @@
 const express = require('express')
 const port = 4000
 const morgan = require('morgan')
-
+const cors = require('cors')
 const { getUser, saveSong, loadSongs, deleteSong } = require('./handlers')
 express()
+    .use(cors({ origin: 'https://simple-sequencer.onrender.com/' }))
     .use(morgan('tiny'))
     .use(express.static('./server/assets'))
     .use(express.json())
