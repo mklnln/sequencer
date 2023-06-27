@@ -16,12 +16,19 @@ const Header = () => {
             loadUserSongs,
             `loadUserSongs is not, so we fetch loadUserSongs`
         )
-        fetch(`/api/user-login/${user.sub}`)
+        fetch(`/api/user-login/${user.sub}`, {
+            // ! potential security risk, but may lead to fixing loadUserSongs bug on live site
+            // headers: {
+            //     'Access-Control-Allow-Origin': '*',
+            //     'Access-Control-Allow-Credentials': true,
+            // },
+        })
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
                 setLoadUserSongs(handleLoadSongsFetch(data.data))
             })
+            .catch((err) => console.log(err))
     }
 
     return (

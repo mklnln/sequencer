@@ -1,10 +1,10 @@
 import { createGlobalStyle } from 'styled-components'
-import NouveauIBM from '../assets/fonts/Nouveau_IBM.ttf'
+import PerfectDOS from '../assets/fonts/PerfectDOS.ttf'
 
 const GlobalStyle = createGlobalStyle`
 @font-face {
     font-family: 'MS-DOS';
-    src: url(${NouveauIBM}) format('truetype');
+    src: url(${PerfectDOS}) format('truetype');
     font-weight: normal;
     font-style: normal;
   }
