@@ -45,7 +45,10 @@ const App = () => {
 
     // remove non-song data from the BE document
     const handleLoadSongsFetch = (songsAndIDs) => {
-        console.log(songsAndIDs)
+        console.log(
+            songsAndIDs,
+            `songsandIDs sent to handleLoadSongsFetch from the loadUserSongs fetch in Header.js`
+        )
         const keysToUse = Object.keys(songsAndIDs).filter((key) => {
             return key !== 'userID' && key !== '_id'
         })

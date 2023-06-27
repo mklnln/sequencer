@@ -10,9 +10,16 @@ const Header = () => {
         useContext(MusicParametersContext)
 
     if (user && !loadUserSongs) {
+        console.log(
+            user,
+            ` user is valid and...`,
+            loadUserSongs,
+            `loadUserSongs is not, so we fetch loadUserSongs`
+        )
         fetch(`/api/user-login/${user.sub}`)
             .then((res) => res.json())
             .then((data) => {
+                console.log(data)
                 setLoadUserSongs(handleLoadSongsFetch(data.data))
             })
     }
