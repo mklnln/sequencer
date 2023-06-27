@@ -71,6 +71,7 @@ const saveSong = async (req, res) => {
 
 const loadSongs = async (req, res) => {
     const { userID } = req.params
+    console.log(userID)
     try {
         await client.connect()
         const userInfo = await db
