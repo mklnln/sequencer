@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import CustomDropdown from './CustomDropdown'
+import { deleteSongFetch, saveSongFetch } from '../utilities/APIfetches'
 
 const LoadSaveTestButtons = ({ notesToPlay }) => {
     const {
@@ -78,30 +79,7 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
 
             console.log(saveObj, songName, stepCount)
             setSongSavedOrDeleted('saving to database...')
-            // fetch(`${process.env.REACT_APP_API_URL}/api/save-song`, {
-            fetch(`/api/save-song`, {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...saveObj }),
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.status === 200) {
-                        setSongSavedOrDeleted('Song saved!')
-                        console.log(data, 'song POST')
-                        setLoadUserSongs(handleLoadSongsFetch(data.data))
-
-                        setTimeout(() => {
-                            setSongSavedOrDeleted(false)
-                        }, 5000)
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+            saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
         }
     }
     const handleDelete = () => {
@@ -113,30 +91,7 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
             const bodyObj = {}
             bodyObj.songName = loadSong
             bodyObj.userID = user.sub
-            // fetch(`${process.env.REACT_APP_API_URL}/api/delete-song/`, {
-            fetch(`/api/delete-song/`, {
-                method: 'DELETE',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...bodyObj }),
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.status === 200) {
-                        console.log(data)
-                        setSongSavedOrDeleted('Song deleted!')
-                        setLoadUserSongs(handleLoadSongsFetch(data.data))
-
-                        setTimeout(() => {
-                            setSongSavedOrDeleted(false)
-                        }, 5000)
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+            deleteSongFetch(setSongSavedOrDeleted, setLoadUserSongs, bodyObj)
         }
     }
 
