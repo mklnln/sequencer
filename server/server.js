@@ -9,7 +9,7 @@ const { getUser, saveSong, loadSongs, deleteSong } = require('./handlers')
 express()
     .use(
         cors({
-            origin: 'https://simple-sequencer.onrender.com/',
+            origin: 'https://simple-sequencer.onrender.com',
             credentials: true,
         })
     ) // Access-Control-Allow-Origin in response header
