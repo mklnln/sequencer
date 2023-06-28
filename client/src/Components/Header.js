@@ -16,16 +16,7 @@ const Header = () => {
             loadUserSongs,
             `loadUserSongs is not, so we fetch loadUserSongs`
         )
-        fetch(`/api/load-songs/${user.sub}`, {
-            // ! potential security risk, but may lead to fixing loadUserSongs bug on live site
-            // headers: {
-            //     'Access-Control-Allow-Origin': '*',
-            //     'Access-Control-Allow-Credentials': true,
-            // },
-            // headers: {
-            //     'Access-Control-Allow-Origin': 'https://localhost:3000',
-            // },
-        })
+        fetch(`/api/load-songs/${user.sub}`)
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
@@ -35,7 +26,7 @@ const Header = () => {
     }
 
     const fetchArrow = () => {
-        console.log('lets fetch')
+        console.log('lets fetch', user.sub)
         fetch(`/api/load-songs/${user.sub}`)
             .then((res) => res.json())
             .then((data) => {

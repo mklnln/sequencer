@@ -71,7 +71,7 @@ const saveSong = async (req, res) => {
 
 const loadSongs = async (req, res) => {
     const { userID } = req.params
-    console.log(userID)
+    console.log(userID, 'from load-songs BE handler')
     try {
         await client.connect()
         const userInfo = await db
