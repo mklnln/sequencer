@@ -272,6 +272,20 @@ todo june 27
 		> big question of where to store this fetch. mb create a backend helpers file
 	> not allowed to access the API at sequencer-be.onrender.com because CORS is disabled, thus we arent able to ping mongo for loadUserSongs
 
+todo june 28
+	> get CORS workin, loadUserSongs on live site
+		> request URL seems to stay on sequencer-be despite changing the proxy
+		> deleted node_modules, found cli error that node.js cant complete proxy request, so i instead fetched to localhost:4000 manually
+		> doing fetch('/api...') instead of fetch('http://localhost:4000...') breaks it again. 
+		ITS DA PROXYYY
+		> no clue man
+		> RECAP:
+			> local build works, proxy functions.
+			> proxy isn't mean for production builds apparently
+			> TURN OFF PROXY, use REACT_APP_API_URL and put that in yer fetches
+	> ntoesToPlay integrated on backend
+		> may need to change how we're sending props down. mb switch into only re-rendering when props change but that means making checked reflect those props
+
 
 Auth0 consent stuff:
 	> https://support.google.com/googleapi/answer/6158849#userconsent&zippy=%2Cuser-consent

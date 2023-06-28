@@ -16,7 +16,8 @@ const Header = () => {
             loadUserSongs,
             `loadUserSongs is not, so we fetch loadUserSongs`
         )
-        fetch(`${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`)
+        // fetch(`${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`)
+        fetch(`/api/load-songs/${user.sub}`)
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
@@ -38,7 +39,8 @@ const Header = () => {
 
     async function fetchArrow() {
         return await fetch(
-            `${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`
+            // `${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`
+            `/api/load-songs/${user.sub}`
         )
             .then((resp) => {
                 if (!resp.ok) {
