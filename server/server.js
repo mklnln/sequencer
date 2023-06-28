@@ -5,8 +5,9 @@ const port = 4000
 const morgan = require('morgan')
 const cors = require('cors')
 const { getUser, saveSong, loadSongs, deleteSong } = require('./handlers')
+
 express()
-    .use(cors({ origin: 'http://localhost:3000' }))
+    .use(cors({ origin: 'https://simple-sequencer.onrender.com' }))
     .use(morgan('tiny'))
     .use(express.static('./server/assets'))
     .use(express.json())
@@ -14,7 +15,6 @@ express()
     .use('/', express.static(__dirname + '/'))
     .get('/api/user-login/:userID', getUser)
     .get(`/api/load-songs/:userID`, loadSongs)
-
     .get('/', (req, res) => {
         res.status(404).json({
             status: 404,
