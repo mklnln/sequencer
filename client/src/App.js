@@ -8,7 +8,6 @@ import SorryNarrowWindow from './Components/SorryNarrowWindow'
 export const MusicParametersContext = createContext()
 const App = () => {
     // useEffect(() => {
-    //     console.log(process.env.REACT_APP_HOOK_THEORY_USER)
     //     if (hookTheoryChords.length === 0) {
     //         fetch('https://api.hooktheory.com/v1/users/auth', {
     //             method: 'POST',
