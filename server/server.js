@@ -7,11 +7,12 @@ const cors = require('cors')
 const { getUser, saveSong, loadSongs, deleteSong } = require('./handlers')
 
 express()
-    .use(
-        cors({
-            origin: 'https://simple-sequencer.onrender.com'
-        })
-    ) // Access-Control-Allow-Origin in response header
+    .use(cors({ origin: 'http://localhost:3000' })) // Access-Control-Allow-Origin in response header
+//     .use(
+//         cors({
+//             origin: 'https://simple-sequencer.onrender.com'
+//         })
+//     ) // Access-Control-Allow-Origin in response header
     .use(morgan('tiny'))
     .use(express.static('./server/assets'))
     .use(express.json())

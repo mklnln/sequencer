@@ -78,29 +78,30 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
 
             console.log(saveObj, songName, stepCount)
             setSongSavedOrDeleted('saving to database...')
-            // fetch(`/api/save-song`, {
-            //     method: 'POST',
-            //     headers: {
-            //         Accept: 'application/json',
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ ...saveObj }),
-            // })
-            //     .then((res) => res.json())
-            //     .then((data) => {
-            //         if (data.status === 200) {
-            //             setSongSavedOrDeleted('Song saved!')
-            //             console.log(data, 'song POST')
-            //             setLoadUserSongs(handleLoadSongsFetch(data.data))
+            // fetch(`${process.env.REACT_APP_API_URL}/api/save-song`, {
+            fetch(`/api/save-song`, {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ...saveObj }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.status === 200) {
+                        setSongSavedOrDeleted('Song saved!')
+                        console.log(data, 'song POST')
+                        setLoadUserSongs(handleLoadSongsFetch(data.data))
 
-            //             setTimeout(() => {
-            //                 setSongSavedOrDeleted(false)
-            //             }, 5000)
-            //         }
-            //     })
-            //     .catch((error) => {
-            //         console.log(error)
-            //     })
+                        setTimeout(() => {
+                            setSongSavedOrDeleted(false)
+                        }, 5000)
+                    }
+                })
+                .catch((error) => {
+                    console.log(error)
+                })
         }
     }
     const handleDelete = () => {
@@ -112,6 +113,7 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
             const bodyObj = {}
             bodyObj.songName = loadSong
             bodyObj.userID = user.sub
+            // fetch(`${process.env.REACT_APP_API_URL}/api/delete-song/`, {
             fetch(`/api/delete-song/`, {
                 method: 'DELETE',
                 headers: {
