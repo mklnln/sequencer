@@ -25,16 +25,37 @@ const Header = () => {
             .catch((err) => console.log(err))
     }
 
-    const fetchArrow = () => {
-        console.log('lets fetch', user.sub)
-        fetch(`/api/load-songs/${user.sub}`)
-            .then((res) => res.json())
+    // const fetchArrow = () => {
+    //     console.log('lets fetch', user.sub)
+    //     fetch(`/api/load-songs/${user.sub}`)
+    //         .then((res) => res.json())
+    //         .then((data) => {
+    //             console.log(data)
+    //             setLoadUserSongs(handleLoadSongsFetch(data.data))
+    //         })
+    //         .catch((err) => console.log(err))
+    // }
+
+    async function fetchArrow() {
+        return await fetch(`/api/load-songs/${user.sub}`)
+            .then((resp) => {
+                if (!resp.ok) {
+                    throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`
+                }
+                console.log(resp, 'response from fetch')
+                return resp.json()
+            })
             .then((data) => {
+                // your code with json here...
                 console.log(data)
                 setLoadUserSongs(handleLoadSongsFetch(data.data))
             })
-            .catch((err) => console.log(err))
+            .catch((err) => {
+                console.debug('Error in fetch', err)
+                // setErrors(err)
+            })
     }
+
     return (
         <Banner>
             <TitleDiv>
