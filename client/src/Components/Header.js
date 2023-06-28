@@ -16,7 +16,7 @@ const Header = () => {
             loadUserSongs,
             `loadUserSongs is not, so we fetch loadUserSongs`
         )
-        fetch(`/api/load-songs/${user.sub}`)
+        fetch(`${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`)
             .then((res) => res.json())
             .then((data) => {
                 console.log(data)
@@ -37,7 +37,9 @@ const Header = () => {
     // }
 
     async function fetchArrow() {
-        return await fetch(`/api/load-songs/${user.sub}`)
+        return await fetch(
+            `${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`
+        )
             .then((resp) => {
                 if (!resp.ok) {
                     throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`
