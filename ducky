@@ -273,19 +273,27 @@ todo june 27
 	> not allowed to access the API at sequencer-be.onrender.com because CORS is disabled, thus we arent able to ping mongo for loadUserSongs
 
 todo june 28
-	> get CORS workin, loadUserSongs on live site
+	>VVV get CORS workin, loadUserSongs on live site
 		> request URL seems to stay on sequencer-be despite changing the proxy
 		> deleted node_modules, found cli error that node.js cant complete proxy request, so i instead fetched to localhost:4000 manually
 		> doing fetch('/api...') instead of fetch('http://localhost:4000...') breaks it again. 
 		ITS DA PROXYYY
-		> no clue man
 		> RECAP:
 			> local build works, proxy functions.
 			> proxy isn't mean for production builds apparently
-			> TURN OFF PROXY, use REACT_APP_API_URL and put that in yer fetches
-	> ntoesToPlay integrated on backend
-		> may need to change how we're sending props down. mb switch into only re-rendering when props change but that means making checked reflect those props
+			> TURN OFF PROXY, use REACT_APP_API_URL and put that in yer fetches, i.e. no more shortening fetches to /api/ whatever, insert that env var to include https://sequencer-be...
+	
 
+todo june 29
+	> > why still says loading on sign out?
+	> remove handleLoadSongsFetch, i know it isnt needed
+		> change format of data in DB, make a songs array of objects, as the hndleLoad.. just removes the data and ids that are in the same data.data payload
+		> SAVEOBJ first thing to look at now
+	> ntoesToPlay integrated on backend
+		> may need to change how we're sending props down. mb switch into only re-rendering when props change but that means making checked reflect those props, which is THE thing ive been havin trouble with over the last lil bit
+	> mongo stuck on pending, beurk
+		> stuck stuck suck
+	> removing setSendChordPattern GRids.js line 210 seems to not change anything? what's going on? seems like my checking in each SingleCheckbox is enough.
 
 Auth0 consent stuff:
 	> https://support.google.com/googleapi/answer/6158849#userconsent&zippy=%2Cuser-consent

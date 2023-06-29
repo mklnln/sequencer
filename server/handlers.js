@@ -16,6 +16,7 @@ const getUser = async (req, res) => {
     console.log('literally anything coming out of this handler?')
     try {
         await client.connect()
+        console.log('connected to mongo client')
         const userInfo = await db
             .collection('users')
             .findOne({ userID: userID })
@@ -42,18 +43,30 @@ const getUser = async (req, res) => {
         console.log(err.stack)
     } finally {
         client.close()
+        console.log('disconnected from mongo client')
     }
 }
 
 const saveSong = async (req, res) => {
     const songInfo = req.body
     const userID = songInfo.userID
+    const songName = songInfo.song.songName
+    const songObj = songInfo.song
     try {
         await client.connect()
+        console.log('connected to mongo client')
 
+        const objDBSongs = await db
+            .collection('users')
+            .findOne({ userID: userID })
+        console.log(objDBSongs, 'dbdbdbdb')
+        objDBSongs.songs[songName] = songObj
         await db
             .collection('users')
-            .updateOne({ userID: userID }, { $set: songInfo })
+            .updateOne(
+                { userID: userID },
+                { $set: { songs: objDBSongs.songs } }
+            )
         const updatedUserInfo = await db
             .collection('users')
             .findOne({ userID: userID })
@@ -66,6 +79,7 @@ const saveSong = async (req, res) => {
         console.log(err.stack)
     } finally {
         client.close()
+        console.log('disconnected from mongo client')
     }
 }
 
@@ -74,6 +88,7 @@ const loadSongs = async (req, res) => {
     console.log(userID, 'from load-songs BE handler')
     try {
         await client.connect()
+        console.log('connected to mongo client')
         const userInfo = await db
             .collection('users')
             .findOne({ userID: userID })
@@ -88,6 +103,7 @@ const loadSongs = async (req, res) => {
         console.log(err.stack)
     } finally {
         client.close()
+        console.log('disconnected from mongo client')
     }
 }
 
@@ -95,6 +111,7 @@ const deleteSong = async (req, res) => {
     const { userID, songName } = req.body
     try {
         await client.connect()
+        console.log('connected to mongo client')
         await db
             .collection('users')
             .updateOne({ userID: userID }, { $unset: { [songName]: '' } })
@@ -112,6 +129,7 @@ const deleteSong = async (req, res) => {
         console.log(err.stack)
     } finally {
         client.close()
+        console.log('disconnected from mongo client')
     }
 }
 

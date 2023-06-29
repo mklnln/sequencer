@@ -40,8 +40,12 @@ export const getHookTheoryBearerToken = async (hookTheoryChords) => {
     }
 }
 
+const proxy =
+    process.env.NODE_ENV === 'development' ? '' : process.env.REACT_APP_API_URL
+
 export const loadUserSongsFetch = async (sub, setLoadUserSongs) => {
-    return await fetch(`/api/load-songs/${sub}`)
+    console.log('fetchin....')
+    return await fetch(`${proxy}/api/load-songs/${sub}`)
         .then((res) => res.json())
         .then((data) => {
             console.log(data)
@@ -55,8 +59,8 @@ export const saveSongFetch = async (
     setSongSavedOrDeleted,
     saveObj
 ) => {
-    // fetch(`${process.env.REACT_APP_API_URL}/api/save-song`, {
-    fetch(`/api/save-song`, {
+    console.log(saveObj, 'saveoj')
+    fetch(`${proxy}/api/save-song`, {
         method: 'POST',
         headers: {
             Accept: 'application/json',
@@ -69,8 +73,9 @@ export const saveSongFetch = async (
             if (data.status === 200) {
                 setSongSavedOrDeleted('Song saved!')
                 console.log(data, 'song POST')
-                setLoadUserSongs(handleLoadSongsFetch(data.data))
+                setLoadUserSongs(data.data.songs)
 
+                console.log(data.data, 'response')
                 setTimeout(() => {
                     setSongSavedOrDeleted(false)
                 }, 5000)
@@ -86,8 +91,7 @@ export const deleteSongFetch = async (
     setLoadUserSongs,
     bodyObj
 ) => {
-    // fetch(`${process.env.REACT_APP_API_URL}/api/delete-song/`, {
-    fetch(`/api/delete-song/`, {
+    fetch(`${proxy}/api/delete-song/`, {
         method: 'DELETE',
         headers: {
             Accept: 'application/json',
