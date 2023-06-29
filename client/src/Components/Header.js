@@ -4,6 +4,7 @@ import LoginButton from './LoginButton'
 import { useAuth0 } from '@auth0/auth0-react'
 import { MusicParametersContext } from '../App'
 import { loadUserSongsFetch } from '../utilities/APIfetches'
+import { fakeSong } from '../utilities/BigObjectsAndArrays'
 
 const Header = () => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
@@ -13,10 +14,11 @@ const Header = () => {
     if (user && !loadUserSongs) {
         loadUserSongsFetch(user.sub, setLoadUserSongs)
         console.log('we call da fetch boy')
+        console.log(loadUserSongs, 'user songs')
     }
-
-  
-
+    const loadFakeSongs = () => {
+        setLoadUserSongs(fakeSong.songs)
+    }
     async function fetchArrow() {
         loadUserSongsFetch(user.sub, setLoadUserSongs)
         console.log('we call da fetch boy')
@@ -56,6 +58,7 @@ const Header = () => {
                 check user
             </button> */}
             <div onClick={fetchArrow}>fetch test</div>
+            <div onClick={loadFakeSongs}>load fake songs</div>
             {error && <span>Error authenticating.. try again.</span>}
             {!error && isLoading && <span>Loading...</span>}
             {!error && !isLoading && (

@@ -61,23 +61,24 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
         } else {
             // load all relevant parameters into the body for the backend
             const saveObj = {}
-            saveObj[songName] = {}
-            saveObj[songName].notesToPlay = notesToPlay
             saveObj.userID = user.sub
-            saveObj[songName].stepCount = stepCount
-            saveObj[songName].rootNote = rootNote
-            saveObj[songName].tempo = tempo
-            saveObj[songName].wonkFactor = wonkFactor
-            saveObj[songName].melodyVolume = melodyVolume
-            saveObj[songName].chordsVolume = chordsVolume
-            saveObj[songName].sound = sound
-            saveObj[songName].filterCutoff = filterCutoff
-            saveObj[songName].attack = attack
-            saveObj[songName].decay = decay
-            saveObj[songName].sustain = sustain
-            saveObj[songName].release = release
+            saveObj['song'] = {}
+            saveObj['song'].songName = songName
+            saveObj['song'].notesToPlay = notesToPlay
+            saveObj['song'].stepCount = stepCount
+            saveObj['song'].rootNote = rootNote
+            saveObj['song'].tempo = tempo
+            saveObj['song'].wonkFactor = wonkFactor
+            saveObj['song'].melodyVolume = melodyVolume
+            saveObj['song'].chordsVolume = chordsVolume
+            saveObj['song'].sound = sound
+            saveObj['song'].filterCutoff = filterCutoff
+            saveObj['song'].attack = attack
+            saveObj['song'].decay = decay
+            saveObj['song'].sustain = sustain
+            saveObj['song'].release = release
 
-            console.log(saveObj, songName, stepCount)
+            // console.log(saveObj, songName, stepCount)
             setSongSavedOrDeleted('saving to database...')
             saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
         }

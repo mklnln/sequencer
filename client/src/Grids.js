@@ -10,6 +10,7 @@ import {
 } from './utilities/FrontEndHelpers.js'
 import {
     chordNotesArr,
+    fakeSong,
     melodyNotesObj,
     romanNumeralReference,
 } from './utilities/BigObjectsAndArrays.js'
@@ -213,11 +214,15 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
+    console.log(notesToPlay, 'nots')
     return (
         <>
             <GridsContainer>
                 <span>
                     Grids.js has rendered {countReRenders.current} times.
+                </span>
+                <span onClick={() => setNotesToPlay(fakeSong.songs[123])}>
+                    load fake notesToPlay
                 </span>
 
                 <Sequencer
