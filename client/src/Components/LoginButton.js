@@ -16,7 +16,11 @@ const LoginButton = () => {
 
 export default LoginButton
 
-const Login = styled.div`
+const Login = styled.button`
+    background-color: black;
+    font-family: inherit;
+    color: inherit;
+    font-size: 16px;
     border: 1px solid var(--lightest-color);
     margin: 10px;
     padding: 5px;

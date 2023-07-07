@@ -295,6 +295,10 @@ todo june 29
 		> stuck stuck suck
 	> removing setSendChordPattern GRids.js line 210 seems to not change anything? what's going on? seems like my checking in each SingleCheckbox is enough.
 
+todo jul 7
+	> 
+
+
 Auth0 consent stuff:
 	> https://support.google.com/googleapi/answer/6158849#userconsent&zippy=%2Cuser-consent
 		> veryifying/validating my app with google so that ppl other than me can log-in without using my specific dev keys (which are limited, must use client ID and client secret)
