@@ -48,6 +48,8 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
         console.log('clicked!')
         setSongName('')
         document.activeElement.blur()
+
+        console.log('testing gt')
         // const testForInput = []
         // Object.keys(areChordBeatsChecked).forEach((chord) => {
         //     areChordBeatsChecked[chord].map((beat) => {
