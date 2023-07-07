@@ -43,7 +43,11 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
         return newState
     }
 
-    const handleSave = () => {
+    const handleSave = (event) => {
+        event.preventDefault()
+        console.log('clicked!')
+        setSongName('')
+        document.activeElement.blur()
         // const testForInput = []
         // Object.keys(areChordBeatsChecked).forEach((chord) => {
         //     areChordBeatsChecked[chord].map((beat) => {
@@ -116,11 +120,14 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                     <>
                         <ColumnDiv>
                             <span>Name</span>
-                            <StyledInput
-                                type="text"
-                                onChange={handleSongName}
-                                value={songName}
-                            />
+
+                            <form onSubmit={handleSave}>
+                                <StyledInput
+                                    type="text"
+                                    onChange={handleSongName}
+                                    value={songName}
+                                />
+                            </form>
 
                             <StyledButton onClick={handleSave}>
                                 <span>Save</span>
@@ -218,19 +225,30 @@ const StyledInput = styled.input`
     margin-left: 5px;
     background: black;
     color: var(--primary-color);
-    outline: solid 0.2px var(--lightest-color);
+    /* outline: solid 0.2px var(--lightest-color); */
     padding: 4px;
     font-family: 'MS-DOS';
     font-size: 16px;
-    border: none;
+    outline: none;
+    border: 1px solid var(--lightest-color);
+    &:focus {
+        border: 1px solid var(--primary-color);
+    }
 `
 
-const StyledButton = styled.div`
+const StyledButton = styled.button`
+    /* font-family: inherit; */
+    /* background-color: inherit; */
+    /* font-size: inherit; */
+    all: inherit;
     border: 1px solid var(--lightest-color);
     margin: 10px;
     padding: 4px 8px;
     // width: 40%;
     max-width: 100px;
+    &:focus {
+        border: 1px solid var(--primary-color);
+    }
     && {
         text-align: center;
         // padding-left: 0px;

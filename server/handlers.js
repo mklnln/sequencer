@@ -62,7 +62,14 @@ const saveSong = async (req, res) => {
             .collection('users')
             .findOne({ userID: userID })
         console.log(objDBSongs, 'dbdbdbdb')
-        objDBSongs.songs[songName] = songObj
+
+        // todo create userID if objDBSongs is null
+        await db.collection('users').insertOne({ userID: userID })
+        if (!objDBSongs) {
+            // ?
+        }
+
+        // objDBSongs.songs[songName] = songObj
         await db
             .collection('users')
             .updateOne(
