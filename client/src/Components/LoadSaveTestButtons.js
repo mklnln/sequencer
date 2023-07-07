@@ -31,18 +31,6 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
     const [songName, setSongName] = useState('')
 
-    const handleLoadSongsFetch = (songsAndIDs) => {
-        console.log(songsAndIDs, 'fetch')
-        const keysToUse = Object.keys(songsAndIDs).filter((key) => {
-            return key !== 'userID' && key !== '_id'
-        })
-        const newState = {}
-        keysToUse.forEach((key) => {
-            newState[key] = songsAndIDs[key]
-        })
-        return newState
-    }
-
     const handleSave = (event) => {
         event.preventDefault()
         console.log('clicked!')
@@ -89,6 +77,7 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
             saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
         }
     }
+
     const handleDelete = () => {
         if (loadSong === '75442486-0878-440c-9db1-a7006c25a39f' && user.sub) {
             window.alert(
@@ -108,13 +97,13 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
     return (
         <MainDiv>
             <ColumnDiv>
-                {/* <StyledButton
+                <StyledButton
                     onClick={() => {
-                        console.log(sound)
+                        console.log(loadSong, 'loadsong')
                     }}
                 >
                     test
-                </StyledButton> */}
+                </StyledButton>
             </ColumnDiv>
             <br />
             <>
@@ -260,6 +249,8 @@ const StyledButton = styled.button`
     :hover {
         cursor: pointer;
         background-color: var(--primary-color);
-        color: black;
+        span {
+            color: black;
+        }
     }
 `

@@ -8,7 +8,7 @@ import { fakeSong } from '../utilities/BigObjectsAndArrays'
 
 const Header = () => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
-    const { loadUserSongs, setLoadUserSongs, songSaved, handleLoadSongsFetch } =
+    const { loadUserSongs, setLoadUserSongs, songSaved } =
         useContext(MusicParametersContext)
 
     if (user && !loadUserSongs) {

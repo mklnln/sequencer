@@ -296,7 +296,11 @@ todo june 29
 	> removing setSendChordPattern GRids.js line 210 seems to not change anything? what's going on? seems like my checking in each SingleCheckbox is enough.
 
 todo jul 7
-	> 
+	> save a song, retrieve it from BE, it displays in grid
+		>V save song, check BE for user
+		>V save songs to an object
+		> display in grid?
+		
 
 
 Auth0 consent stuff:

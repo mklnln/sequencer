@@ -1,21 +1,3 @@
-const handleLoadSongsFetch = (songsAndIDs) => {
-    console.log(
-        songsAndIDs,
-        `songsandIDs sent to handleLoadSongsFetch from the loadUserSongs fetch in Header.js`
-    )
-    const keysToUse = Object.keys(songsAndIDs).filter((key) => {
-        return key !== 'userID' && key !== '_id'
-    })
-    const newState = {}
-    keysToUse.forEach((key) => {
-        newState[key] = songsAndIDs[key]
-    })
-    console.log(
-        'handle load songs fetch has run. are we calling it unnecessarily?'
-    )
-    return newState
-}
-
 export const getHookTheoryBearerToken = async (hookTheoryChords) => {
     if (hookTheoryChords.length === 0) {
         fetch('https://api.hooktheory.com/v1/users/auth', {
@@ -51,7 +33,7 @@ export const loadUserSongsFetch = async (sub, setLoadUserSongs) => {
         .then((data) => {
             console.log(data)
             if (data.data) {
-                setLoadUserSongs(handleLoadSongsFetch(data.data))
+                setLoadUserSongs(data.data.songs)
             } else {
                 console.log('no saved songs yet')
                 setLoadUserSongs({ 'No saved songs yet': { null: null } })
@@ -65,7 +47,7 @@ export const saveSongFetch = async (
     setSongSavedOrDeleted,
     saveObj
 ) => {
-    console.log(saveObj, 'saveoj')
+    console.log(JSON.stringify({ ...saveObj }), 'saveoj')
     fetch(`${proxy}/api/save-song`, {
         method: 'POST',
         headers: {
@@ -78,10 +60,9 @@ export const saveSongFetch = async (
         .then((data) => {
             if (data.status === 200) {
                 setSongSavedOrDeleted('Song saved!')
-                console.log(data, 'song POST')
                 setLoadUserSongs(data.data.songs)
 
-                console.log(data.data, 'response')
+                console.log(data.data, 'are teh saved songs there??')
                 setTimeout(() => {
                     setSongSavedOrDeleted(false)
                 }, 5000)
@@ -110,7 +91,7 @@ export const deleteSongFetch = async (
             if (data.status === 200) {
                 console.log(data)
                 setSongSavedOrDeleted('Song deleted!')
-                setLoadUserSongs(handleLoadSongsFetch(data.data))
+                setLoadUserSongs(data.data.songs)
 
                 setTimeout(() => {
                     setSongSavedOrDeleted(false)

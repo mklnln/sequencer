@@ -28,7 +28,7 @@ const getUser = async (req, res) => {
                 data: userInfo,
             })
         } else {
-            await db.collection('users').insertOne({ userID: userID })
+            await users.insertOne({ userID: userID })
             const newUserInfo = await db
                 .collection('users')
                 .findOne({ userID: userID })
@@ -50,35 +50,20 @@ const getUser = async (req, res) => {
 }
 
 const saveSong = async (req, res) => {
-    const songInfo = req.body
-    const userID = songInfo.userID
-    const songName = songInfo.song.songName
-    const songObj = songInfo.song
+    const userID = req.body.userID
+    const songObj = req.body.song
+    const songName = req.body.song.songName
+    const users = db.collection('users')
+    // ? should i remove songName from the song object before committing it to the DB?
     try {
         await client.connect()
-        console.log('connected to mongo client')
-
-        const objDBSongs = await db
-            .collection('users')
-            .findOne({ userID: userID })
-        console.log(objDBSongs, 'dbdbdbdb')
-
-        // todo create userID if objDBSongs is null
-        await db.collection('users').insertOne({ userID: userID })
-        if (!objDBSongs) {
-            // ?
+        const DBSongs = await users.findOne({ userID: userID })
+        if (!DBSongs) {
+            await users.insertOne({ userID: userID })
         }
-
-        // objDBSongs.songs[songName] = songObj
-        await db
-            .collection('users')
-            .updateOne(
-                { userID: userID },
-                { $set: { songs: objDBSongs.songs } }
-            )
-        const updatedUserInfo = await db
-            .collection('users')
-            .findOne({ userID: userID })
+        const updateCommand = { $set: { [`songs.${songName}`]: songObj } }
+        await users.findOneAndUpdate({ userID: userID }, updateCommand)
+        const updatedUserInfo = await users.findOne({ userID: userID })
         res.status(200).json({
             status: 200,
             message: "Song saved. Here's the updated document",
@@ -88,7 +73,6 @@ const saveSong = async (req, res) => {
         console.log(err.stack)
     } finally {
         client.close()
-        console.log('disconnected from mongo client')
     }
 }
 
