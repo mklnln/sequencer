@@ -111,38 +111,37 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                 </StyledButton> */}
             </ColumnDiv>
             <br />
-            {loadUserSongs ? (
-                <>
-                    {isAuthenticated && (
-                        <>
-                            <ColumnDiv>
-                                <span>Name</span>
-                                <StyledInput
-                                    type="text"
-                                    onChange={handleSongName}
-                                    value={songName}
-                                />
+            <>
+                {isAuthenticated && (
+                    <>
+                        <ColumnDiv>
+                            <span>Name</span>
+                            <StyledInput
+                                type="text"
+                                onChange={handleSongName}
+                                value={songName}
+                            />
 
-                                <StyledButton onClick={handleSave}>
-                                    <span>Save</span>
-                                </StyledButton>
-                            </ColumnDiv>
+                            <StyledButton onClick={handleSave}>
+                                <span>Save</span>
+                            </StyledButton>
+                        </ColumnDiv>
 
-                            <span>
-                                {songSavedOrDeleted ? songSavedOrDeleted : ''}
-                            </span>
-                            {loadUserSongs ? (
-                                <LoadingSongsDiv>
-                                    <ColumnDiv>
-                                        <CustomDropdown
-                                            title="Load Song"
-                                            stateValue={loadSong}
-                                            stateValueOptions={Object.keys(
-                                                loadUserSongs
-                                            )}
-                                            setState={setLoadSong}
-                                        />
-                                        {/* <label>Load Song:</label>
+                        <span>
+                            {songSavedOrDeleted ? songSavedOrDeleted : ''}
+                        </span>
+                        {loadUserSongs ? (
+                            <LoadingSongsDiv>
+                                <ColumnDiv>
+                                    <CustomDropdown
+                                        title="Load Song"
+                                        stateValue={loadSong}
+                                        stateValueOptions={Object.keys(
+                                            loadUserSongs
+                                        )}
+                                        setState={setLoadSong}
+                                    />
+                                    {/* <label>Load Song:</label>
                                         <select
                                             value={loadSong}
                                             onChange={(e) => {
@@ -167,12 +166,12 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                                                 }
                                             )}
                                         </select> */}
-                                    </ColumnDiv>
-                                </LoadingSongsDiv>
-                            ) : (
-                                <span>loading songs...</span>
-                            )}
-                            {/* <ColumnDiv>
+                                </ColumnDiv>
+                            </LoadingSongsDiv>
+                        ) : (
+                            <span>loading...</span>
+                        )}
+                        {/* <ColumnDiv>
                                 {loadSong !==
                                     '75442486-0878-440c-9db1-a7006c25a39f' && (
                                     <DeleteButton
@@ -182,12 +181,9 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                                     </DeleteButton>
                                 )}
                             </ColumnDiv> */}
-                        </>
-                    )}
-                </>
-            ) : (
-                <span>log in to see your saved songs</span>
-            )}
+                    </>
+                )}
+            </>
         </MainDiv>
     )
 }

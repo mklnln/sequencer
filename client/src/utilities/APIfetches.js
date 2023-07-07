@@ -45,11 +45,17 @@ const proxy =
 
 export const loadUserSongsFetch = async (sub, setLoadUserSongs) => {
     console.log('fetchin....')
+    console.log(`${proxy}/api/load-songs/${sub}`, 'call')
     return await fetch(`${proxy}/api/load-songs/${sub}`)
         .then((res) => res.json())
         .then((data) => {
             console.log(data)
-            setLoadUserSongs(handleLoadSongsFetch(data.data))
+            if (data.data) {
+                setLoadUserSongs(handleLoadSongsFetch(data.data))
+            } else {
+                console.log('no saved songs yet')
+                setLoadUserSongs({ 'No saved songs yet': { null: null } })
+            }
         })
         .catch((err) => console.log(err))
 }

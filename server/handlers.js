@@ -13,13 +13,14 @@ const db = client.db('sequencer')
 
 const getUser = async (req, res) => {
     const { userID } = req.params
-    console.log('literally anything coming out of this handler?')
+    console.log('getting user')
     try {
         await client.connect()
         console.log('connected to mongo client')
         const userInfo = await db
             .collection('users')
             .findOne({ userID: userID })
+        console.log(userInfo, 'userInfo, already made')
         if (userInfo) {
             res.status(200).json({
                 status: 200,
@@ -28,14 +29,15 @@ const getUser = async (req, res) => {
             })
         } else {
             await db.collection('users').insertOne({ userID: userID })
-            const userInfo = await db
+            const newUserInfo = await db
                 .collection('users')
                 .findOne({ userID: userID })
-            if (userInfo) {
+            console.log(newUserInfo, 'newUserInfo, freshly made')
+            if (newUserInfo) {
                 res.status(200).json({
                     status: 200,
                     message: `User created.`,
-                    data: userInfo,
+                    data: newUserInfo,
                 })
             }
         }
@@ -92,15 +94,22 @@ const loadSongs = async (req, res) => {
         const userInfo = await db
             .collection('users')
             .findOne({ userID: userID })
+
+        console.log(userInfo, 'da response we need')
         if (userInfo) {
             res.status(200).json({
                 status: 200,
                 message: "Request received. Here's the user and all songs.",
                 data: userInfo,
             })
+        } else {
+            res.status(200).json({
+                status: 200,
+                message: 'Request received. User has not yet saved any songs.',
+            })
         }
     } catch (err) {
-        console.log(err.stack)
+        console.log(err)
     } finally {
         client.close()
         console.log('disconnected from mongo client')

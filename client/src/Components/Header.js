@@ -20,6 +20,7 @@ const Header = () => {
         setLoadUserSongs(fakeSong.songs)
     }
     async function fetchArrow() {
+        console.log(loadUserSongs, 'user')
         loadUserSongsFetch(user.sub, setLoadUserSongs)
         console.log('we call da fetch boy')
         // return await fetch(
