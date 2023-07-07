@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import DropdownArrow from '../assets/SVGs/DropdownArrow'
 const CustomDropdown = ({ title, stateValue, stateValueOptions, setState }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [hoverOnDropdown, setHoverOnDropdown] = useState(false)
 
     const handleOptionClick = (option, index) => {
         let set = option
@@ -13,14 +14,21 @@ const CustomDropdown = ({ title, stateValue, stateValueOptions, setState }) => {
         setIsDropdownOpen(false)
     }
 
-    const mouseLeave = () => {
-        setIsDropdownOpen(false)
+    if (isDropdownOpen && !hoverOnDropdown) {
+        const listener = () => {
+            setIsDropdownOpen(false)
+            document.removeEventListener('click', listener)
+        }
+        document.addEventListener('click', listener)
     }
+
     return (
         <DropdownContainer>
             <ParameterLabel>{title}</ParameterLabel>
             <ULDropdown
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                onMouseEnter={() => setHoverOnDropdown(true)}
+                onMouseLeave={() => setHoverOnDropdown(false)}
                 style={
                     isDropdownOpen
                         ? {

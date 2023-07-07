@@ -13,12 +13,14 @@ const db = client.db('sequencer')
 
 const getUser = async (req, res) => {
     const { userID } = req.params
-    console.log('literally anything coming out of this handler?')
+    console.log('getting user')
     try {
         await client.connect()
+        console.log('connected to mongo client')
         const userInfo = await db
             .collection('users')
             .findOne({ userID: userID })
+        console.log(userInfo, 'userInfo, already made')
         if (userInfo) {
             res.status(200).json({
                 status: 200,
@@ -26,15 +28,16 @@ const getUser = async (req, res) => {
                 data: userInfo,
             })
         } else {
-            await db.collection('users').insertOne({ userID: userID })
-            const userInfo = await db
+            await users.insertOne({ userID: userID })
+            const newUserInfo = await db
                 .collection('users')
                 .findOne({ userID: userID })
-            if (userInfo) {
+            console.log(newUserInfo, 'newUserInfo, freshly made')
+            if (newUserInfo) {
                 res.status(200).json({
                     status: 200,
                     message: `User created.`,
-                    data: userInfo,
+                    data: newUserInfo,
                 })
             }
         }
@@ -42,21 +45,25 @@ const getUser = async (req, res) => {
         console.log(err.stack)
     } finally {
         client.close()
+        console.log('disconnected from mongo client')
     }
 }
 
 const saveSong = async (req, res) => {
-    const songInfo = req.body
-    const userID = songInfo.userID
+    const userID = req.body.userID
+    const songObj = req.body.song
+    const songName = req.body.song.songName
+    const users = db.collection('users')
+    // ? should i remove songName from the song object before committing it to the DB?
     try {
         await client.connect()
-
-        await db
-            .collection('users')
-            .updateOne({ userID: userID }, { $set: songInfo })
-        const updatedUserInfo = await db
-            .collection('users')
-            .findOne({ userID: userID })
+        const DBSongs = await users.findOne({ userID: userID })
+        if (!DBSongs) {
+            await users.insertOne({ userID: userID })
+        }
+        const updateCommand = { $set: { [`songs.${songName}`]: songObj } }
+        await users.findOneAndUpdate({ userID: userID }, updateCommand)
+        const updatedUserInfo = await users.findOne({ userID: userID })
         res.status(200).json({
             status: 200,
             message: "Song saved. Here's the updated document",
@@ -74,20 +81,29 @@ const loadSongs = async (req, res) => {
     console.log(userID, 'from load-songs BE handler')
     try {
         await client.connect()
+        console.log('connected to mongo client')
         const userInfo = await db
             .collection('users')
             .findOne({ userID: userID })
+
+        console.log(userInfo, 'da response we need')
         if (userInfo) {
             res.status(200).json({
                 status: 200,
                 message: "Request received. Here's the user and all songs.",
                 data: userInfo,
             })
+        } else {
+            res.status(200).json({
+                status: 200,
+                message: 'Request received. User has not yet saved any songs.',
+            })
         }
     } catch (err) {
-        console.log(err.stack)
+        console.log(err)
     } finally {
         client.close()
+        console.log('disconnected from mongo client')
     }
 }
 
@@ -95,6 +111,7 @@ const deleteSong = async (req, res) => {
     const { userID, songName } = req.body
     try {
         await client.connect()
+        console.log('connected to mongo client')
         await db
             .collection('users')
             .updateOne({ userID: userID }, { $unset: { [songName]: '' } })
@@ -112,6 +129,7 @@ const deleteSong = async (req, res) => {
         console.log(err.stack)
     } finally {
         client.close()
+        console.log('disconnected from mongo client')
     }
 }
 

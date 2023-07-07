@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { MusicParametersContext } from '../App'
 import CustomDropdown from './CustomDropdown'
+import { deleteSongFetch, saveSongFetch } from '../utilities/APIfetches'
 
 const LoadSaveTestButtons = ({ notesToPlay }) => {
     const {
@@ -30,19 +31,13 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
     const [songName, setSongName] = useState('')
 
-    const handleLoadSongsFetch = (songsAndIDs) => {
-        console.log(songsAndIDs, 'fetch')
-        const keysToUse = Object.keys(songsAndIDs).filter((key) => {
-            return key !== 'userID' && key !== '_id'
-        })
-        const newState = {}
-        keysToUse.forEach((key) => {
-            newState[key] = songsAndIDs[key]
-        })
-        return newState
-    }
+    const handleSave = (event) => {
+        event.preventDefault()
+        console.log('clicked!')
+        setSongName('')
+        document.activeElement.blur()
 
-    const handleSave = () => {
+        console.log('testing gt')
         // const testForInput = []
         // Object.keys(areChordBeatsChecked).forEach((chord) => {
         //     areChordBeatsChecked[chord].map((beat) => {
@@ -60,49 +55,29 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
         } else {
             // load all relevant parameters into the body for the backend
             const saveObj = {}
-            saveObj[songName] = {}
-            saveObj[songName].notesToPlay = notesToPlay
             saveObj.userID = user.sub
-            saveObj[songName].stepCount = stepCount
-            saveObj[songName].rootNote = rootNote
-            saveObj[songName].tempo = tempo
-            saveObj[songName].wonkFactor = wonkFactor
-            saveObj[songName].melodyVolume = melodyVolume
-            saveObj[songName].chordsVolume = chordsVolume
-            saveObj[songName].sound = sound
-            saveObj[songName].filterCutoff = filterCutoff
-            saveObj[songName].attack = attack
-            saveObj[songName].decay = decay
-            saveObj[songName].sustain = sustain
-            saveObj[songName].release = release
+            saveObj['song'] = {}
+            saveObj['song'].songName = songName
+            saveObj['song'].notesToPlay = notesToPlay
+            saveObj['song'].stepCount = stepCount
+            saveObj['song'].rootNote = rootNote
+            saveObj['song'].tempo = tempo
+            saveObj['song'].wonkFactor = wonkFactor
+            saveObj['song'].melodyVolume = melodyVolume
+            saveObj['song'].chordsVolume = chordsVolume
+            saveObj['song'].sound = sound
+            saveObj['song'].filterCutoff = filterCutoff
+            saveObj['song'].attack = attack
+            saveObj['song'].decay = decay
+            saveObj['song'].sustain = sustain
+            saveObj['song'].release = release
 
-            console.log(saveObj, songName, stepCount)
+            // console.log(saveObj, songName, stepCount)
             setSongSavedOrDeleted('saving to database...')
-            // fetch(`/api/save-song`, {
-            //     method: 'POST',
-            //     headers: {
-            //         Accept: 'application/json',
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify({ ...saveObj }),
-            // })
-            //     .then((res) => res.json())
-            //     .then((data) => {
-            //         if (data.status === 200) {
-            //             setSongSavedOrDeleted('Song saved!')
-            //             console.log(data, 'song POST')
-            //             setLoadUserSongs(handleLoadSongsFetch(data.data))
-
-            //             setTimeout(() => {
-            //                 setSongSavedOrDeleted(false)
-            //             }, 5000)
-            //         }
-            //     })
-            //     .catch((error) => {
-            //         console.log(error)
-            //     })
+            saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
         }
     }
+
     const handleDelete = () => {
         if (loadSong === '75442486-0878-440c-9db1-a7006c25a39f' && user.sub) {
             window.alert(
@@ -112,29 +87,7 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
             const bodyObj = {}
             bodyObj.songName = loadSong
             bodyObj.userID = user.sub
-            fetch(`/api/delete-song/`, {
-                method: 'DELETE',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...bodyObj }),
-            })
-                .then((res) => res.json())
-                .then((data) => {
-                    if (data.status === 200) {
-                        console.log(data)
-                        setSongSavedOrDeleted('Song deleted!')
-                        setLoadUserSongs(handleLoadSongsFetch(data.data))
-
-                        setTimeout(() => {
-                            setSongSavedOrDeleted(false)
-                        }, 5000)
-                    }
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
+            deleteSongFetch(setSongSavedOrDeleted, setLoadUserSongs, bodyObj)
         }
     }
 
@@ -144,47 +97,49 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
     return (
         <MainDiv>
             <ColumnDiv>
-                {/* <StyledButton
+                <StyledButton
                     onClick={() => {
-                        console.log(sound)
+                        console.log(loadSong, 'loadsong')
                     }}
                 >
                     test
-                </StyledButton> */}
+                </StyledButton>
             </ColumnDiv>
             <br />
-            {loadUserSongs ? (
-                <>
-                    {isAuthenticated && (
-                        <>
-                            <ColumnDiv>
-                                <span>Name</span>
+            <>
+                {isAuthenticated && (
+                    <>
+                        <ColumnDiv>
+                            <span>Name</span>
+
+                            <form onSubmit={handleSave}>
                                 <StyledInput
                                     type="text"
                                     onChange={handleSongName}
                                     value={songName}
                                 />
+                            </form>
 
-                                <StyledButton onClick={handleSave}>
-                                    <span>Save</span>
-                                </StyledButton>
-                            </ColumnDiv>
+                            <StyledButton onClick={handleSave}>
+                                <span>Save</span>
+                            </StyledButton>
+                        </ColumnDiv>
 
-                            <span>
-                                {songSavedOrDeleted ? songSavedOrDeleted : ''}
-                            </span>
-                            {loadUserSongs ? (
-                                <LoadingSongsDiv>
-                                    <ColumnDiv>
-                                        <CustomDropdown
-                                            title="Load Song"
-                                            stateValue={loadSong}
-                                            stateValueOptions={Object.keys(
-                                                loadUserSongs
-                                            )}
-                                            setState={setLoadSong}
-                                        />
-                                        {/* <label>Load Song:</label>
+                        <span>
+                            {songSavedOrDeleted ? songSavedOrDeleted : ''}
+                        </span>
+                        {loadUserSongs ? (
+                            <LoadingSongsDiv>
+                                <ColumnDiv>
+                                    <CustomDropdown
+                                        title="Load Song"
+                                        stateValue={loadSong}
+                                        stateValueOptions={Object.keys(
+                                            loadUserSongs
+                                        )}
+                                        setState={setLoadSong}
+                                    />
+                                    {/* <label>Load Song:</label>
                                         <select
                                             value={loadSong}
                                             onChange={(e) => {
@@ -209,12 +164,12 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                                                 }
                                             )}
                                         </select> */}
-                                    </ColumnDiv>
-                                </LoadingSongsDiv>
-                            ) : (
-                                <span>loading songs...</span>
-                            )}
-                            {/* <ColumnDiv>
+                                </ColumnDiv>
+                            </LoadingSongsDiv>
+                        ) : (
+                            <span>loading...</span>
+                        )}
+                        {/* <ColumnDiv>
                                 {loadSong !==
                                     '75442486-0878-440c-9db1-a7006c25a39f' && (
                                     <DeleteButton
@@ -224,12 +179,9 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                                     </DeleteButton>
                                 )}
                             </ColumnDiv> */}
-                        </>
-                    )}
-                </>
-            ) : (
-                <span>log in to see your saved songs</span>
-            )}
+                    </>
+                )}
+            </>
         </MainDiv>
     )
 }
@@ -264,19 +216,30 @@ const StyledInput = styled.input`
     margin-left: 5px;
     background: black;
     color: var(--primary-color);
-    outline: solid 0.2px var(--lightest-color);
+    /* outline: solid 0.2px var(--lightest-color); */
     padding: 4px;
     font-family: 'MS-DOS';
     font-size: 16px;
-    border: none;
+    outline: none;
+    border: 1px solid var(--lightest-color);
+    &:focus {
+        border: 1px solid var(--primary-color);
+    }
 `
 
-const StyledButton = styled.div`
+const StyledButton = styled.button`
+    /* font-family: inherit; */
+    /* background-color: inherit; */
+    /* font-size: inherit; */
+    all: inherit;
     border: 1px solid var(--lightest-color);
     margin: 10px;
     padding: 4px 8px;
     // width: 40%;
     max-width: 100px;
+    &:focus {
+        border: 1px solid var(--primary-color);
+    }
     && {
         text-align: center;
         // padding-left: 0px;
@@ -286,6 +249,8 @@ const StyledButton = styled.div`
     :hover {
         cursor: pointer;
         background-color: var(--primary-color);
-        color: black;
+        span {
+            color: black;
+        }
     }
 `

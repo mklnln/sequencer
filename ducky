@@ -272,6 +272,36 @@ todo june 27
 		> big question of where to store this fetch. mb create a backend helpers file
 	> not allowed to access the API at sequencer-be.onrender.com because CORS is disabled, thus we arent able to ping mongo for loadUserSongs
 
+todo june 28
+	>VVV get CORS workin, loadUserSongs on live site
+		> request URL seems to stay on sequencer-be despite changing the proxy
+		> deleted node_modules, found cli error that node.js cant complete proxy request, so i instead fetched to localhost:4000 manually
+		> doing fetch('/api...') instead of fetch('http://localhost:4000...') breaks it again. 
+		ITS DA PROXYYY
+		> RECAP:
+			> local build works, proxy functions.
+			> proxy isn't mean for production builds apparently
+			> TURN OFF PROXY, use REACT_APP_API_URL and put that in yer fetches, i.e. no more shortening fetches to /api/ whatever, insert that env var to include https://sequencer-be...
+	
+
+todo june 29
+	> > why still says loading on sign out?
+	> remove handleLoadSongsFetch, i know it isnt needed
+		> change format of data in DB, make a songs array of objects, as the hndleLoad.. just removes the data and ids that are in the same data.data payload
+		> SAVEOBJ first thing to look at now
+	> ntoesToPlay integrated on backend
+		> may need to change how we're sending props down. mb switch into only re-rendering when props change but that means making checked reflect those props, which is THE thing ive been havin trouble with over the last lil bit
+	> mongo stuck on pending, beurk
+		> stuck stuck suck
+	> removing setSendChordPattern GRids.js line 210 seems to not change anything? what's going on? seems like my checking in each SingleCheckbox is enough.
+
+todo jul 7
+	> save a song, retrieve it from BE, it displays in grid
+		>V save song, check BE for user
+		>V save songs to an object
+		> display in grid?
+		
+
 
 Auth0 consent stuff:
 	> https://support.google.com/googleapi/answer/6158849#userconsent&zippy=%2Cuser-consent

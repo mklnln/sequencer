@@ -3,59 +3,46 @@ import styled from 'styled-components'
 import LoginButton from './LoginButton'
 import { useAuth0 } from '@auth0/auth0-react'
 import { MusicParametersContext } from '../App'
+import { loadUserSongsFetch } from '../utilities/APIfetches'
+import { fakeSong } from '../utilities/BigObjectsAndArrays'
 
 const Header = () => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
-    const { loadUserSongs, setLoadUserSongs, songSaved, handleLoadSongsFetch } =
+    const { loadUserSongs, setLoadUserSongs, songSaved } =
         useContext(MusicParametersContext)
 
     if (user && !loadUserSongs) {
-        console.log(
-            user,
-            ` user is valid and...`,
-            loadUserSongs,
-            `loadUserSongs is not, so we fetch loadUserSongs`
-        )
-        fetch(`${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`)
-            .then((res) => res.json())
-            .then((data) => {
-                console.log(data)
-                setLoadUserSongs(handleLoadSongsFetch(data.data))
-            })
-            .catch((err) => console.log(err))
+        loadUserSongsFetch(user.sub, setLoadUserSongs)
+        console.log('we call da fetch boy')
+        console.log(loadUserSongs, 'user songs')
     }
-
-    // const fetchArrow = () => {
-    //     console.log('lets fetch', user.sub)
-    //     fetch(`/api/load-songs/${user.sub}`)
-    //         .then((res) => res.json())
-    //         .then((data) => {
-    //             console.log(data)
-    //             setLoadUserSongs(handleLoadSongsFetch(data.data))
-    //         })
-    //         .catch((err) => console.log(err))
-    // }
-
+    const loadFakeSongs = () => {
+        setLoadUserSongs(fakeSong.songs)
+    }
     async function fetchArrow() {
-        return await fetch(
-            `${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`
-        )
-            .then((resp) => {
-                if (!resp.ok) {
-                    throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`
-                }
-                console.log(resp, 'response from fetch')
-                return resp.json()
-            })
-            .then((data) => {
-                // your code with json here...
-                console.log(data)
-                setLoadUserSongs(handleLoadSongsFetch(data.data))
-            })
-            .catch((err) => {
-                console.debug('Error in fetch', err)
-                // setErrors(err)
-            })
+        console.log(loadUserSongs, 'user')
+        loadUserSongsFetch(user.sub, setLoadUserSongs)
+        console.log('we call da fetch boy')
+        // return await fetch(
+        //     // `${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`
+        //     `/api/load-songs/${user.sub}`
+        // )
+        //     .then((resp) => {
+        //         if (!resp.ok) {
+        //             throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`
+        //         }
+        //         console.log(resp, 'response from fetch')
+        //         return resp.json()
+        //     })
+        //     .then((data) => {
+        //         // your code with json here...
+        //         console.log(data)
+        //         setLoadUserSongs(handleLoadSongsFetch(data.data))
+        //     })
+        //     .catch((err) => {
+        //         console.debug('Error in fetch', err)
+        //         // setErrors(err)
+        //     })
     }
 
     return (
@@ -72,6 +59,7 @@ const Header = () => {
                 check user
             </button> */}
             <div onClick={fetchArrow}>fetch test</div>
+            <div onClick={loadFakeSongs}>load fake songs</div>
             {error && <span>Error authenticating.. try again.</span>}
             {!error && isLoading && <span>Loading...</span>}
             {!error && !isLoading && (

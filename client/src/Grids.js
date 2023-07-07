@@ -10,6 +10,7 @@ import {
 } from './utilities/FrontEndHelpers.js'
 import {
     chordNotesArr,
+    fakeSong,
     melodyNotesObj,
     romanNumeralReference,
 } from './utilities/BigObjectsAndArrays.js'
@@ -19,6 +20,7 @@ import BeatMarkers from './Components/BeatMarkers.js'
 import CheckboxRow from './Components/CheckboxRow.js'
 import LoadSaveTestButtons from './Components/LoadSaveTestButtons.js'
 import Sequencer from './Sequencer.js'
+import { getAPIChordsFetch } from './utilities/APIfetches.js'
 const Grids = () => {
     const {
         chordInputStep,
@@ -102,76 +104,36 @@ const Grids = () => {
     }
     // ? do i want hookTheoryChords in state? triggers a rerender when it changes. mb id prefer a useRef so it doesnt trigger a rerender. we need it to persist in the event of rendering due to something else
     useEffect(() => {
-        if (hookTheoryChords.length === 0) {
-            fetch('https://api.hooktheory.com/v1/trends/nodes', {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
-                },
-            })
-                .then((res) => res.json()) // D-04-33-02 9pm-6am, glen royal vic 1001 decarie 843-1568 grace
-                .then((data) => {
-                    setHookTheoryChords(data.slice(0, 4)) // slice takes only the first 4 array items
-                })
-                .catch((error) => {
-                    console.log(error, 'NOOOOOOOOOO')
-                })
-        } else if (chosenAPIChords.length > 0) {
-            fetch(
-                `https://api.hooktheory.com/v1/trends/nodes?cp=${chosenAPIChords.toString()}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${process.env.REACT_APP_HOOK_THEORY_BEARER}`,
-                    },
-                }
-            )
-                .then((res) => res.json())
-                .then((data) => {
-                    // i only take chords from the api that match those i've put in the sequencer
-                    const removeUnsupportedChords = data.filter((chord) => {
-                        return chord['chord_ID'].length <= 1
-                    })
-                    console.log(removeUnsupportedChords)
-                    setHookTheoryChords(removeUnsupportedChords.slice(0, 4)) // slice takes only the first 4 array items
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        }
+        getAPIChordsFetch(setHookTheoryChords, chosenAPIChords)
 
         // * the below is for getting songs with the specific chord progression.
         // todo give back 3 random songs, provide link to hooktheory site?
-        if (chosenAPIChords.length >= 4) {
-            // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
-            const APISongs = []
-            let page = 1
-            fetch(
-                `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                        Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
-                    },
-                }
-            )
-                .then((res) => res.json())
-                .then((data) => {
-                    console.log(data, 'hook API givin songs w chords')
-                    data.forEach((song) => {
-                        APISongs.push(song)
-                    })
-                })
-                .catch((error) => {
-                    console.log(error)
-                })
-        }
+        // if (chosenAPIChords.length >= 4) {
+        //     // this works but only gives 20 results. i dont want to just exclusively give back artists with A in their name, lol.
+        //     const APISongs = []
+        //     let page = 1
+        //     fetch(
+        //         `https://api.hooktheory.com/v1/trends/songs?cp=${chosenAPIChords.toString()}`,
+        //         {
+        //             method: 'GET',
+        //             headers: {
+        //                 Accept: 'application/json',
+        //                 'Content-Type': 'application/json',
+        //                 Authorization: process.env.REACT_APP_HOOK_THEORY_BEARER,
+        //             },
+        //         }
+        //     )
+        //         .then((res) => res.json())
+        //         .then((data) => {
+        //             console.log(data, 'hook API givin songs w chords')
+        //             data.forEach((song) => {
+        //                 APISongs.push(song)
+        //             })
+        //         })
+        //         .catch((error) => {
+        //             console.log(error)
+        //         })
+        // }
     }, [chosenAPIChords])
 
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
@@ -252,11 +214,15 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
+    console.log(notesToPlay, 'nots')
     return (
         <>
             <GridsContainer>
                 <span>
                     Grids.js has rendered {countReRenders.current} times.
+                </span>
+                <span onClick={() => setNotesToPlay(fakeSong.songs[123])}>
+                    load fake notesToPlay
                 </span>
 
                 <Sequencer

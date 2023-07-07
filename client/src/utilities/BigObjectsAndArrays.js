@@ -132,3 +132,59 @@ export const slidersToShowObj = {
         defaultValue: 7500,
     },
 }
+
+export const fakeSong = {
+    songs: {
+        123: {
+            'beat-1': {
+                'note-1': {
+                    chords: 1,
+                    melody: 1,
+                },
+            },
+            'beat-2': {},
+            'beat-3': {
+                'note-8': {
+                    melody: 1,
+                },
+            },
+            'beat-4': {},
+            'beat-5': {
+                'note-5': {
+                    melody: 1,
+                },
+            },
+            'beat-6': {
+                'note-4': {
+                    chords: 1,
+                },
+            },
+            'beat-7': {
+                'note-3': {
+                    melody: 1,
+                },
+            },
+            'beat-8': {},
+            'beat-9': {
+                'note-5': {
+                    melody: 1,
+                },
+            },
+            'beat-10': {},
+            'beat-11': {},
+            'beat-12': {
+                'note-3': {
+                    chords: 1,
+                },
+            },
+            'beat-13': {
+                'note-10': {
+                    melody: 1,
+                },
+            },
+            'beat-14': {},
+            'beat-15': {},
+            'beat-16': {},
+        },
+    },
+}
