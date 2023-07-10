@@ -33,7 +33,6 @@ const Grids = () => {
     const [tempo, setTempo] = useState(120)
 
     const [sendChordPattern, setSendChordPattern] = useState(undefined)
-    const [beatForAnimation, setBeatForAnimation] = useState(1)
 
     const [clickedNote, setClickedNote] = useState({
         beatNum: null,
@@ -44,9 +43,6 @@ const Grids = () => {
 
     const [notesToPlay, setNotesToPlay] = useState(makeNotesToPlayMaster)
     const [currentBeat, setCurrentBeat] = useState(0)
-
-    const [resetMelody, setResetMelody] = useState(false)
-    const [resetChords, setResetChords] = useState(false)
 
     // ! "When something can be calculated from the existing props or state, don’t put it in state.
     // ! .. Instead, calculate it during rendering."
@@ -230,14 +226,16 @@ const Grids = () => {
                     notesToPlay={notesToPlay}
                     tempo={tempo}
                     setTempo={setTempo}
-                    beatForAnimation={beatForAnimation}
-                    setBeatForAnimation={setBeatForAnimation}
                     stepCount={stepCount}
                     setStepCount={setStepCount}
                     currentBeat={currentBeat}
                     setCurrentBeat={setCurrentBeat}
                 />
-                <LoadSaveTestButtons notesToPlay={notesToPlay} />
+                <LoadSaveTestButtons
+                    notesToPlay={notesToPlay}
+                    setNotesToPlay={setNotesToPlay}
+                />
+                {/* <BothSequencersDiv> */}
                 <MelodySequencerGrid>
                     {/* {countCheckboxRenders.current} */}
                     <AllBoxesDiv>
@@ -324,6 +322,7 @@ const Grids = () => {
                         />
                     </AllBoxesDiv>
                 </ChordSequencerGrid>
+                {/* </BothSequencersDiv> */}
                 <HookTheoryChordsDiv>
                     {hookTheoryChords.length !== 0 &&
                     hookTheoryChords !== '' ? (
@@ -362,7 +361,8 @@ const GridsContainer = styled.div`
 `
 
 const ChordSequencerGrid = styled.div`
-    height: 300px;
+    margin: 20px;
+    height: 198px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -375,6 +375,13 @@ const MelodySequencerGrid = styled.div`
     align-items: center;
     flex-wrap: wrap;
 `
+// todo bring next to each other
+// const BothSequencersDiv = styled.div`
+//     display: flex;
+//     flex-direction: row;
+//     justify-content: center;
+//     align-items: flex-start;
+// `
 
 const AllBoxesDiv = styled.div`
     display: flex;
@@ -416,7 +423,7 @@ const ResetSpan = styled.span`
 `
 
 const HookTheoryChordsDiv = styled.div`
-    height: 60px;
+    height: 100px;
     margin: 10px 0px;
     display: flex;
     justify-content: center;

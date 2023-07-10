@@ -301,6 +301,19 @@ todo jul 7
 		>V save songs to an object
 		> display in grid?
 		
+todo jul 10
+	> load songs from BE
+		> V can do w test, load fake notes to play??
+		> save song parameters to BE
+		18 + 20*note + 20
+		198
+		
+so i can call it done-ish:
+	fix ADSR
+	load/save songs including parameters
+		> erthin undefined
+			> where do i get these params from then? do i want them from context? 
+		
 
 
 Auth0 consent stuff:

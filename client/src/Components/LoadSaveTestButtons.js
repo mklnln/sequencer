@@ -5,39 +5,26 @@ import { MusicParametersContext } from '../App'
 import CustomDropdown from './CustomDropdown'
 import { deleteSongFetch, saveSongFetch } from '../utilities/APIfetches'
 
-const LoadSaveTestButtons = ({ notesToPlay }) => {
+const LoadSaveTestButtons = ({ notesToPlay, setNotesToPlay }) => {
     const {
         songSavedOrDeleted,
         loadSong,
         loadUserSongs,
-        areChordBeatsChecked,
         stepCount,
         rootNote,
         tempo,
         wonkFactor,
-        melodyVolume,
-        chordsVolume,
         sound,
-        filterCutoff,
-        attack,
-        decay,
-        sustain,
-        release,
         setSongSavedOrDeleted,
         setLoadUserSongs,
         setLoadSong,
     } = useContext(MusicParametersContext)
-
-    const { user, isAuthenticated, isLoading, error } = useAuth0()
+    const { user, isAuthenticated } = useAuth0()
     const [songName, setSongName] = useState('')
-
     const handleSave = (event) => {
         event.preventDefault()
-        console.log('clicked!')
-        setSongName('')
         document.activeElement.blur()
 
-        console.log('testing gt')
         // const testForInput = []
         // Object.keys(areChordBeatsChecked).forEach((chord) => {
         //     areChordBeatsChecked[chord].map((beat) => {
@@ -72,7 +59,12 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
             saveObj['song'].sustain = sustain
             saveObj['song'].release = release
 
-            // console.log(saveObj, songName, stepCount)
+            console.log(
+                saveObj,
+                songName,
+                stepCount,
+                'checking all saving parameters'
+            )
             setSongSavedOrDeleted('saving to database...')
             saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
         }
@@ -138,6 +130,8 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                                             loadUserSongs
                                         )}
                                         setState={setLoadSong}
+                                        setNotesToPlay={setNotesToPlay}
+                                        loadUserSongs={loadUserSongs}
                                     />
                                     {/* <label>Load Song:</label>
                                         <select

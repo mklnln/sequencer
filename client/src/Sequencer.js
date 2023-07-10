@@ -29,11 +29,8 @@ const Sequencer = ({
     notesToPlay,
     tempo,
     setTempo,
-    beatForAnimation,
-    setBeatForAnimation,
     stepCount,
     setStepCount,
-    currentBeat,
     setCurrentBeat,
 }) => {
     const [playing, setPlaying] = useState(false)

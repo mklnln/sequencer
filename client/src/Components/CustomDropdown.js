@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 import DropdownArrow from '../assets/SVGs/DropdownArrow'
-const CustomDropdown = ({ title, stateValue, stateValueOptions, setState }) => {
+const CustomDropdown = ({
+    title,
+    stateValue,
+    stateValueOptions,
+    setState,
+    setNotesToPlay,
+    loadUserSongs,
+}) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [hoverOnDropdown, setHoverOnDropdown] = useState(false)
 
@@ -12,6 +19,9 @@ const CustomDropdown = ({ title, stateValue, stateValueOptions, setState }) => {
         }
         setState(set)
         setIsDropdownOpen(false)
+        if (title === 'Load Song') {
+            setNotesToPlay(loadUserSongs[option]['notesToPlay'])
+        }
     }
 
     if (isDropdownOpen && !hoverOnDropdown) {
