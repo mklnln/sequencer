@@ -55,6 +55,7 @@ export const updateBlankStepCountArray = (stepCount) => {
     for (let i = stepCount; i > 0; i--) {
         arr.push(0)
     }
+    console.log(arr, 'new stepcount arry')
     return arr
 }
 
@@ -71,7 +72,7 @@ export const updateNotesToPlayMaster = (stepCount, notesToPlay) => {
             delete obj[`beat-${i}`]
         }
     }
-
+    console.log(obj, 'new notes to play')
     return obj
 }
 

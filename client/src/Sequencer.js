@@ -16,7 +16,11 @@ import {
     setupSample,
     playSynth,
 } from './utilities/AudioEngine'
-import { slidersToShowObj, soundOptions } from './utilities/BigObjectsAndArrays'
+import {
+    dropdownsObj,
+    slidersToShowObj,
+    soundOptions,
+} from './utilities/BigObjectsAndArrays'
 import {
     rootNoteOptions,
     stepCountOptions,
@@ -27,21 +31,20 @@ import StopButton from './assets/SVGs/StopButton'
 const Sequencer = ({
     currentBeatRef,
     notesToPlay,
-    tempo,
-    setTempo,
-    stepCount,
-    setStepCount,
+    // tempo,
+    // setTempo,
+    // stepCount,
+    // setStepCount,
     setCurrentBeat,
+    parameterValuesObj,
+    bubbleUpParameterInfo,
 }) => {
+    const { tempo, steps } = parameterValuesObj
     const [playing, setPlaying] = useState(false)
     const intervalRunningRef = useRef(false)
     const intervalIDRef = useRef('')
     const sentToPlayEngineRef = useRef(false) // prevents sending playEngine calls that have already been sent
-    const [wonk, setWonk] = useState(0)
-    const [melodyVolume, setMelodyVolume] = useState(100)
-    const [chordsVolume, setChordsVolume] = useState(100)
     const [rootNote, setRootNote] = useState('A')
-    const [filterCutoff, setFilterCutoff] = useState(7500)
     const [sound, setSound] = useState('Sine')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
@@ -50,7 +53,7 @@ const Sequencer = ({
         return 60 / (tempo * 2)
     }
 
-    let beatDuration = tempoToSeconds(tempo) // time of one eighth note in seconds
+    let beatDuration = tempoToSeconds(parameterValuesObj.tempo) // time of one eighth note in seconds
     const scheduleAheadTime = beatDuration / 3 // for setInterval, check ahead to see if a note is to be played
     let nextNoteTime = 0
 
@@ -58,16 +61,19 @@ const Sequencer = ({
         playSynth(
             scaleIndex,
             playing,
-            rootNoteOptions.indexOf(rootNote) + 1,
-            wonk,
-            melodyVolume,
-            chordsVolume,
-            sound,
-            filterCutoff,
-            parameterValuesObj['attack'],
-            parameterValuesObj['decay'],
-            parameterValuesObj['sustain'],
-            parameterValuesObj['release'],
+            parameterValuesObj,
+            // rootNoteOptions.indexOf(rootNote) + 1,
+            // // ! send just paramValObj and deconstruct on the other side
+            // // ! send just paramValObj and deconstruct on the other side
+            // wonk,
+            // melodyVolume,
+            // chordsVolume,
+            // sound,
+            // filterCutoff,
+            // parameterValuesObj['attack'],
+            // parameterValuesObj['decay'],
+            // parameterValuesObj['sustain'],
+            // parameterValuesObj['release'],
             type,
             nextNoteTime
         )
@@ -94,9 +100,7 @@ const Sequencer = ({
             if (!sentToPlayEngineRef.current) {
                 // find potential notes to be played by checking notesToPlay
                 const futureBeatTarget =
-                    notesToPlay[
-                        `beat-${(currentBeatRef.current % stepCount) + 1}`
-                    ]
+                    notesToPlay[`beat-${(currentBeatRef.current % steps) + 1}`]
                 const futureBeatNotesArray = Object.keys(futureBeatTarget)
                 // calculate current elapsed time
                 const elapsedPlayTime = eighthNoteTicks * beatDuration
@@ -128,7 +132,7 @@ const Sequencer = ({
     }
 
     const advanceCurrentBeat = () => {
-        if (currentBeatRef.current >= stepCount) {
+        if (currentBeatRef.current >= parameterValuesObj.steps) {
             currentBeatRef.current = 1
             setCurrentBeat(1)
         } else {
@@ -178,35 +182,6 @@ const Sequencer = ({
         setCurrentBeat(0)
     }
 
-    const [parameterValuesObj, setParameterValuesObj] = useState({
-        wonk: 0,
-        melodyVolume: 100,
-        chordsVolume: 100,
-        attack: 1,
-        decay: 15,
-        sustain: 60,
-        release: 5,
-        filter: 7500,
-    })
-
-    const [changedParameter, setChangedParameter] = useState({
-        title: '',
-        value: null,
-    })
-
-    const bubbleUpSliderInfo = useCallback((value, title) => {
-        setChangedParameter({
-            title: title.toLowerCase(),
-            value: value,
-        })
-    }, [])
-
-    if (changedParameter) {
-        let obj = { ...parameterValuesObj }
-        obj[changedParameter.title] = changedParameter.value
-        setParameterValuesObj(obj)
-        setChangedParameter(null)
-    }
     return (
         <>
             <MainDiv>
@@ -226,43 +201,31 @@ const Sequencer = ({
                             key={`${index}`}
                             slider={slidersToShowObj[slider]}
                             sliderStaticInfo={sliderStaticInfo}
-                            bubbleUpSliderInfo={bubbleUpSliderInfo}
-                            setTempo={setTempo}
+                            bubbleUpParameterInfo={bubbleUpParameterInfo}
                         />
                     )
                 })}
-
                 <DropdownsDiv>
-                    <SoundFilterDiv>
-                        <CustomDropdown
-                            title="Sound"
-                            stateValue={sound}
-                            stateValueOptions={soundOptions}
-                            setState={setSound}
-                            isDropdownOpen={isDropdownOpen}
-                            setIsDropdownOpen={setIsDropdownOpen}
-                        />
-                    </SoundFilterDiv>
-                    <SoundFilterDiv>
-                        <CustomDropdown
-                            title="Steps"
-                            stateValue={stepCount}
-                            stateValueOptions={stepCountOptions}
-                            setState={setStepCount}
-                            isDropdownOpen={isDropdownOpen}
-                            setIsDropdownOpen={setIsDropdownOpen}
-                        />
-                    </SoundFilterDiv>
-                    <SoundFilterDiv>
-                        <CustomDropdown
-                            title="Root"
-                            stateValue={rootNote}
-                            stateValueOptions={rootNoteOptions}
-                            setState={setRootNote}
-                            isDropdownOpen={isDropdownOpen}
-                            setIsDropdownOpen={setIsDropdownOpen}
-                        />
-                    </SoundFilterDiv>
+                    {Object.keys(dropdownsObj).map((param) => {
+                        return (
+                            <SoundFilterDiv>
+                                <CustomDropdown
+                                    title={dropdownsObj[param].title}
+                                    stateValueOptions={
+                                        dropdownsObj[param].options
+                                    }
+                                    defaultValue={
+                                        dropdownsObj[param].defaultValue
+                                    }
+                                    isDropdownOpen={isDropdownOpen}
+                                    setIsDropdownOpen={setIsDropdownOpen}
+                                    bubbleUpParameterInfo={
+                                        bubbleUpParameterInfo
+                                    }
+                                />
+                            </SoundFilterDiv>
+                        )
+                    })}
                 </DropdownsDiv>
             </MainDiv>
             <Ref>

@@ -1,3 +1,5 @@
+import { dropdownsObj, rootNoteOptions } from './BigObjectsAndArrays'
+
 const samplePianoC2 = require('../assets/samples/c2.mp3')
 const sampleOohC2 = require('../assets/samples/oohc2.mp3')
 const sampleFeltPianoC3 = require('../assets/samples/feltPianoC3.mp3')
@@ -47,7 +49,7 @@ export const playSample = (
     // audioCtx,
     index,
     playing,
-    rootNote,
+    root,
     wonkFactor,
     voiceQty
 ) => {
@@ -63,7 +65,7 @@ export const playSample = (
         // https://zpl.fi/pitch-shifting-in-web-audio-api/
         const playSound = audioCtx.createBufferSource()
         playSound.buffer = audio
-        // our rootnote is A. our sample is C
+        // our root is A. our sample is C
         // so A is
         const now = audioCtx.currentTime
         // source.playbackRate.value = 2 ** ((noteToPlay - sampleNote) / 12);
@@ -108,24 +110,38 @@ export const playSynth = (
     // audioCtx,
     index,
     playing,
-    rootNote,
-    wonkFactor,
-    melodyVolume,
-    chordsVolume,
-    sound,
-    filterCutoff,
-    attack,
-    decay,
-    sustain,
-    release,
+    parameterValuesObj,
+    // root,
+    // wonkFactor,
+    // melodyVolume,
+    // chordsVolume,
+    // sound,
+    // filterCutoff,
+    // attack,
+    // decay,
+    // sustain,
+    // release,
     polyphony,
     nextNoteTime
 ) => {
-    let rootFrequency = 220 * 2 ** (rootNote / 12) // instead of accessing a big object with note frequency values, we can just calculate them based off of A3 = 220Hz
+    const {
+        wonkFactor,
+        melodyVolume,
+        chordsVolume,
+        sound,
+        filter,
+        attack,
+        decay,
+        sustain,
+        release,
+        root,
+    } = parameterValuesObj
+    let rootFrequency =
+        220 * 2 ** (dropdownsObj.root.options.indexOf(root) / 12) // instead of accessing a big object with note frequency values, we can just calculate them based off of A3 = 220Hz
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
     // take index, voice chord based off the starting note of the scale
     // based off of index being a proper scale degree (1,2,3 etc), we need to minus one to
-
+    console.log(root)
     // ! if melody, do monophony. if chords, do polyphony
     // const voicing = [scale[index - 1], , scale[index + 1], scale[index + 3]]
     const voicing = []
@@ -151,7 +167,7 @@ export const playSynth = (
         osc.frequency.value = note // (1.1/12) 1.075*
         osc.type = sound.toLowerCase()
         const lowPassFilter = audioCtx.createBiquadFilter()
-        lowPassFilter.frequency.value = filterCutoff
+        lowPassFilter.frequency.value = filter
         lowPassFilter.type = 'lowpass'
         const now = audioCtx.currentTime
         osc.connect(lowPassFilter)

@@ -39,7 +39,7 @@ const Grids = () => {
         scaleIndex: null,
         whichGrid: null,
     })
-    const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
+    // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
 
     const [notesToPlay, setNotesToPlay] = useState(makeNotesToPlayMaster)
     const [currentBeat, setCurrentBeat] = useState(0)
@@ -60,6 +60,40 @@ const Grids = () => {
 
     const currentBeatRef = useRef(0)
     // todo make helper
+    const [parameterValuesObj, setParameterValuesObj] = useState({
+        tempo: 120,
+        wonk: 0,
+        melodyVolume: 100,
+        chordsVolume: 100,
+        attack: 1,
+        decay: 15,
+        sustain: 60,
+        release: 5,
+        filter: 7500,
+        sound: 'Sine',
+        steps: 16,
+        root: 1,
+    })
+
+    const [changedParameter, setChangedParameter] = useState({
+        title: '',
+        value: null,
+    })
+
+    const bubbleUpParameterInfo = useCallback((value, title) => {
+        console.log(value, title, 'what value and title are canging?')
+        setChangedParameter({
+            title: title.toLowerCase(),
+            value: value,
+        })
+    }, [])
+
+    if (changedParameter) {
+        let obj = { ...parameterValuesObj }
+        obj[changedParameter.title] = changedParameter.value
+        setParameterValuesObj(obj)
+        setChangedParameter(null)
+    }
 
     const handleChordClick = (chordID, index) => {
         setHookTheoryChords([]) // may have previously used this to trigger useEffect
@@ -133,14 +167,13 @@ const Grids = () => {
     }, [chosenAPIChords])
 
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
-    if (stepCount !== Object.keys(notesToPlay).length) {
-        console.log(
-            'we know we changed stepCount',
-            stepCount,
-            Object.keys(notesToPlay).length
+    if (parameterValuesObj.steps !== Object.keys(notesToPlay).length) {
+        setNotesToPlay((prev) =>
+            updateNotesToPlayMaster(parameterValuesObj.steps, prev)
         )
-        setNotesToPlay((prev) => updateNotesToPlayMaster(stepCount, prev))
-        setBlankStepCountArray(updateBlankStepCountArray(stepCount))
+        setBlankStepCountArray(
+            updateBlankStepCountArray(parameterValuesObj.steps)
+        )
     }
     const countReRenders = useRef(1)
 
@@ -210,7 +243,7 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
-    console.log(notesToPlay, 'nots')
+
     return (
         <>
             <GridsContainer>
@@ -224,16 +257,15 @@ const Grids = () => {
                 <Sequencer
                     currentBeatRef={currentBeatRef}
                     notesToPlay={notesToPlay}
-                    tempo={tempo}
-                    setTempo={setTempo}
-                    stepCount={stepCount}
-                    setStepCount={setStepCount}
                     currentBeat={currentBeat}
                     setCurrentBeat={setCurrentBeat}
+                    parameterValuesObj={parameterValuesObj}
+                    bubbleUpParameterInfo={bubbleUpParameterInfo}
                 />
                 <LoadSaveTestButtons
                     notesToPlay={notesToPlay}
                     setNotesToPlay={setNotesToPlay}
+                    parameterValuesObj={parameterValuesObj}
                 />
                 {/* <BothSequencersDiv> */}
                 <MelodySequencerGrid>

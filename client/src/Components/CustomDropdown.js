@@ -8,16 +8,17 @@ const CustomDropdown = ({
     setState,
     setNotesToPlay,
     loadUserSongs,
+    bubbleUpParameterInfo,
+    defaultValue,
 }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [hoverOnDropdown, setHoverOnDropdown] = useState(false)
-
+    const [dropdownValue, setDropdownValue] = useState(defaultValue)
     const handleOptionClick = (option, index) => {
-        let set = option
-        if (title === 'Steps') {
-            set = parseInt(option)
-        }
-        setState(set)
+        // let set = option
+        // setState(set)
+        bubbleUpParameterInfo(option, title)
+        setDropdownValue(option)
         setIsDropdownOpen(false)
         if (title === 'Load Song') {
             setNotesToPlay(loadUserSongs[option]['notesToPlay'])
@@ -58,7 +59,7 @@ const CustomDropdown = ({
                     ))
                 ) : (
                     <ChosenOptionDiv>
-                        <span>{stateValue}</span>
+                        <span>{dropdownValue}</span>
                         <DropdownArrow />
                     </ChosenOptionDiv>
                 )}

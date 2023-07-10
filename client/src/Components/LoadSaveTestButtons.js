@@ -5,7 +5,11 @@ import { MusicParametersContext } from '../App'
 import CustomDropdown from './CustomDropdown'
 import { deleteSongFetch, saveSongFetch } from '../utilities/APIfetches'
 
-const LoadSaveTestButtons = ({ notesToPlay, setNotesToPlay }) => {
+const LoadSaveTestButtons = ({
+    notesToPlay,
+    setNotesToPlay,
+    parameterValuesObj,
+}) => {
     const {
         songSavedOrDeleted,
         loadSong,
@@ -46,18 +50,7 @@ const LoadSaveTestButtons = ({ notesToPlay, setNotesToPlay }) => {
             saveObj['song'] = {}
             saveObj['song'].songName = songName
             saveObj['song'].notesToPlay = notesToPlay
-            saveObj['song'].stepCount = stepCount
-            saveObj['song'].rootNote = rootNote
-            saveObj['song'].tempo = tempo
-            saveObj['song'].wonkFactor = wonkFactor
-            saveObj['song'].melodyVolume = melodyVolume
-            saveObj['song'].chordsVolume = chordsVolume
-            saveObj['song'].sound = sound
-            saveObj['song'].filterCutoff = filterCutoff
-            saveObj['song'].attack = attack
-            saveObj['song'].decay = decay
-            saveObj['song'].sustain = sustain
-            saveObj['song'].release = release
+            saveObj['song'].parameters = parameterValuesObj
 
             console.log(
                 saveObj,
