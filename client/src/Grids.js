@@ -33,20 +33,16 @@ const Grids = () => {
     const [tempo, setTempo] = useState(120)
 
     const [sendChordPattern, setSendChordPattern] = useState(undefined)
-    const [beatForAnimation, setBeatForAnimation] = useState(1)
 
     const [clickedNote, setClickedNote] = useState({
         beatNum: null,
         scaleIndex: null,
         whichGrid: null,
     })
-    const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
+    // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
 
     const [notesToPlay, setNotesToPlay] = useState(makeNotesToPlayMaster)
     const [currentBeat, setCurrentBeat] = useState(0)
-
-    const [resetMelody, setResetMelody] = useState(false)
-    const [resetChords, setResetChords] = useState(false)
 
     // ! "When something can be calculated from the existing props or state, don’t put it in state.
     // ! .. Instead, calculate it during rendering."
@@ -64,6 +60,46 @@ const Grids = () => {
 
     const currentBeatRef = useRef(0)
     // todo make helper
+    const [parameterValuesObj, setParameterValuesObj] = useState({
+        tempo: 120,
+        wonk: 0,
+        melody: 100,
+        chords: 100,
+        attack: 1,
+        decay: 15,
+        sustain: 60,
+        release: 5,
+        filter: 7500,
+        sound: 'Sine',
+        steps: 16,
+        root: 1,
+    })
+    const [loadNewSongBool, setLoadNewSongBool] = useState(false)
+
+    const [changedParameter, setChangedParameter] = useState({
+        title: '',
+        value: null,
+    })
+
+    const bubbleUpParameterInfo = useCallback((value, title) => {
+        setChangedParameter({
+            title: title.toLowerCase(),
+            value: value,
+        })
+    }, [])
+
+    if (changedParameter?.value) {
+        let obj = { ...parameterValuesObj }
+        obj[changedParameter.title] = changedParameter.value
+        setParameterValuesObj(obj)
+        setChangedParameter(null)
+    }
+
+    const bubbleUpCurrentSongChange = useCallback((notesToPlay, parameters) => {
+        console.log(notesToPlay, parameters, 'in bubbling')
+        setNotesToPlay(notesToPlay)
+        setParameterValuesObj(parameters)
+    }, [])
 
     const handleChordClick = (chordID, index) => {
         setHookTheoryChords([]) // may have previously used this to trigger useEffect
@@ -137,15 +173,14 @@ const Grids = () => {
     }, [chosenAPIChords])
 
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
-    if (stepCount !== Object.keys(notesToPlay).length) {
-        console.log(
-            'we know we changed stepCount',
-            stepCount,
-            Object.keys(notesToPlay).length
-        )
-        setNotesToPlay((prev) => updateNotesToPlayMaster(stepCount, prev))
-        setBlankStepCountArray(updateBlankStepCountArray(stepCount))
-    }
+    // if (parameterValuesObj.steps !== Object.keys(notesToPlay).length) {
+    //     setNotesToPlay((prev) =>
+    //         updateNotesToPlayMaster(parameterValuesObj.steps, prev)
+    //     )
+    //     setBlankStepCountArray(
+    //         updateBlankStepCountArray(parameterValuesObj.steps)
+    //     )
+    // }
     const countReRenders = useRef(1)
 
     useEffect(() => {
@@ -214,7 +249,7 @@ const Grids = () => {
             grid: gridToDelete,
         })
     }
-    console.log(notesToPlay, 'nots')
+
     return (
         <>
             <GridsContainer>
@@ -228,16 +263,19 @@ const Grids = () => {
                 <Sequencer
                     currentBeatRef={currentBeatRef}
                     notesToPlay={notesToPlay}
-                    tempo={tempo}
-                    setTempo={setTempo}
-                    beatForAnimation={beatForAnimation}
-                    setBeatForAnimation={setBeatForAnimation}
-                    stepCount={stepCount}
-                    setStepCount={setStepCount}
                     currentBeat={currentBeat}
                     setCurrentBeat={setCurrentBeat}
+                    parameterValuesObj={parameterValuesObj}
+                    bubbleUpParameterInfo={bubbleUpParameterInfo}
                 />
-                <LoadSaveTestButtons notesToPlay={notesToPlay} />
+                <LoadSaveTestButtons
+                    notesToPlay={notesToPlay}
+                    setNotesToPlay={setNotesToPlay}
+                    parameterValuesObj={parameterValuesObj}
+                    setParameterValuesObj={setParameterValuesObj}
+                    bubbleUpCurrentSongChange={bubbleUpCurrentSongChange}
+                />
+                {/* <BothSequencersDiv> */}
                 <MelodySequencerGrid>
                     {/* {countCheckboxRenders.current} */}
                     <AllBoxesDiv>
@@ -324,6 +362,7 @@ const Grids = () => {
                         />
                     </AllBoxesDiv>
                 </ChordSequencerGrid>
+                {/* </BothSequencersDiv> */}
                 <HookTheoryChordsDiv>
                     {hookTheoryChords.length !== 0 &&
                     hookTheoryChords !== '' ? (
@@ -362,7 +401,8 @@ const GridsContainer = styled.div`
 `
 
 const ChordSequencerGrid = styled.div`
-    height: 300px;
+    margin: 20px;
+    height: 198px;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -375,6 +415,13 @@ const MelodySequencerGrid = styled.div`
     align-items: center;
     flex-wrap: wrap;
 `
+// todo bring next to each other
+// const BothSequencersDiv = styled.div`
+//     display: flex;
+//     flex-direction: row;
+//     justify-content: center;
+//     align-items: flex-start;
+// `
 
 const AllBoxesDiv = styled.div`
     display: flex;
@@ -416,7 +463,7 @@ const ResetSpan = styled.span`
 `
 
 const HookTheoryChordsDiv = styled.div`
-    height: 60px;
+    height: 100px;
     margin: 10px 0px;
     display: flex;
     justify-content: center;

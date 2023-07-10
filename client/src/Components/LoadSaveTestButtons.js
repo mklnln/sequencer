@@ -5,87 +5,56 @@ import { MusicParametersContext } from '../App'
 import CustomDropdown from './CustomDropdown'
 import { deleteSongFetch, saveSongFetch } from '../utilities/APIfetches'
 
-const LoadSaveTestButtons = ({ notesToPlay }) => {
+const LoadSaveTestButtons = ({
+    notesToPlay,
+    setNotesToPlay,
+    parameterValuesObj,
+    bubbleUpCurrentSongChange,
+}) => {
     const {
         songSavedOrDeleted,
-        loadSong,
+        currentSong,
         loadUserSongs,
-        areChordBeatsChecked,
         stepCount,
-        rootNote,
-        tempo,
-        wonkFactor,
-        melodyVolume,
-        chordsVolume,
-        sound,
-        filterCutoff,
-        attack,
-        decay,
-        sustain,
-        release,
         setSongSavedOrDeleted,
         setLoadUserSongs,
-        setLoadSong,
+        setCurrentSong,
     } = useContext(MusicParametersContext)
-
-    const { user, isAuthenticated, isLoading, error } = useAuth0()
+    const { user, isAuthenticated } = useAuth0()
     const [songName, setSongName] = useState('')
-
     const handleSave = (event) => {
         event.preventDefault()
-        console.log('clicked!')
-        setSongName('')
         document.activeElement.blur()
 
-        console.log('testing gt')
-        // const testForInput = []
-        // Object.keys(areChordBeatsChecked).forEach((chord) => {
-        //     areChordBeatsChecked[chord].map((beat) => {
-        //         if (beat === 1) {
-        //             testForInput.push(beat)
-        //         }
-        //     })
-        // })
         if (songName === '') {
             alert(`You can't save without a song name.`)
-            // } else if (testForInput.length === 0) {
-            //     alert(
-            //         `You can't save without actually putting some notes in the sequencer.`
-            //     )
         } else {
             // load all relevant parameters into the body for the backend
-            const saveObj = {}
-            saveObj.userID = user.sub
-            saveObj['song'] = {}
-            saveObj['song'].songName = songName
-            saveObj['song'].notesToPlay = notesToPlay
-            saveObj['song'].stepCount = stepCount
-            saveObj['song'].rootNote = rootNote
-            saveObj['song'].tempo = tempo
-            saveObj['song'].wonkFactor = wonkFactor
-            saveObj['song'].melodyVolume = melodyVolume
-            saveObj['song'].chordsVolume = chordsVolume
-            saveObj['song'].sound = sound
-            saveObj['song'].filterCutoff = filterCutoff
-            saveObj['song'].attack = attack
-            saveObj['song'].decay = decay
-            saveObj['song'].sustain = sustain
-            saveObj['song'].release = release
+            const saveObj = {
+                userID: user.sub,
+                song: {
+                    songName: songName,
+                    notesToPlay: notesToPlay,
+                    parameters: parameterValuesObj,
+                },
+            }
 
-            // console.log(saveObj, songName, stepCount)
             setSongSavedOrDeleted('saving to database...')
             saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
         }
     }
 
     const handleDelete = () => {
-        if (loadSong === '75442486-0878-440c-9db1-a7006c25a39f' && user.sub) {
+        if (
+            currentSong === '75442486-0878-440c-9db1-a7006c25a39f' &&
+            user.sub
+        ) {
             window.alert(
                 'Invalid selection. In order to delete, you must be logged-in and load the song from the dropdown list and then click delete. Making changes after loading will prevent deletion.'
             )
         } else {
             const bodyObj = {}
-            bodyObj.songName = loadSong
+            bodyObj.songName = currentSong
             bodyObj.userID = user.sub
             deleteSongFetch(setSongSavedOrDeleted, setLoadUserSongs, bodyObj)
         }
@@ -94,12 +63,13 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
     const handleSongName = (e) => {
         setSongName(e.target.value)
     }
+
     return (
         <MainDiv>
             <ColumnDiv>
                 <StyledButton
                     onClick={() => {
-                        console.log(loadSong, 'loadsong')
+                        console.log(currentSong, 'currentSong')
                     }}
                 >
                     test
@@ -133,17 +103,22 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                                 <ColumnDiv>
                                     <CustomDropdown
                                         title="Load Song"
-                                        stateValue={loadSong}
+                                        stateValue={currentSong}
                                         stateValueOptions={Object.keys(
                                             loadUserSongs
                                         )}
-                                        setState={setLoadSong}
+                                        setState={setCurrentSong}
+                                        setNotesToPlay={setNotesToPlay}
+                                        loadUserSongs={loadUserSongs}
+                                        bubbleUpCurrentSongChange={
+                                            bubbleUpCurrentSongChange
+                                        }
                                     />
                                     {/* <label>Load Song:</label>
                                         <select
-                                            value={loadSong}
+                                            value={currentSong}
                                             onChange={(e) => {
-                                                setLoadSong(e.target.value)
+                                                setCurrentSong(e.target.value)
                                             }}
                                         >
                                             <option default hidden>
@@ -170,7 +145,7 @@ const LoadSaveTestButtons = ({ notesToPlay }) => {
                             <span>loading...</span>
                         )}
                         {/* <ColumnDiv>
-                                {loadSong !==
+                                {currentSong !==
                                     '75442486-0878-440c-9db1-a7006c25a39f' && (
                                     <DeleteButton
                                         onClick={() => handleDelete()}

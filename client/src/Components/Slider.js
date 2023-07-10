@@ -1,89 +1,78 @@
 import React, { memo, useState } from 'react'
 import styled from 'styled-components'
 import NoiseSVG from '../assets/SVGs/SliderNoiseSVG.js'
-import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG.js'
 
-const Slider = memo(
-    ({
-        parameterName,
-        // dragging,
-        // setDragging,
-        // dragStartY,
-        // setDragStartY,
-        // slider,
-        sliderStaticInfo,
-        bubbleUpSliderInfo,
-        setTempo,
-    }) => {
-        const [dragStartY, setDragStartY] = useState(null)
-        const [dragging, setDragging] = useState(false)
-        // const { stateValue, setParameterState } = slider
-        const { minValue, maxValue, title, defaultValue } = sliderStaticInfo
-        const [sliderValue, setSliderValue] = useState(defaultValue)
-        const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
-        const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
-        const handleMouseMove = (e) => {
-            if (dragging) {
-                const deltaY = dragStartY - e.clientY
-                const newValue = Math.max(
-                    // math.max chooses higher value, ensuring the value doesn't drop below minValue
-                    minValue,
-                    // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
-                    Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
-                )
-                console.log(title, 'title')
-                if (title !== 'Tempo') {
-                    bubbleUpSliderInfo(Math.round(newValue), title)
-                } else {
-                    setTempo(Math.round(newValue), title)
-                }
-                setSliderValue(Math.round(newValue))
-                setDragStartY(e.clientY)
+const Slider = memo(({ sliderStaticInfo, bubbleUpParameterInfo }) => {
+    const [dragStartY, setDragStartY] = useState(null)
+    const [dragging, setDragging] = useState(false)
+    const { minValue, maxValue, title, defaultValue } = sliderStaticInfo
+    const [sliderValue, setSliderValue] = useState(defaultValue)
+    const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
+    const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
+    const handleMouseMove = (e) => {
+        if (dragging) {
+            const deltaY = dragStartY - e.clientY
+            let newValue = Math.max(
+                // math.max chooses higher value, ensuring the value doesn't drop below minValue
+                minValue,
+                // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
+                Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
+            )
+            setSliderValue(Math.round(newValue))
+            if (title === 'Filter') {
+                // console.log(newValue, range, '??')
+                // let pct = newValue / range
+                newValue = (newValue * 0.01) ** 2
+                console.log(newValue, 'after exp')
+                // something like % of range put it to log
             }
-        }
-        const handleMouseUp = () => {
-            setDragging(false)
-        }
-        const handleMouseDown = (e) => {
-            setDragging(true)
+            bubbleUpParameterInfo(Math.round(newValue), title)
+
             setDragStartY(e.clientY)
         }
-
-        const handleMouseLeave = () => {
-            setDragging(false)
-        }
-
-        const calculateTop = () => {
-            const valueWithinRange = sliderValue - minValue
-            const percentDisplacementFromTop = (valueWithinRange / range) * 100
-            return 100 - percentDisplacementFromTop
-        }
-
-        const gap = calculateTop()
-
-        return (
-            <SliderContainer>
-                <span>{title}</span>
-                <SliderBackground
-                    onMouseMove={handleMouseMove}
-                    onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseLeave}
-                >
-                    <SliderRange>
-                        <NoiseSVG />
-                        <SliderThumb
-                            style={{
-                                borderBottomWidth: `${(100 - gap) / 2}px`,
-                                top: `${gap}%`, // required variables are out of scope if called below
-                            }}
-                        />
-                    </SliderRange>
-                </SliderBackground>
-            </SliderContainer>
-        )
     }
-)
+    const handleMouseUp = () => {
+        setDragging(false)
+    }
+    const handleMouseDown = (e) => {
+        setDragging(true)
+        setDragStartY(e.clientY)
+    }
+
+    const handleMouseLeave = () => {
+        setDragging(false)
+    }
+
+    const calculateTop = () => {
+        const valueWithinRange = sliderValue - minValue
+        const percentDisplacementFromTop = (valueWithinRange / range) * 100
+        return 100 - percentDisplacementFromTop
+    }
+
+    const gap = calculateTop()
+
+    return (
+        <SliderContainer>
+            <span>{title}</span>
+            <SliderBackground
+                onMouseMove={handleMouseMove}
+                onMouseDown={handleMouseDown}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+            >
+                <SliderRange>
+                    <NoiseSVG />
+                    <SliderThumb
+                        style={{
+                            borderBottomWidth: `${(100 - gap) / 2}px`,
+                            top: `${gap}%`, // required variables are out of scope if called below
+                        }}
+                    />
+                </SliderRange>
+            </SliderBackground>
+        </SliderContainer>
+    )
+})
 
 export default Slider
 
@@ -117,21 +106,6 @@ const SliderRange = styled.div`
         background-color: var(--secondary-color);
         opacity: 60%;
     }
-`
-
-const NoiseFill = styled.span`
-    position: relative;
-    top: -5%;
-    margin: auto;
-    height: 100px;
-    user-select: none;
-    word-break: break-all;
-    width: 10px;
-    // letter-spacing: em;
-    line-height: 3.5px;
-    position: absolute;
-    font-size: 22px;
-    color: var(--lightest-color);
 `
 
 const SliderThumb = styled.div`

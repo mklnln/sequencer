@@ -263,7 +263,7 @@ todo june 24
 todo june 26
 	>V clean up aesthetic for buttons
 	> loading songs from BE
-	> drill checked state down from loadSong
+	> drill checked state down from currentSong
 	> samples, ADSR
 	>V ACCEPT slow downs, get functionalities in first
 
@@ -299,7 +299,30 @@ todo jul 7
 	> save a song, retrieve it from BE, it displays in grid
 		>V save song, check BE for user
 		>V save songs to an object
-		> display in grid?
+		> display in gri
+
+		
+todo jul 10
+	> load songs from BE
+		> V can do w test, load fake notes to play??
+		> save song parameters to BE
+			> use context, or give many things?
+			> need tempo, full ADSR, sound, filter, stepCount, rootNote, etc etc etc in:
+				>v LoadSaveTestButtons
+				>v add other params to obj
+				>v remove state send to cstomdropwn?
+				>v .map on customDropDown boys 
+			>v null parameter?
+			> no missing parameters?
+				> wtf is loadSong?
+			> loading parameters from BE
+		
+so i can call it done-ish:
+	fix ADSR, volume knobs, distortion
+	load/save songs including parameters
+		> erthin undefined
+			> where do i get these params from then? do i want them from context? 
+	playable samples
 		
 
 

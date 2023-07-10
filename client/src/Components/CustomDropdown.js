@@ -1,19 +1,36 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 import DropdownArrow from '../assets/SVGs/DropdownArrow'
-const CustomDropdown = ({ title, stateValue, stateValueOptions, setState }) => {
+const CustomDropdown = ({
+    title,
+    stateValueOptions,
+    loadUserSongs,
+    setState,
+    bubbleUpParameterInfo,
+    bubbleUpCurrentSongChange,
+    defaultValue,
+}) => {
+    // dropdown logic must be in this smaller component or else they all open if its kept in Sequencer.js
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [hoverOnDropdown, setHoverOnDropdown] = useState(false)
-
-    const handleOptionClick = (option, index) => {
-        let set = option
-        if (title === 'Steps') {
-            set = parseInt(option)
-        }
-        setState(set)
+    // without dropdownValue, state wont update the UI
+    const [dropdownValue, setDropdownValue] = useState(defaultValue)
+    const handleOptionClick = (option) => {
+        setDropdownValue(option)
         setIsDropdownOpen(false)
+        if (title === 'Load Song') {
+            console.log('load new song bool true')
+            setState(option)
+            bubbleUpCurrentSongChange(
+                loadUserSongs[option].notesToPlay,
+                loadUserSongs[option].parameters
+            )
+        } else {
+            bubbleUpParameterInfo(option, title)
+        }
     }
 
+    // when user clicks outside of the dropdown, it closes
     if (isDropdownOpen && !hoverOnDropdown) {
         const listener = () => {
             setIsDropdownOpen(false)
@@ -48,7 +65,7 @@ const CustomDropdown = ({ title, stateValue, stateValueOptions, setState }) => {
                     ))
                 ) : (
                     <ChosenOptionDiv>
-                        <span>{stateValue}</span>
+                        <span>{dropdownValue}</span>
                         <DropdownArrow />
                     </ChosenOptionDiv>
                 )}
