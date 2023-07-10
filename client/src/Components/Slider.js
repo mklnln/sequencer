@@ -12,14 +12,22 @@ const Slider = memo(({ sliderStaticInfo, bubbleUpParameterInfo }) => {
     const handleMouseMove = (e) => {
         if (dragging) {
             const deltaY = dragStartY - e.clientY
-            const newValue = Math.max(
+            let newValue = Math.max(
                 // math.max chooses higher value, ensuring the value doesn't drop below minValue
                 minValue,
                 // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
                 Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
             )
-            bubbleUpParameterInfo(Math.round(newValue), title)
             setSliderValue(Math.round(newValue))
+            if (title === 'Filter') {
+                // console.log(newValue, range, '??')
+                // let pct = newValue / range
+                newValue = (newValue * 0.01) ** 2
+                console.log(newValue, 'after exp')
+                // something like % of range put it to log
+            }
+            bubbleUpParameterInfo(Math.round(newValue), title)
+
             setDragStartY(e.clientY)
         }
     }

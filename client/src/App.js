@@ -16,7 +16,7 @@ const App = () => {
     const [chosenAPIChords, setChosenAPIChords] = useState([])
     const [hookTheoryChords, setHookTheoryChords] = useState([])
     const [loadUserSongs, setLoadUserSongs] = useState(null)
-    const [loadSong, setLoadSong] = useState('empty')
+    const [currentSong, setCurrentSong] = useState('empty')
 
     const [songSavedOrDeleted, setSongSavedOrDeleted] = useState(false)
     const [songDeleted, setSongDeleted] = useState(false)
@@ -44,8 +44,8 @@ const App = () => {
                     setChordInputStep,
                     loadUserSongs,
                     setLoadUserSongs,
-                    loadSong,
-                    setLoadSong,
+                    currentSong,
+                    setCurrentSong,
                     songSavedOrDeleted,
                     setSongSavedOrDeleted,
                     songDeleted,

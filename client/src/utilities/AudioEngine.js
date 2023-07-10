@@ -107,27 +107,16 @@ export const playSample = (
 }
 
 export const playSynth = (
-    // audioCtx,
     index,
     playing,
     parameterValuesObj,
-    // root,
-    // wonkFactor,
-    // melodyVolume,
-    // chordsVolume,
-    // sound,
-    // filterCutoff,
-    // attack,
-    // decay,
-    // sustain,
-    // release,
     polyphony,
     nextNoteTime
 ) => {
     const {
         wonkFactor,
-        melodyVolume,
-        chordsVolume,
+        melody,
+        chords,
         sound,
         filter,
         attack,
@@ -141,17 +130,16 @@ export const playSynth = (
     const scale = [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] // two octaves of the major scale, counted by # semitones away from the tonic
     // take index, voice chord based off the starting note of the scale
     // based off of index being a proper scale degree (1,2,3 etc), we need to minus one to
-    console.log(root)
     // ! if melody, do monophony. if chords, do polyphony
     // const voicing = [scale[index - 1], , scale[index + 1], scale[index + 3]]
     const voicing = []
     let volume
     if (polyphony === 'melody') {
         voicing.push(scale[index - 1])
-        volume = melodyVolume
+        volume = melody
         rootFrequency = rootFrequency * 2
     } else {
-        volume = chordsVolume
+        volume = chords
         voicing.push(scale[index - 1])
         voicing.push(scale[index + 1])
         voicing.push(scale[index + 3])
@@ -171,6 +159,7 @@ export const playSynth = (
         lowPassFilter.type = 'lowpass'
         const now = audioCtx.currentTime
         osc.connect(lowPassFilter)
+        console.log(lowPassFilter, 'LPF')
         const synthGain = audioCtx.createGain()
         // shape the ADSR (attack, decay, sustain, release) envelope of the sound
         const attackTime = (attack / 100) * 2

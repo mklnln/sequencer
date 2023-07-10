@@ -3,28 +3,34 @@ import styled from 'styled-components'
 import DropdownArrow from '../assets/SVGs/DropdownArrow'
 const CustomDropdown = ({
     title,
-    stateValue,
     stateValueOptions,
-    setState,
-    setNotesToPlay,
     loadUserSongs,
+    setState,
     bubbleUpParameterInfo,
+    bubbleUpCurrentSongChange,
     defaultValue,
 }) => {
+    // dropdown logic must be in this smaller component or else they all open if its kept in Sequencer.js
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [hoverOnDropdown, setHoverOnDropdown] = useState(false)
+    // without dropdownValue, state wont update the UI
     const [dropdownValue, setDropdownValue] = useState(defaultValue)
-    const handleOptionClick = (option, index) => {
-        // let set = option
-        // setState(set)
-        bubbleUpParameterInfo(option, title)
+    const handleOptionClick = (option) => {
         setDropdownValue(option)
         setIsDropdownOpen(false)
         if (title === 'Load Song') {
-            setNotesToPlay(loadUserSongs[option]['notesToPlay'])
+            console.log('load new song bool true')
+            setState(option)
+            bubbleUpCurrentSongChange(
+                loadUserSongs[option].notesToPlay,
+                loadUserSongs[option].parameters
+            )
+        } else {
+            bubbleUpParameterInfo(option, title)
         }
     }
 
+    // when user clicks outside of the dropdown, it closes
     if (isDropdownOpen && !hoverOnDropdown) {
         const listener = () => {
             setIsDropdownOpen(false)

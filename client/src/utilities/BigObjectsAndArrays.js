@@ -53,13 +53,13 @@ export const slidersToShowObj = {
         title: 'Wonk',
         defaultValue: 0,
     },
-    melodyVolume: {
+    melody: {
         minValue: 0,
         maxValue: 100,
         title: 'Melody',
         defaultValue: 100,
     },
-    chordsVolume: {
+    chords: {
         minValue: 0,
         maxValue: 100,
         title: 'Chords',

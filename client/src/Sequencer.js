@@ -31,10 +31,6 @@ import StopButton from './assets/SVGs/StopButton'
 const Sequencer = ({
     currentBeatRef,
     notesToPlay,
-    // tempo,
-    // setTempo,
-    // stepCount,
-    // setStepCount,
     setCurrentBeat,
     parameterValuesObj,
     bubbleUpParameterInfo,
@@ -44,39 +40,18 @@ const Sequencer = ({
     const intervalRunningRef = useRef(false)
     const intervalIDRef = useRef('')
     const sentToPlayEngineRef = useRef(false) // prevents sending playEngine calls that have already been sent
-    const [rootNote, setRootNote] = useState('A')
-    const [sound, setSound] = useState('Sine')
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
     // const { stepCount, setStepCount } = useContext(MusicParametersContext)
     const tempoToSeconds = (tempo) => {
         return 60 / (tempo * 2)
     }
 
-    let beatDuration = tempoToSeconds(parameterValuesObj.tempo) // time of one eighth note in seconds
+    let beatDuration = tempoToSeconds(tempo) // time of one eighth note in seconds
     const scheduleAheadTime = beatDuration / 3 // for setInterval, check ahead to see if a note is to be played
     let nextNoteTime = 0
 
     const playEngine = (nextNoteTime, scaleIndex, type) => {
-        playSynth(
-            scaleIndex,
-            playing,
-            parameterValuesObj,
-            // rootNoteOptions.indexOf(rootNote) + 1,
-            // // ! send just paramValObj and deconstruct on the other side
-            // // ! send just paramValObj and deconstruct on the other side
-            // wonk,
-            // melodyVolume,
-            // chordsVolume,
-            // sound,
-            // filterCutoff,
-            // parameterValuesObj['attack'],
-            // parameterValuesObj['decay'],
-            // parameterValuesObj['sustain'],
-            // parameterValuesObj['release'],
-            type,
-            nextNoteTime
-        )
+        playSynth(scaleIndex, playing, parameterValuesObj, type, nextNoteTime)
     }
 
     const stopIntervalAndFalsifyRef = () => {
@@ -156,7 +131,7 @@ const Sequencer = ({
 
     // ? mb a vestige of an older build. needs to wait until samples are re-integrated
     const parseSound = (e) => {
-        setSound(e.target.value)
+        // setSound(e.target.value)
         if (
             e.target.value === 'samplePianoC2' ||
             e.target.value === 'sampleOohC2' ||
@@ -181,7 +156,6 @@ const Sequencer = ({
         setPlaying(!playing)
         setCurrentBeat(0)
     }
-
     return (
         <>
             <MainDiv>
@@ -208,7 +182,7 @@ const Sequencer = ({
                 <DropdownsDiv>
                     {Object.keys(dropdownsObj).map((param) => {
                         return (
-                            <SoundFilterDiv>
+                            <SoundFilterDiv key={param}>
                                 <CustomDropdown
                                     title={dropdownsObj[param].title}
                                     stateValueOptions={
@@ -217,8 +191,6 @@ const Sequencer = ({
                                     defaultValue={
                                         dropdownsObj[param].defaultValue
                                     }
-                                    isDropdownOpen={isDropdownOpen}
-                                    setIsDropdownOpen={setIsDropdownOpen}
                                     bubbleUpParameterInfo={
                                         bubbleUpParameterInfo
                                     }

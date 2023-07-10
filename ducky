@@ -263,7 +263,7 @@ todo june 24
 todo june 26
 	>V clean up aesthetic for buttons
 	> loading songs from BE
-	> drill checked state down from loadSong
+	> drill checked state down from currentSong
 	> samples, ADSR
 	>V ACCEPT slow downs, get functionalities in first
 
@@ -308,8 +308,14 @@ todo jul 10
 		> save song parameters to BE
 			> use context, or give many things?
 			> need tempo, full ADSR, sound, filter, stepCount, rootNote, etc etc etc in:
-				> LoadSaveTestButtons
-				> add other params to obj
+				>v LoadSaveTestButtons
+				>v add other params to obj
+				>v remove state send to cstomdropwn?
+				>v .map on customDropDown boys 
+			>v null parameter?
+			> no missing parameters?
+				> wtf is loadSong?
+			> loading parameters from BE
 		
 so i can call it done-ish:
 	fix ADSR, volume knobs, distortion
