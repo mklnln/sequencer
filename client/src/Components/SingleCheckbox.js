@@ -1,28 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
-import { MusicParametersContext } from '../App'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
-import {
-    handleNoteClick,
-    trackAndResetPattern,
-} from '../utilities/FrontEndHelpers'
 const SingleCheckbox = ({
     beatNum,
-    // areXBeatsChecked,
-    // setAreXBeatsChecked,
     scaleIndex,
     whichGrid,
     bubbleUpCheckboxInfo,
     notesToPlay,
-    setNotesToPlay,
-    sendChordPattern,
-    setSendChordPattern,
 }) => {
     const [checked, setChecked] = useState(0)
     const handleChange = () => {
         bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
-        // setChecked(!checked)
-        console.log('reset checked')
     }
 
     if (
@@ -30,29 +18,14 @@ const SingleCheckbox = ({
             1 &&
         checked === 0
     ) {
-        console.log('we set it yes we did')
         setChecked(1)
     } else if (
-        // ! we dont have
         notesToPlay[`beat-${beatNum}`][`note-${scaleIndex}`]?.[whichGrid] ===
             undefined &&
         checked === 1
     ) {
-        console.log('we removed it in fact')
         setChecked(0)
     }
-
-    // if (
-    //     sendChordPattern?.pattern?.[beatNum - 1] !== undefined &&
-    //     sendChordPattern?.grid === whichGrid
-    // ) {
-    //     let numBool = checked ? 1 : 0
-    //     if (numBool !== sendChordPattern.pattern[beatNum - 1]) {
-    //         setChecked(sendChordPattern.pattern[beatNum - 1])
-    //     }
-    //     // ! how do i stop this call once we've clearly gone through everything?
-    //     trackAndResetPattern(sendChordPattern, setSendChordPattern)
-    // }
 
     return (
         <SVGContainer

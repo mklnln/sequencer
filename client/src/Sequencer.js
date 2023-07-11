@@ -175,6 +175,7 @@ const Sequencer = ({
                             key={`${index}`}
                             slider={slidersToShowObj[slider]}
                             sliderStaticInfo={sliderStaticInfo}
+                            stateValue={parameterValuesObj.slider}
                             bubbleUpParameterInfo={bubbleUpParameterInfo}
                         />
                     )
@@ -238,15 +239,15 @@ const StartStopButton = styled.button`
 `
 
 const Ref = styled.div`
-    margin-top: -30px;
-    margin-bottom: 15px;
+    /* margin-top: -30px; */
+    /* margin-bottom: 15px; */
 `
 const MainDiv = styled.div`
     display: flex;
     justify-content: space-around;
     align-items: center;
     margin: auto;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
     height: 128px;
     position: relative;
     max-width: 900px;
@@ -264,7 +265,7 @@ const DropdownsDiv = styled.div`
     margin-top: -23px;
 `
 const SoundFilterDiv = styled.div`
-    padding: 10px;
+    padding: 10px 0px;
     display: flex;
     flex-direction: column;
     justify-content: center;

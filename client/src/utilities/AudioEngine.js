@@ -159,7 +159,6 @@ export const playSynth = (
         lowPassFilter.type = 'lowpass'
         const now = audioCtx.currentTime
         osc.connect(lowPassFilter)
-        console.log(lowPassFilter, 'LPF')
         const synthGain = audioCtx.createGain()
         // shape the ADSR (attack, decay, sustain, release) envelope of the sound
         const attackTime = (attack / 100) * 2

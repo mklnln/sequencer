@@ -2,77 +2,81 @@ import React, { memo, useState } from 'react'
 import styled from 'styled-components'
 import NoiseSVG from '../assets/SVGs/SliderNoiseSVG.js'
 
-const Slider = memo(({ sliderStaticInfo, bubbleUpParameterInfo }) => {
-    const [dragStartY, setDragStartY] = useState(null)
-    const [dragging, setDragging] = useState(false)
-    const { minValue, maxValue, title, defaultValue } = sliderStaticInfo
-    const [sliderValue, setSliderValue] = useState(defaultValue)
-    const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
-    const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
-    const handleMouseMove = (e) => {
-        if (dragging) {
-            const deltaY = dragStartY - e.clientY
-            let newValue = Math.max(
-                // math.max chooses higher value, ensuring the value doesn't drop below minValue
-                minValue,
-                // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
-                Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
-            )
-            setSliderValue(Math.round(newValue))
-            if (title === 'Filter') {
-                // console.log(newValue, range, '??')
-                // let pct = newValue / range
-                newValue = (newValue * 0.01) ** 2
-                console.log(newValue, 'after exp')
-                // something like % of range put it to log
-            }
-            bubbleUpParameterInfo(Math.round(newValue), title)
+const Slider = memo(
+    ({ sliderStaticInfo, bubbleUpParameterInfo, stateValue }) => {
+        const [dragStartY, setDragStartY] = useState(null)
+        const [dragging, setDragging] = useState(false)
+        const { minValue, maxValue, title, defaultValue } = sliderStaticInfo
+        const [sliderValue, setSliderValue] = useState(defaultValue)
+        const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
+        const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
 
+        const handleMouseMove = (e) => {
+            if (dragging) {
+                const deltaY = dragStartY - e.clientY
+                let newValue = Math.max(
+                    // math.max chooses higher value, ensuring the value doesn't drop below minValue
+                    minValue,
+                    // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
+                    Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
+                )
+                setSliderValue(Math.round(newValue))
+                if (title === 'Filter') {
+                    // console.log(newValue, range, '??')
+                    // let pct = newValue / range
+                    newValue = (newValue * 0.01) ** 2
+                    console.log(newValue, 'after exp')
+                    // something like % of range put it to log
+                }
+                bubbleUpParameterInfo(Math.round(newValue), title)
+
+                setDragStartY(e.clientY)
+            }
+        }
+        const handleMouseUp = () => {
+            setDragging(false)
+        }
+        const handleMouseDown = (e) => {
+            setDragging(true)
             setDragStartY(e.clientY)
         }
-    }
-    const handleMouseUp = () => {
-        setDragging(false)
-    }
-    const handleMouseDown = (e) => {
-        setDragging(true)
-        setDragStartY(e.clientY)
-    }
 
-    const handleMouseLeave = () => {
-        setDragging(false)
+        const handleMouseLeave = () => {
+            setDragging(false)
+        }
+
+        const calculateTop = () => {
+            const valueWithinRange = sliderValue - minValue
+            const percentDisplacementFromTop = (valueWithinRange / range) * 100
+            return 100 - percentDisplacementFromTop
+        }
+
+        const gap = calculateTop()
+
+
+        return (
+            <SliderContainer>
+                <span>{title}</span>
+                <SliderBackground
+                    onMouseMove={handleMouseMove}
+                    onMouseDown={handleMouseDown}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    <SliderRange>
+                        <NoiseSVG />
+                        <SliderThumb
+                            style={{
+                                borderBottomWidth: `${(100 - gap) / 2}px`,
+                                top: `${gap}%`, // required variables are out of scope if called below
+                            }}
+                        />
+                    </SliderRange>
+                </SliderBackground>
+            </SliderContainer>
+        )
     }
-
-    const calculateTop = () => {
-        const valueWithinRange = sliderValue - minValue
-        const percentDisplacementFromTop = (valueWithinRange / range) * 100
-        return 100 - percentDisplacementFromTop
-    }
-
-    const gap = calculateTop()
-
-    return (
-        <SliderContainer>
-            <span>{title}</span>
-            <SliderBackground
-                onMouseMove={handleMouseMove}
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
-            >
-                <SliderRange>
-                    <NoiseSVG />
-                    <SliderThumb
-                        style={{
-                            borderBottomWidth: `${(100 - gap) / 2}px`,
-                            top: `${gap}%`, // required variables are out of scope if called below
-                        }}
-                    />
-                </SliderRange>
-            </SliderBackground>
-        </SliderContainer>
-    )
-})
+)
 
 export default Slider
 

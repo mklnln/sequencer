@@ -39,7 +39,6 @@ const Grids = () => {
         scaleIndex: null,
         whichGrid: null,
     })
-    // const [stepCount, setStepCount] = useState(16) // amt of steps, i.e. how many COLUMNS are there
 
     const [notesToPlay, setNotesToPlay] = useState(makeNotesToPlayMaster)
     const [currentBeat, setCurrentBeat] = useState(0)
@@ -74,7 +73,6 @@ const Grids = () => {
         steps: 16,
         root: 1,
     })
-    const [loadNewSongBool, setLoadNewSongBool] = useState(false)
 
     const [changedParameter, setChangedParameter] = useState({
         title: '',
@@ -96,9 +94,11 @@ const Grids = () => {
     }
 
     const bubbleUpCurrentSongChange = useCallback((notesToPlay, parameters) => {
-        console.log(notesToPlay, parameters, 'in bubbling')
         setNotesToPlay(notesToPlay)
         setParameterValuesObj(parameters)
+        setBlankStepCountArray(
+            updateBlankStepCountArray(Object.keys(notesToPlay).length)
+        )
     }, [])
 
     const handleChordClick = (chordID, index) => {
@@ -173,14 +173,15 @@ const Grids = () => {
     }, [chosenAPIChords])
 
     // when the user selects a different amount of steps, change notesToPlay to accomodate that
-    // if (parameterValuesObj.steps !== Object.keys(notesToPlay).length) {
-    //     setNotesToPlay((prev) =>
-    //         updateNotesToPlayMaster(parameterValuesObj.steps, prev)
-    //     )
-    //     setBlankStepCountArray(
-    //         updateBlankStepCountArray(parameterValuesObj.steps)
-    //     )
-    // }
+    if (parameterValuesObj.steps !== Object.keys(notesToPlay).length) {
+        console.log('YA LETS RERENDER')
+        setNotesToPlay((prev) =>
+            updateNotesToPlayMaster(parameterValuesObj.steps, prev)
+        )
+        setBlankStepCountArray(
+            updateBlankStepCountArray(parameterValuesObj.steps)
+        )
+    }
     const countReRenders = useRef(1)
 
     useEffect(() => {

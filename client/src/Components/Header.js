@@ -92,7 +92,6 @@ const TitleDiv = styled.div`
 `
 const ShadowH1 = styled.h1`
     position: absolute;
-    // border: 1px solid fuchsia;
     top: 6.5%;
     left: 9%;
     opacity: 45%;
@@ -103,7 +102,6 @@ const Banner = styled.div`
     width: 95vw;
     align-items: center;
     justify-content: center;
-    /* padding-bottom: 15px; */
     margin: 5px;
     border: 6px double var(--lightest-color);
 `

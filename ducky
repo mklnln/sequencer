@@ -314,15 +314,33 @@ todo jul 10
 				>v .map on customDropDown boys 
 			>v null parameter?
 			> no missing parameters?
-				> wtf is loadSong?
+				> wtf is currentSong?
+					> currently loaded song, can access it when chosen
 			> loading parameters from BE
-		
+
+todo jul 11
+	> loadSave beautify
+		>v dropdown width
+		>v "" currentSong appearance
+		>v "" songSave/Deleted appearance
+			> animate? floating box looks better???
+		>v remove test btn
+	> v stepCount change not triggering grid re-redner
+	> compressor
+	> parameters not updating when loading song
+
 so i can call it done-ish:
 	fix ADSR, volume knobs, distortion
-	load/save songs including parameters
+		> compressor
+	V load/save songs including parameters
 		> erthin undefined
 			> where do i get these params from then? do i want them from context? 
 	playable samples
+	make save/load not ugly
+	grids side by side?
+		> adding scroll bars
+	add some explanation, modals a plenty	
+		> ask xime for input
 		
 
 
