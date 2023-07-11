@@ -26,8 +26,6 @@ const proxy =
     process.env.NODE_ENV === 'development' ? '' : process.env.REACT_APP_API_URL
 
 export const loadUserSongsFetch = async (sub, setLoadUserSongs) => {
-    console.log('fetchin....')
-    console.log(`${proxy}/api/load-songs/${sub}`, 'call')
     return await fetch(`${proxy}/api/load-songs/${sub}`)
         .then((res) => res.json())
         .then((data) => {
@@ -35,7 +33,6 @@ export const loadUserSongsFetch = async (sub, setLoadUserSongs) => {
             if (data.data) {
                 setLoadUserSongs(data.data.songs)
             } else {
-                console.log('no saved songs yet')
                 setLoadUserSongs({ 'No saved songs yet': { null: null } })
             }
         })
@@ -47,7 +44,6 @@ export const saveSongFetch = async (
     setSongSavedOrDeleted,
     saveObj
 ) => {
-    console.log(JSON.stringify({ ...saveObj }), 'saveoj')
     fetch(`${proxy}/api/save-song`, {
         method: 'POST',
         headers: {
@@ -61,8 +57,6 @@ export const saveSongFetch = async (
             if (data.status === 200) {
                 setSongSavedOrDeleted('Song saved!')
                 setLoadUserSongs(data.data.songs)
-
-                console.log(data.data, 'are teh saved songs there??')
                 setTimeout(() => {
                     setSongSavedOrDeleted(false)
                 }, 5000)

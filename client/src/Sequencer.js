@@ -1,12 +1,5 @@
-import React, {
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { MusicParametersContext } from './App'
 import { loadSample } from './utilities/AudioEngine'
 import { audioTime } from './utilities/AudioEngine'
 import Slider from './Components/Slider'
@@ -21,10 +14,7 @@ import {
     slidersToShowObj,
     soundOptions,
 } from './utilities/BigObjectsAndArrays'
-import {
-    rootNoteOptions,
-    stepCountOptions,
-} from './utilities/BigObjectsAndArrays'
+
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
@@ -175,6 +165,7 @@ const Sequencer = ({
                             key={`${index}`}
                             slider={slidersToShowObj[slider]}
                             sliderStaticInfo={sliderStaticInfo}
+                            stateValue={parameterValuesObj[slider]}
                             bubbleUpParameterInfo={bubbleUpParameterInfo}
                         />
                     )
@@ -185,6 +176,7 @@ const Sequencer = ({
                             <SoundFilterDiv key={param}>
                                 <CustomDropdown
                                     title={dropdownsObj[param].title}
+                                    stateValue={parameterValuesObj[param]}
                                     stateValueOptions={
                                         dropdownsObj[param].options
                                     }
@@ -238,15 +230,15 @@ const StartStopButton = styled.button`
 `
 
 const Ref = styled.div`
-    margin-top: -30px;
-    margin-bottom: 15px;
+    /* margin-top: -30px; */
+    /* margin-bottom: 15px; */
 `
 const MainDiv = styled.div`
     display: flex;
     justify-content: space-around;
     align-items: center;
     margin: auto;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
     height: 128px;
     position: relative;
     max-width: 900px;
@@ -264,7 +256,7 @@ const DropdownsDiv = styled.div`
     margin-top: -23px;
 `
 const SoundFilterDiv = styled.div`
-    padding: 10px;
+    padding: 10px 0px;
     display: flex;
     flex-direction: column;
     justify-content: center;

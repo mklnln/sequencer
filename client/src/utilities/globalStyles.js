@@ -35,11 +35,7 @@ span {
     user-select: none;
     letter-spacing: 0.00em;
 }
-option {
-    :hover{
-        background-color: fuchsia;
-    }
-}
+
 `
 
 export default GlobalStyle

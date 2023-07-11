@@ -3,27 +3,22 @@ import styled from 'styled-components'
 import DropdownArrow from '../assets/SVGs/DropdownArrow'
 const CustomDropdown = ({
     title,
+    stateValue,
     stateValueOptions,
     loadUserSongs,
-    setState,
     bubbleUpParameterInfo,
     bubbleUpCurrentSongChange,
-    defaultValue,
 }) => {
-    // dropdown logic must be in this smaller component or else they all open if its kept in Sequencer.js
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [hoverOnDropdown, setHoverOnDropdown] = useState(false)
-    // without dropdownValue, state wont update the UI
-    const [dropdownValue, setDropdownValue] = useState(defaultValue)
+
     const handleOptionClick = (option) => {
-        setDropdownValue(option)
         setIsDropdownOpen(false)
         if (title === 'Load Song') {
-            console.log('load new song bool true')
-            setState(option)
             bubbleUpCurrentSongChange(
                 loadUserSongs[option].notesToPlay,
-                loadUserSongs[option].parameters
+                loadUserSongs[option].parameters,
+                option
             )
         } else {
             bubbleUpParameterInfo(option, title)
@@ -38,6 +33,7 @@ const CustomDropdown = ({
         }
         document.addEventListener('click', listener)
     }
+    const stringMax = title === 'Load Song' ? 18 : 8
 
     return (
         <DropdownContainer>
@@ -46,13 +42,10 @@ const CustomDropdown = ({
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 onMouseEnter={() => setHoverOnDropdown(true)}
                 onMouseLeave={() => setHoverOnDropdown(false)}
-                style={
-                    isDropdownOpen
-                        ? {
-                              zIndex: '2',
-                          }
-                        : { zIndex: '0' }
-                }
+                style={{
+                    zIndex: isDropdownOpen ? '2' : '0',
+                    width: title === 'Load Song' ? '200px' : '95px',
+                }}
             >
                 {isDropdownOpen ? (
                     stateValueOptions.map((option, index) => (
@@ -60,12 +53,30 @@ const CustomDropdown = ({
                             key={option}
                             onClick={() => handleOptionClick(option, index)}
                         >
-                            {option}
+                            {option.toString().length <= stringMax + 3 ? (
+                                <span>{option}</span>
+                            ) : (
+                                <span>
+                                    {option.substring(0, stringMax)}
+                                    ...
+                                </span>
+                            )}
                         </Option>
                     ))
                 ) : (
                     <ChosenOptionDiv>
-                        <span>{dropdownValue}</span>
+                        <span>
+                            {stateValue?.toString().length <= stringMax + 3 ? (
+                                <span>{stateValue}</span>
+                            ) : (
+                                <span>
+                                    {stateValue
+                                        ?.toString()
+                                        .substring(0, stringMax)}
+                                    ...
+                                </span>
+                            )}
+                        </span>
                         <DropdownArrow />
                     </ChosenOptionDiv>
                 )}
@@ -81,7 +92,11 @@ const DropdownContainer = styled.div`
     height: 100%;
     margin: 4px 0px;
 `
-const ParameterLabel = styled.span``
+const ParameterLabel = styled.span`
+    font-size: 16px;
+    width: 100px;
+    text-align: center;
+`
 
 const ULDropdown = styled.ul`
     position: absolute;

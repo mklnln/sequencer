@@ -64,22 +64,12 @@ const CheckboxNoiseSVG = () => {
     )
 }
 
-// CSS can be finnicky eh
 const NoiseStyle = styled.svg`
-    // rect {
-    //     fill: inherit;
-    // }
     z-index: -5;
-    // overflow: hidden;
     position: absolute;
     left: 0%;
-    // top: 20%;
     height: 100%;
     width: 100%;
-    // fill: gray !important;
-    // color: fuchsia;
 
-    // border: 1px solid fuchsia;
-    // background-color: yellow;
 `
 export default CheckboxNoiseSVG

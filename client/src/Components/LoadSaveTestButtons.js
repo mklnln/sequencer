@@ -10,15 +10,13 @@ const LoadSaveTestButtons = ({
     setNotesToPlay,
     parameterValuesObj,
     bubbleUpCurrentSongChange,
+    currentSong,
 }) => {
     const {
         songSavedOrDeleted,
-        currentSong,
         loadUserSongs,
-        stepCount,
         setSongSavedOrDeleted,
         setLoadUserSongs,
-        setCurrentSong,
     } = useContext(MusicParametersContext)
     const { user, isAuthenticated } = useAuth0()
     const [songName, setSongName] = useState('')
@@ -38,9 +36,9 @@ const LoadSaveTestButtons = ({
                     parameters: parameterValuesObj,
                 },
             }
-
             setSongSavedOrDeleted('saving to database...')
             saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
+            bubbleUpCurrentSongChange(notesToPlay, parameterValuesObj, songName)
         }
     }
 
@@ -66,15 +64,11 @@ const LoadSaveTestButtons = ({
 
     return (
         <MainDiv>
-            <ColumnDiv>
-                <StyledButton
-                    onClick={() => {
-                        console.log(currentSong, 'currentSong')
-                    }}
-                >
-                    test
-                </StyledButton>
-            </ColumnDiv>
+            <SavedMessageDiv>
+                <SavedMessage>
+                    {songSavedOrDeleted ? songSavedOrDeleted : ''}
+                </SavedMessage>
+            </SavedMessageDiv>
             <br />
             <>
                 {isAuthenticated && (
@@ -82,78 +76,44 @@ const LoadSaveTestButtons = ({
                         <ColumnDiv>
                             <span>Name</span>
 
-                            <form onSubmit={handleSave}>
-                                <StyledInput
-                                    type="text"
-                                    onChange={handleSongName}
-                                    value={songName}
-                                />
-                            </form>
+                            <RowDiv>
+                                <form onSubmit={handleSave}>
+                                    <StyledInput
+                                        type="text"
+                                        onChange={handleSongName}
+                                        value={songName}
+                                    />
+                                </form>
 
-                            <StyledButton onClick={handleSave}>
-                                <span>Save</span>
-                            </StyledButton>
+                                <StyledButton onClick={handleSave}>
+                                    <span>SAVE</span>
+                                </StyledButton>
+                            </RowDiv>
                         </ColumnDiv>
 
-                        <span>
-                            {songSavedOrDeleted ? songSavedOrDeleted : ''}
-                        </span>
                         {loadUserSongs ? (
                             <LoadingSongsDiv>
-                                <ColumnDiv>
+                                <RowDiv>
                                     <CustomDropdown
                                         title="Load Song"
                                         stateValue={currentSong}
                                         stateValueOptions={Object.keys(
                                             loadUserSongs
                                         )}
-                                        setState={setCurrentSong}
                                         setNotesToPlay={setNotesToPlay}
                                         loadUserSongs={loadUserSongs}
                                         bubbleUpCurrentSongChange={
                                             bubbleUpCurrentSongChange
                                         }
+                                        defaultValue={
+                                            currentSong ? currentSong : '---'
+                                        }
                                     />
-                                    {/* <label>Load Song:</label>
-                                        <select
-                                            value={currentSong}
-                                            onChange={(e) => {
-                                                setCurrentSong(e.target.value)
-                                            }}
-                                        >
-                                            <option default hidden>
-                                                Choose a song...
-                                            </option>
-                                            {Object.keys(loadUserSongs).map(
-                                                (song, index) => {
-                                                    return (
-                                                        <>
-                                                            <option
-                                                                key={song}
-                                                                value={song}
-                                                            >
-                                                                {song}
-                                                            </option>
-                                                        </>
-                                                    )
-                                                }
-                                            )}
-                                        </select> */}
-                                </ColumnDiv>
+                                </RowDiv>
                             </LoadingSongsDiv>
                         ) : (
                             <span>loading...</span>
                         )}
-                        {/* <ColumnDiv>
-                                {currentSong !==
-                                    '75442486-0878-440c-9db1-a7006c25a39f' && (
-                                    <DeleteButton
-                                        onClick={() => handleDelete()}
-                                    >
-                                        delete currently loaded song
-                                    </DeleteButton>
-                                )}
-                            </ColumnDiv> */}
                     </>
                 )}
             </>
@@ -166,7 +126,19 @@ const LoadingSongsDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 21px;
 `
+const SavedMessageDiv = styled.div`
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 18px;
+`
+const SavedMessage = styled.span`
+    /* border: 1px solid var(--primary-color); */
+`
+
 const DeleteButton = styled.button`
     margin: 20px;
 
@@ -176,26 +148,33 @@ const MainDiv = styled.div`
     display: flex;
     justify-content: center;
     flex-direction: row;
-    border: 1px solid fuchsia;
+    margin-bottom: 5px;
+`
+
+const RowDiv = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin: 1px 50px;
 `
 
 const ColumnDiv = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: row;
-    margin: 0px 20px;
+    flex-direction: column;
+    /* height: 50px; */
 `
-
 const StyledInput = styled.input`
     margin-left: 5px;
     background: black;
     color: var(--primary-color);
-    /* outline: solid 0.2px var(--lightest-color); */
     padding: 4px;
     font-family: 'MS-DOS';
     font-size: 16px;
     outline: none;
+    height: 12px;
     border: 1px solid var(--lightest-color);
     &:focus {
         border: 1px solid var(--primary-color);
@@ -203,21 +182,17 @@ const StyledInput = styled.input`
 `
 
 const StyledButton = styled.button`
-    /* font-family: inherit; */
-    /* background-color: inherit; */
-    /* font-size: inherit; */
     all: inherit;
     border: 1px solid var(--lightest-color);
-    margin: 10px;
-    padding: 4px 8px;
-    // width: 40%;
+    margin: 0px 10px;
+    padding: 0px 8px;
     max-width: 100px;
+    height: 20px;
     &:focus {
         border: 1px solid var(--primary-color);
     }
     && {
         text-align: center;
-        // padding-left: 0px;
     }
     display: flex;
     justify-content: center;
