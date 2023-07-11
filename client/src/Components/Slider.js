@@ -6,8 +6,7 @@ const Slider = memo(
     ({ sliderStaticInfo, bubbleUpParameterInfo, stateValue }) => {
         const [dragStartY, setDragStartY] = useState(null)
         const [dragging, setDragging] = useState(false)
-        const { minValue, maxValue, title, defaultValue } = sliderStaticInfo
-        const [sliderValue, setSliderValue] = useState(defaultValue)
+        const { minValue, maxValue, title } = sliderStaticInfo
         const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
         const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
 
@@ -18,9 +17,9 @@ const Slider = memo(
                     // math.max chooses higher value, ensuring the value doesn't drop below minValue
                     minValue,
                     // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
-                    Math.min(maxValue, sliderValue + deltaY * valuePerPixel)
+                    Math.min(maxValue, stateValue + deltaY * valuePerPixel)
                 )
-                setSliderValue(Math.round(newValue))
+                // setSliderValue(Math.round(newValue))
                 if (title === 'Filter') {
                     // console.log(newValue, range, '??')
                     // let pct = newValue / range
@@ -46,13 +45,12 @@ const Slider = memo(
         }
 
         const calculateTop = () => {
-            const valueWithinRange = sliderValue - minValue
+            const valueWithinRange = stateValue - minValue
             const percentDisplacementFromTop = (valueWithinRange / range) * 100
             return 100 - percentDisplacementFromTop
         }
 
         const gap = calculateTop()
-
 
         return (
             <SliderContainer>

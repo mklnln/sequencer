@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import CheckboxNoiseSVG from '../assets/SVGs/CheckboxNoiseSVG'
 const SingleCheckbox = ({
@@ -8,23 +8,8 @@ const SingleCheckbox = ({
     bubbleUpCheckboxInfo,
     notesToPlay,
 }) => {
-    const [checked, setChecked] = useState(0)
     const handleChange = () => {
         bubbleUpCheckboxInfo(beatNum, scaleIndex, whichGrid)
-    }
-
-    if (
-        notesToPlay[`beat-${beatNum}`][`note-${scaleIndex}`]?.[whichGrid] ===
-            1 &&
-        checked === 0
-    ) {
-        setChecked(1)
-    } else if (
-        notesToPlay[`beat-${beatNum}`][`note-${scaleIndex}`]?.[whichGrid] ===
-            undefined &&
-        checked === 1
-    ) {
-        setChecked(0)
     }
 
     return (
@@ -34,7 +19,13 @@ const SingleCheckbox = ({
         >
             <CheckboxButton
                 type="checkbox"
-                className={checked ? 'checked' : ''}
+                className={
+                    notesToPlay[`beat-${beatNum}`][`note-${scaleIndex}`]?.[
+                        whichGrid
+                    ] === 1
+                        ? 'checked'
+                        : ''
+                }
                 onClick={handleChange}
             />
             <CheckboxNoiseSVG />

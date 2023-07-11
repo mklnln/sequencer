@@ -1,12 +1,5 @@
-import React, {
-    useCallback,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { MusicParametersContext } from './App'
 import { loadSample } from './utilities/AudioEngine'
 import { audioTime } from './utilities/AudioEngine'
 import Slider from './Components/Slider'
@@ -21,10 +14,7 @@ import {
     slidersToShowObj,
     soundOptions,
 } from './utilities/BigObjectsAndArrays'
-import {
-    rootNoteOptions,
-    stepCountOptions,
-} from './utilities/BigObjectsAndArrays'
+
 import CustomDropdown from './Components/CustomDropdown'
 import PlayButton from './assets/SVGs/PlayButton'
 import StopButton from './assets/SVGs/StopButton'
@@ -175,7 +165,7 @@ const Sequencer = ({
                             key={`${index}`}
                             slider={slidersToShowObj[slider]}
                             sliderStaticInfo={sliderStaticInfo}
-                            stateValue={parameterValuesObj.slider}
+                            stateValue={parameterValuesObj[slider]}
                             bubbleUpParameterInfo={bubbleUpParameterInfo}
                         />
                     )
@@ -186,6 +176,7 @@ const Sequencer = ({
                             <SoundFilterDiv key={param}>
                                 <CustomDropdown
                                     title={dropdownsObj[param].title}
+                                    stateValue={parameterValuesObj[param]}
                                     stateValueOptions={
                                         dropdownsObj[param].options
                                     }

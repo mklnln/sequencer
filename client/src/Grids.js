@@ -30,7 +30,6 @@ const Grids = () => {
         hookTheoryChords,
         setHookTheoryChords,
     } = useContext(MusicParametersContext)
-    const [tempo, setTempo] = useState(120)
 
     const [sendChordPattern, setSendChordPattern] = useState(undefined)
 
@@ -42,7 +41,7 @@ const Grids = () => {
 
     const [notesToPlay, setNotesToPlay] = useState(makeNotesToPlayMaster)
     const [currentBeat, setCurrentBeat] = useState(0)
-
+    const [currentSong, setCurrentSong] = useState('---')
     // ! "When something can be calculated from the existing props or state, don’t put it in state.
     // ! .. Instead, calculate it during rendering."
     const [blankStepCountArray, setBlankStepCountArray] = useState(
@@ -93,13 +92,17 @@ const Grids = () => {
         setChangedParameter(null)
     }
 
-    const bubbleUpCurrentSongChange = useCallback((notesToPlay, parameters) => {
-        setNotesToPlay(notesToPlay)
-        setParameterValuesObj(parameters)
-        setBlankStepCountArray(
-            updateBlankStepCountArray(Object.keys(notesToPlay).length)
-        )
-    }, [])
+    const bubbleUpCurrentSongChange = useCallback(
+        (notesToPlay, parameters, songName) => {
+            setNotesToPlay(notesToPlay)
+            setParameterValuesObj(parameters)
+            setBlankStepCountArray(
+                updateBlankStepCountArray(Object.keys(notesToPlay).length)
+            )
+            setCurrentSong(songName)
+        },
+        []
+    )
 
     const handleChordClick = (chordID, index) => {
         setHookTheoryChords([]) // may have previously used this to trigger useEffect
@@ -275,6 +278,7 @@ const Grids = () => {
                     parameterValuesObj={parameterValuesObj}
                     setParameterValuesObj={setParameterValuesObj}
                     bubbleUpCurrentSongChange={bubbleUpCurrentSongChange}
+                    currentSong={currentSong}
                 />
                 {/* <BothSequencersDiv> */}
                 <MelodySequencerGrid>

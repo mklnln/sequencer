@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import styled from 'styled-components'
 import LoginButton from './LoginButton'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -8,8 +8,9 @@ import { fakeSong } from '../utilities/BigObjectsAndArrays'
 
 const Header = () => {
     const { user, isAuthenticated, isLoading, error } = useAuth0()
-    const { loadUserSongs, setLoadUserSongs, songSaved } =
-        useContext(MusicParametersContext)
+    const { loadUserSongs, setLoadUserSongs } = useContext(
+        MusicParametersContext
+    )
 
     if (user && !loadUserSongs) {
         loadUserSongsFetch(user.sub, setLoadUserSongs)
@@ -19,30 +20,8 @@ const Header = () => {
     const loadFakeSongs = () => {
         setLoadUserSongs(fakeSong.songs)
     }
-    async function fetchArrow() {
-        console.log(loadUserSongs, 'user')
+    const fetchArrow = () => {
         loadUserSongsFetch(user.sub, setLoadUserSongs)
-        console.log('we call da fetch boy')
-        // return await fetch(
-        //     // `${process.env.REACT_APP_API_URL}/api/load-songs/${user.sub}`
-        //     `/api/load-songs/${user.sub}`
-        // )
-        //     .then((resp) => {
-        //         if (!resp.ok) {
-        //             throw `Server error: [${resp.status}] [${resp.statusText}] [${resp.url}]`
-        //         }
-        //         console.log(resp, 'response from fetch')
-        //         return resp.json()
-        //     })
-        //     .then((data) => {
-        //         // your code with json here...
-        //         console.log(data)
-        //         setLoadUserSongs(handleLoadSongsFetch(data.data))
-        //     })
-        //     .catch((err) => {
-        //         console.debug('Error in fetch', err)
-        //         // setErrors(err)
-        //     })
     }
 
     return (
@@ -51,13 +30,7 @@ const Header = () => {
                 <h1>Sequencer</h1>
                 <ShadowH1>Sequencer</ShadowH1>
             </TitleDiv>
-            {/* <button
-                onClick={() => {
-                    console.log(user)
-                }}
-            >
-                check user
-            </button> */}
+
             <div onClick={fetchArrow}>fetch test</div>
             <div onClick={loadFakeSongs}>load fake songs</div>
             {error && <span>Error authenticating.. try again.</span>}

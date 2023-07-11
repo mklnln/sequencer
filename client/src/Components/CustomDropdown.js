@@ -3,30 +3,22 @@ import styled from 'styled-components'
 import DropdownArrow from '../assets/SVGs/DropdownArrow'
 const CustomDropdown = ({
     title,
+    stateValue,
     stateValueOptions,
     loadUserSongs,
-    setState,
     bubbleUpParameterInfo,
     bubbleUpCurrentSongChange,
-    defaultValue,
 }) => {
-    // dropdown logic must be in this smaller component or else they all open if its kept in Sequencer.js
-    console.log(defaultValue, 'defval')
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [hoverOnDropdown, setHoverOnDropdown] = useState(false)
-    // without dropdownValue, state wont update the UI
-    const [dropdownValue, setDropdownValue] = useState(defaultValue)
 
     const handleOptionClick = (option) => {
-        setDropdownValue(option)
         setIsDropdownOpen(false)
         if (title === 'Load Song') {
-            setState(option)
-            setDropdownValue(defaultValue)
-            // bubbleUpParameterInfo(option, title)
             bubbleUpCurrentSongChange(
                 loadUserSongs[option].notesToPlay,
-                loadUserSongs[option].parameters
+                loadUserSongs[option].parameters,
+                option
             )
         } else {
             bubbleUpParameterInfo(option, title)
@@ -42,6 +34,7 @@ const CustomDropdown = ({
         document.addEventListener('click', listener)
     }
     const stringMax = title === 'Load Song' ? 18 : 8
+
     return (
         <DropdownContainer>
             <ParameterLabel>{title}</ParameterLabel>
@@ -49,13 +42,6 @@ const CustomDropdown = ({
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 onMouseEnter={() => setHoverOnDropdown(true)}
                 onMouseLeave={() => setHoverOnDropdown(false)}
-                // style={
-                //     isDropdownOpen
-                //         ? {
-                //               zIndex: '2',
-                //           }
-                //         : { zIndex: '0' }
-                // }
                 style={{
                     zIndex: isDropdownOpen ? '2' : '0',
                     width: title === 'Load Song' ? '200px' : '95px',
@@ -80,18 +66,16 @@ const CustomDropdown = ({
                 ) : (
                     <ChosenOptionDiv>
                         <span>
-                            {dropdownValue?.toString().length <=
-                            stringMax + 3 ? (
-                                <span>{dropdownValue}</span>
+                            {stateValue?.toString().length <= stringMax + 3 ? (
+                                <span>{stateValue}</span>
                             ) : (
                                 <span>
-                                    {dropdownValue
+                                    {stateValue
                                         ?.toString()
                                         .substring(0, stringMax)}
                                     ...
                                 </span>
                             )}
-                            {/* {dropdownValue?.toString().substring(0, stringMax)} */}
                         </span>
                         <DropdownArrow />
                     </ChosenOptionDiv>

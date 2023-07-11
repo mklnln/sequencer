@@ -10,17 +10,14 @@ const LoadSaveTestButtons = ({
     setNotesToPlay,
     parameterValuesObj,
     bubbleUpCurrentSongChange,
+    currentSong,
 }) => {
     const {
         songSavedOrDeleted,
-        currentSong,
         loadUserSongs,
-        stepCount,
         setSongSavedOrDeleted,
         setLoadUserSongs,
-        setCurrentSong,
     } = useContext(MusicParametersContext)
-    console.log(currentSong, 'currentsong')
     const { user, isAuthenticated } = useAuth0()
     const [songName, setSongName] = useState('')
     const handleSave = (event) => {
@@ -39,10 +36,9 @@ const LoadSaveTestButtons = ({
                     parameters: parameterValuesObj,
                 },
             }
-            setCurrentSong(songName)
             setSongSavedOrDeleted('saving to database...')
             saveSongFetch(setLoadUserSongs, setSongSavedOrDeleted, saveObj)
-            bubbleUpCurrentSongChange(notesToPlay, parameterValuesObj)
+            bubbleUpCurrentSongChange(notesToPlay, parameterValuesObj, songName)
         }
     }
 
@@ -104,7 +100,6 @@ const LoadSaveTestButtons = ({
                                         stateValueOptions={Object.keys(
                                             loadUserSongs
                                         )}
-                                        setState={setCurrentSong}
                                         setNotesToPlay={setNotesToPlay}
                                         loadUserSongs={loadUserSongs}
                                         bubbleUpCurrentSongChange={
