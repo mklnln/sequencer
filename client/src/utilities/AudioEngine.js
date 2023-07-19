@@ -107,7 +107,7 @@ export const playSample = (
 }
 
 const compressorOptions = {
-    threshold: 0, // in decibels
+    threshold: -10, // in decibels
     ratio: 20,
     knee: 0,
     attack: 0.001, // in seconds
@@ -157,13 +157,35 @@ export const playSynth = (
     const lowPassFilter = audioCtx.createBiquadFilter()
     lowPassFilter.frequency.value = filter
     lowPassFilter.type = 'lowpass'
-    const duration = 0.5
+    const duration = 0.1
+    const attackTime = attack / 100
+    console.log(attackTime)
 
-    const attackTime = (attack / 100) * 2
     let sustainLevel = (sustain / 100) * (1 / 4)
+    console.log(sustain, sustainLevel, 'sustain then level/100')
     const decayTime = decay / 100
     const releaseTime = (release / 10) * (1 / 3)
     const synthGain = audioCtx.createGain()
+
+    const now = audioCtx.currentTime
+
+    // shape the ADSR envelope of the sound
+
+    console.log(duration + attackTime + decayTime + releaseTime, 'in seconds')
+    // const compressor = new DynamicsCompressorNode(audioCtx, compressorOptions)
+    // const analyzer = audioCtx.createAnalyser()
+    synthGain
+        // .connect(analyzer)
+        // .connect(compressor)
+        .connect(lowPassFilter)
+        .connect(audioCtx.destination)
+
+    // compressor.connect(synthGain)
+    // synthGain.connect(compressor)
+    // synthGain.connect(compressor)
+    // compressor.connect(audioCtx.destination)
+
+    // todo noteLength must be calculated by my linearRamp to whatever synth ADSR parameters
     voicing.forEach((monophone) => {
         const note = rootFrequency * 2 ** (monophone / 12)
         // 2^(12/12)
@@ -175,59 +197,28 @@ export const playSynth = (
 
         osc.connect(synthGain)
         if (playing) {
-            // osc.start()
             setTimeout(() => {
                 osc.start(nextNoteTime)
-                // }, Math.random() * wonkFactor)
+                osc.connect(synthGain)
+                synthGain.gain.setValueAtTime(0, now)
+                // attack
+                synthGain.gain.linearRampToValueAtTime(
+                    (volume / 100) * (1 / 3),
+                    now + attackTime
+                )
+                // decay down from attack peak to sustain level
+                synthGain.gain.linearRampToValueAtTime(
+                    sustainLevel,
+                    now + attackTime + decayTime
+                )
+                synthGain.gain.linearRampToValueAtTime(
+                    0,
+                    now + duration + attackTime + decayTime + releaseTime
+                )
             }, 1)
             setTimeout(() => {
-                // ! stopping the osc is necessary to keep the audioengine running else it eventually runs out of free oscillators
-                // ! additionally,
                 osc.stop()
-                // remember that setTimeout works in ms, synth in s
             }, (duration + attackTime + decayTime + releaseTime) * 1000)
         }
     })
-
-    const now = audioCtx.currentTime
-
-    // shape the ADSR envelope of the sound
-
-    // the 1/3 value is meant to reduce volume to avoid clipping, same with releaseTime
-
-    // subtracting sustain to a value below or near zero may flip it back over to 0.9999, distorting the audio. set to 0 to avoid this.
-    if (sustain === 1) sustainLevel = 0
-
-    // duration refers to how long the note is held. hardcoded in order to avoid clipping
-
-    synthGain.gain.setValueAtTime(0, 0)
-    // attack
-    synthGain.gain.linearRampToValueAtTime(
-        (volume / 100) * (1 / 5),
-        now + attackTime
-    )
-    console.log(synthGain, (volume / 100) * (1 / 3), 'value')
-    // decay down from attack peak to sustain level
-    synthGain.gain.linearRampToValueAtTime(
-        sustainLevel,
-        now + attackTime + decayTime
-    )
-
-    synthGain.gain.linearRampToValueAtTime(
-        0,
-        now + duration + attackTime + decayTime + releaseTime
-    )
-    const compressor = new DynamicsCompressorNode(audioCtx, compressorOptions)
-
-    synthGain
-        .connect(lowPassFilter)
-        .connect(compressor)
-        .connect(audioCtx.destination)
-
-    // compressor.connect(synthGain)
-    // synthGain.connect(compressor)
-    // synthGain.connect(compressor)
-    // compressor.connect(audioCtx.destination)
-
-    // todo noteLength must be calculated by my linearRamp to whatever synth ADSR parameters
 }

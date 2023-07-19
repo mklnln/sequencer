@@ -4,51 +4,50 @@ import NoiseSVG from '../assets/SVGs/SliderNoiseSVG.js'
 
 const Slider = memo(
     ({ sliderStaticInfo, bubbleUpParameterInfo, stateValue }) => {
-        console.log(stateValue)
         const [dragStartY, setDragStartY] = useState(null)
         const [dragging, setDragging] = useState(false)
-        const [filterPercent, setFilterPercent] = useState(75)
         let { minValue, maxValue, title } = sliderStaticInfo
+        const [sliderUIValue, setSliderUIValue] = useState(
+            title === 'Filter' ? 75 : stateValue
+        )
 
-        let renderedValue = stateValue
+        let renderedValue = sliderUIValue
 
-        // in order to reflect the exponential transformation of the filter state, we have to track the UI for filter with a separate state, filterPercent
+        // the filter value uses an exponential curve, so we track the UI separately
         if (title === 'Filter') {
             minValue = 1
             maxValue = 100
-            renderedValue = filterPercent
         }
         const range = maxValue - minValue // 240 - 30, 210, i.e. lowest highest values possible
         const valuePerPixel = range / 50 // 50px of height, 1 px = this many in value
 
+        let newValue = sliderUIValue
+        let deltaY = 0
         const handleMouseMove = (e) => {
             if (dragging) {
-                const deltaY = dragStartY - e.clientY
-                let newValue = Math.max(
-                    // math.max chooses higher value, ensuring the value doesn't drop below minValue
+                deltaY = dragStartY - e.clientY
+                // ensuring newValue stays within the proper bounds...
+                newValue = Math.max(
                     minValue,
-                    // Math.min of maxValue, stateValue etc chooses lower value to avoid exceeding upper bound
                     Math.min(maxValue, renderedValue + deltaY * valuePerPixel)
                 )
-                if (title === 'Filter') {
-                    setFilterPercent(newValue)
-                    newValue = newValue ** 2
-                }
-                bubbleUpParameterInfo(Math.round(newValue), title)
-
+                setSliderUIValue(newValue)
                 setDragStartY(e.clientY)
             }
         }
-        const handleMouseUp = () => {
-            setDragging(false)
+        const handleMouseOff = () => {
+            if (dragging) {
+                setDragging(false)
+                newValue = newValue ** 2
+                if (title !== 'Filter') {
+                    newValue = newValue / 100
+                }
+                bubbleUpParameterInfo(Math.round(newValue), title)
+            }
         }
         const handleMouseDown = (e) => {
             setDragging(true)
             setDragStartY(e.clientY)
-        }
-
-        const handleMouseLeave = () => {
-            setDragging(false)
         }
 
         const calculateTop = () => {
@@ -65,8 +64,8 @@ const Slider = memo(
                 <SliderBackground
                     onMouseMove={handleMouseMove}
                     onMouseDown={handleMouseDown}
-                    onMouseUp={handleMouseUp}
-                    onMouseLeave={handleMouseLeave}
+                    onMouseUp={handleMouseOff}
+                    onMouseLeave={handleMouseOff}
                 >
                     <SliderRange>
                         <NoiseSVG />
@@ -90,6 +89,7 @@ const SliderContainer = styled.div`
     flex-direction: column;
     align-items: center;
     width: 20px;
+    user-select: none;
 `
 
 const SliderBackground = styled.div`

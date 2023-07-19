@@ -329,6 +329,24 @@ todo jul 11
 	> compressor
 	> parameters not updating when loading song
 
+todo jul 19
+	>v onMouseUp sliders
+		>v getting undefined on mouse leave, mb other cases
+		>v filter sending sliderUIValue if no actual drag occurs
+	>v dragging text 
+	> clipping
+		> i have no idea. need help.
+		> limit to 8 voices?
+	> ADSR fucked, low attack low sustain , decay acts like volume?
+		> high attack, sound never stops
+		> decay should not at all feel like volume
+		> is it possible that seting these linear ramps, they all kinda act at the same time? i want them to act one after the other, but erhaps they each start at eh same time but finish at different times
+			> this'd explain why decay makes attack louder, longer decay means more time for the attack to open before being cut down by the decay
+		> https://www.youtube.com/watch?v=VEvpYUmBp2E&list=PLQ1Pnjr9zvi4x9sofuSjF6fcjjRT222In&index=10
+		> https://dobrian.github.io/cmp/topics/building-a-synthesizer-with-web-audio-api/4.envelopes.html
+			> tl;dr, maybe a curve over time?
+			> maybe also i just need to accept that since its a sequencer its gonna sound v different. use synth to prepare that
+
 so i can call it done-ish:
 	fix ADSR, volume knobs, distortion
 		> compressor
