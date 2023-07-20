@@ -41,7 +41,14 @@ const Sequencer = ({
     let nextNoteTime = 0
 
     const playEngine = (nextNoteTime, scaleIndex, type) => {
-        playSynth(scaleIndex, playing, parameterValuesObj, type, nextNoteTime)
+        playSynth(
+            scaleIndex,
+            playing,
+            parameterValuesObj,
+            type,
+            nextNoteTime,
+            beatDuration / 2
+        )
     }
 
     const stopIntervalAndFalsifyRef = () => {

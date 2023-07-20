@@ -70,7 +70,7 @@ const Grids = () => {
         filter: 7500,
         sound: 'Sine',
         steps: 16,
-        root: 1,
+        root: 'C',
     })
 
     const [changedParameter, setChangedParameter] = useState({
@@ -79,19 +79,22 @@ const Grids = () => {
     })
 
     const bubbleUpParameterInfo = useCallback((value, title) => {
+        console.log(value, title)
         setChangedParameter({
             title: title.toLowerCase(),
             value: value,
         })
     }, [])
 
-    if (changedParameter?.value) {
+    if (changedParameter?.title) {
         let obj = { ...parameterValuesObj }
         obj[changedParameter.title] = changedParameter.value
+        console.log(changedParameter.value, '??')
         setParameterValuesObj(obj)
         setChangedParameter(null)
     }
-
+    // console.log(parameterValuesObj.attack, 'attack in obj')
+    console.log(parameterValuesObj.release, 'release in obj')
     const bubbleUpCurrentSongChange = useCallback(
         (notesToPlay, parameters, songName) => {
             setNotesToPlay(notesToPlay)

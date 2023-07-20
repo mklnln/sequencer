@@ -109,8 +109,8 @@ export const playSample = (
 const compressorOptions = {
     threshold: -10, // in decibels
     ratio: 20,
-    knee: 0,
-    attack: 0.001, // in seconds
+    knee: 1,
+    attack: 0.01, // in seconds
     release: 0.05, // in seconds
 }
 
@@ -119,7 +119,8 @@ export const playSynth = (
     playing,
     parameterValuesObj,
     polyphony,
-    nextNoteTime
+    nextNoteTime,
+    duration
 ) => {
     const {
         wonkFactor,
@@ -147,38 +148,33 @@ export const playSynth = (
         volume = melody
         rootFrequency = rootFrequency * 2
     } else {
-        volume = chords
+        volume = chords / 3
         voicing.push(scale[index - 1])
         voicing.push(scale[index + 1])
         voicing.push(scale[index + 3])
     }
+    volume = ((volume / 100) * 1) / 5
     // we want index, index+2, index+4 notes played.
     // ? this could be a state KEY as in major, minor, harmonic minor
     const lowPassFilter = audioCtx.createBiquadFilter()
     lowPassFilter.frequency.value = filter
     lowPassFilter.type = 'lowpass'
-    const duration = 0.1
-    const attackTime = attack / 100
-    console.log(attackTime)
+    const attackTime = attack / 10 // give 4s
+    // const attackTime = attack / 100
 
-    let sustainLevel = (sustain / 100) * (1 / 4)
-    console.log(sustain, sustainLevel, 'sustain then level/100')
+    let sustainLevel = (sustain / 100) * volume
     const decayTime = decay / 100
     const releaseTime = (release / 10) * (1 / 3)
     const synthGain = audioCtx.createGain()
 
     const now = audioCtx.currentTime
-
     // shape the ADSR envelope of the sound
-
-    console.log(duration + attackTime + decayTime + releaseTime, 'in seconds')
-    // const compressor = new DynamicsCompressorNode(audioCtx, compressorOptions)
+    const compressor = new DynamicsCompressorNode(audioCtx, compressorOptions)
     // const analyzer = audioCtx.createAnalyser()
     synthGain
         // .connect(analyzer)
         // .connect(compressor)
         .connect(lowPassFilter)
-        .connect(audioCtx.destination)
 
     // compressor.connect(synthGain)
     // synthGain.connect(compressor)
@@ -200,17 +196,23 @@ export const playSynth = (
             setTimeout(() => {
                 osc.start(nextNoteTime)
                 osc.connect(synthGain)
+                lowPassFilter.connect(compressor).connect(audioCtx.destination)
                 synthGain.gain.setValueAtTime(0, now)
                 // attack
-                synthGain.gain.linearRampToValueAtTime(
-                    (volume / 100) * (1 / 3),
-                    now + attackTime
-                )
+                synthGain.gain.linearRampToValueAtTime(volume, now + attackTime)
                 // decay down from attack peak to sustain level
-                synthGain.gain.linearRampToValueAtTime(
-                    sustainLevel,
-                    now + attackTime + decayTime
-                )
+
+                // setTimeout(() => {
+                //     console.log(
+                //         now + duration + attackTime,
+                //         'release ramp starts'
+                //     )
+                //     synthGain.gain.linearRampToValueAtTime(
+                //         0,
+                //         now + duration + attackTime + decayTime + releaseTime
+                //     )
+                // }, attackTime * 1000)
+
                 synthGain.gain.linearRampToValueAtTime(
                     0,
                     now + duration + attackTime + decayTime + releaseTime
@@ -218,7 +220,9 @@ export const playSynth = (
             }, 1)
             setTimeout(() => {
                 osc.stop()
-            }, (duration + attackTime + decayTime + releaseTime) * 1000)
+                // osc.disconnect()
+                // synthGain.disconnect()
+            }, (duration + attackTime + decayTime + releaseTime) * 3000)
         }
     })
 }
