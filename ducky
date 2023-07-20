@@ -360,6 +360,10 @@ so i can call it done-ish:
 	add some explanation, modals a plenty	
 		> ask xime for input
 		
+Web Audio wtf:
+	> clg synthGain.gain at setTimeout when attack and decay have passed
+		> value still says 0, always says 0
+	> compressor makes more distortion
 
 
 Auth0 consent stuff:

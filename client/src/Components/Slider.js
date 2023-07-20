@@ -38,11 +38,13 @@ const Slider = memo(
         const handleMouseOff = () => {
             if (dragging) {
                 setDragging(false)
-                newValue = newValue ** 2
+                console.log(newValue, 'b4 ^2')
                 if (title !== 'Filter') {
+                    newValue = newValue ** 2
                     newValue = newValue / 100
                 }
-                bubbleUpParameterInfo(Math.round(newValue), title)
+                console.log(newValue, title, 'from slider')
+                bubbleUpParameterInfo(newValue, title)
             }
         }
         const handleMouseDown = (e) => {

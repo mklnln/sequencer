@@ -86,7 +86,6 @@ const loadSongs = async (req, res) => {
             .collection('users')
             .findOne({ userID: userID })
 
-        console.log(userInfo, 'da response we need')
         if (userInfo) {
             res.status(200).json({
                 status: 200,
